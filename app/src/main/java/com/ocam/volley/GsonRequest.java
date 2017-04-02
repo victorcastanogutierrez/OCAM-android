@@ -1,4 +1,4 @@
-package com.ocam.util.volley;
+package com.ocam.volley;
 
 
 import com.android.volley.AuthFailureError;
@@ -12,6 +12,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.ocam.manager.UserManager;
 import com.ocam.util.Constants;
 
 import java.io.UnsupportedEncodingException;
@@ -43,9 +44,25 @@ public class GsonRequest<T> extends Request<T> {
         this.listener = listener;
     }
 
+    /**
+     * Método que envía en todas las peticiones la cabecera con el token
+     * @return
+     * @throws AuthFailureError
+     */
     @Override
     public Map<String, String> getHeaders() throws AuthFailureError {
-        return headers != null ? headers : super.getHeaders();
+        Map<String, String> sendHeaders;
+        if (headers != null) {
+            sendHeaders = this.headers;
+        } else {
+            sendHeaders = super.getHeaders();
+        }
+
+        UserManager userManager = UserManager.getInstance();
+        if (userManager.getUserTokenDTO() != null) {
+            sendHeaders.put(Constants.HEADER_AUTH_NAME, userManager.getUserTokenDTO().getToken());
+        }
+        return sendHeaders;
     }
 
     @Override

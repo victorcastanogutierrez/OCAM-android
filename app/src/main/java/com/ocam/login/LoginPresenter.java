@@ -10,4 +10,6 @@ public interface LoginPresenter {
 
     void login(String username, String password,  Boolean recuerda);
 
+    void checkUserLogged();
+
 }

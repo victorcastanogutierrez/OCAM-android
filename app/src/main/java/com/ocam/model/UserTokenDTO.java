@@ -7,6 +7,12 @@ public class UserTokenDTO {
 
     private String email;
     private String token;
+    private String login;
+
+    public UserTokenDTO(String token, String email) {
+        this.token = token;
+        this.email = email;
+    }
 
     public String getEmail() {
         return email;
@@ -22,5 +28,13 @@ public class UserTokenDTO {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 }

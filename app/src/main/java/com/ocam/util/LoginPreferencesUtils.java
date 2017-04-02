@@ -25,4 +25,20 @@ public class LoginPreferencesUtils {
         editor.putString(Constants.EMAIL_KEY, data.getEmail());
         editor.commit();
     }
+
+    /**
+     * Retorna el token del usuario logueado en el sistema
+     * @param context
+     * @return
+     */
+    public static UserTokenDTO getUserLogged(Context context) {
+        SharedPreferences sharedPref = ((LoginActivity) context).getPreferences(Context.MODE_PRIVATE);
+        if (sharedPref.contains(Constants.TOKEN_KEY) && sharedPref.contains(Constants.EMAIL_KEY)) {
+            String token = sharedPref.getString(Constants.TOKEN_KEY, null);
+            String email = sharedPref.getString(Constants.EMAIL_KEY, null);
+            return new UserTokenDTO(token, email);
+        } else {
+            return null;
+        }
+    }
 }

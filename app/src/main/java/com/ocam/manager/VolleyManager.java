@@ -10,6 +10,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
+import java.util.Map;
+
 /**
  * Clase que implementa el patrón Singleton y que encapsula la lógica de realizar peticiones
  * a una Queue. Obtenida de la documentación oficial de Google para Volley

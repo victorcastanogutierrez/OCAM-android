@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -12,7 +13,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.ocam.R;
-import com.ocam.util.volley.NukeSSLCerts;
+import com.ocam.model.UserTokenDTO;
+import com.ocam.volley.NukeSSLCerts;
 import com.ocam.util.ViewUtils;
 
 public class LoginActivity extends Activity implements LoginView {
@@ -33,17 +35,20 @@ public class LoginActivity extends Activity implements LoginView {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        //Confiar en todos los certificados: solo para desarrollo
+        new NukeSSLCerts().nuke();
+        this.loginPresenter = new LoginPresenterImpl(this, LoginActivity.this);
+
         setContentView(R.layout.activity_login);
 
-        this.loginPresenter = new LoginPresenterImpl(this, LoginActivity.this);
         this.ilUsername = (TextInputLayout) findViewById(R.id.ilUsername);
         this.ilPassword = (TextInputLayout) findViewById(R.id.ilPassword);
         this.mProgress = (ProgressBar) findViewById(R.id.progressBar);
         this.cbRecuerda = (CheckBox) findViewById(R.id.cbRecuerda);
         this.mOverlayDialog = new Dialog(LoginActivity.this, android.R.style.Theme_Panel);
 
-        //Confiar en todos los certificados: solo para desarrollo
-        new NukeSSLCerts().nuke();
+        this.loginPresenter.checkUserLogged();
+        displayProgress();
     }
 
     /**
@@ -92,7 +97,7 @@ public class LoginActivity extends Activity implements LoginView {
      * Método llamado cuando el login finaliza con éxito
      */
     @Override
-    public void loginSuccess() {
-
+    public void loginSuccess(UserTokenDTO userTokenDTO) {
+        Log.d("Loguea", "Loguea");
     }
 }

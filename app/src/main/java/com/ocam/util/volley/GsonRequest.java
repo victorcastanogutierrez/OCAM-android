@@ -1,4 +1,4 @@
-package com.ocam.util;
+package com.ocam.util.volley;
 
 
 import com.android.volley.AuthFailureError;
@@ -8,9 +8,11 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.Response.Listener;
 import com.android.volley.Response.ErrorListener;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.ocam.util.Constants;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
@@ -33,9 +35,9 @@ public class GsonRequest<T> extends Request<T> {
      * @param clazz Relevant class object, for Gson's reflection
      * @param headers Map of request headers
      */
-    public GsonRequest(String url, Class<T> clazz, Map<String, String> headers,
+    public GsonRequest(String url, int method, Class<T> clazz, Map<String, String> headers,
                        Listener<T> listener, ErrorListener errorListener) {
-        super(Method.GET, Constants.SERVER_URL + url, errorListener);
+        super(method, Constants.SERVER_URL + url, errorListener);
         this.clazz = clazz;
         this.headers = headers;
         this.listener = listener;
@@ -44,6 +46,15 @@ public class GsonRequest<T> extends Request<T> {
     @Override
     public Map<String, String> getHeaders() throws AuthFailureError {
         return headers != null ? headers : super.getHeaders();
+    }
+
+    @Override
+    //This will make the volley error message to contain your server's error message
+    protected VolleyError parseNetworkError(VolleyError volleyError) {
+        if(volleyError.networkResponse != null && volleyError.networkResponse.data != null){
+            volleyError = new VolleyError(new String(volleyError.networkResponse.data));
+        }
+        return volleyError;
     }
 
     @Override

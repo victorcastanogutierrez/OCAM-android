@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">OCAM</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="login">Login</string>
+    <string name="title">OCAM</string>
+</resources>

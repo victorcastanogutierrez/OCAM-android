@@ -23,6 +23,7 @@ public class LoginPreferencesUtils {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(Constants.TOKEN_KEY, data.getToken());
         editor.putString(Constants.EMAIL_KEY, data.getEmail());
+        editor.putString(Constants.REFRESH_TOKEN_KEY, data.getRefreshToken());
         editor.commit();
     }
 
@@ -35,8 +36,9 @@ public class LoginPreferencesUtils {
         SharedPreferences sharedPref = ((LoginActivity) context).getPreferences(Context.MODE_PRIVATE);
         if (sharedPref.contains(Constants.TOKEN_KEY) && sharedPref.contains(Constants.EMAIL_KEY)) {
             String token = sharedPref.getString(Constants.TOKEN_KEY, null);
+            String refreshToken = sharedPref.getString(Constants.REFRESH_TOKEN_KEY, null);
             String email = sharedPref.getString(Constants.EMAIL_KEY, null);
-            return new UserTokenDTO(token, email);
+            return new UserTokenDTO(token, refreshToken, email);
         } else {
             return null;
         }

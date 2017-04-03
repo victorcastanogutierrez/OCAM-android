@@ -8,9 +8,11 @@ public class UserTokenDTO {
     private String email;
     private String token;
     private String login;
+    private String refreshToken;
 
-    public UserTokenDTO(String token, String email) {
+    public UserTokenDTO(String token, String refreshToken, String email) {
         this.token = token;
+        this.refreshToken = refreshToken;
         this.email = email;
     }
 
@@ -36,5 +38,13 @@ public class UserTokenDTO {
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

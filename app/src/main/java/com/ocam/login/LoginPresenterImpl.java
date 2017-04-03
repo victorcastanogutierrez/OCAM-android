@@ -3,6 +3,7 @@ package com.ocam.login;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Base64;
+import android.util.Log;
 
 import com.android.volley.Request.Method;
 import com.android.volley.VolleyError;
@@ -59,6 +60,7 @@ public class LoginPresenterImpl implements LoginPresenter {
 
     /**
      * Comprueba si un usuario está ya logueado
+     * En caso de estarlo renueva el token
      */
     @Override
     public void checkUserLogged() {
@@ -68,18 +70,22 @@ public class LoginPresenterImpl implements LoginPresenter {
         } else {
             ICommand<UserTokenDTO> myCommand = new MyCommand();
             Map<String, String> headers = getAuthHeader(userTokenDTO);
-            String url = Constants.API_FIN_HIKER_BY_EMAIL + '/' + userTokenDTO.getEmail();
-            GsonRequest<UserTokenDTO> request = new GsonRequest<UserTokenDTO>(url,
+            GsonRequest<UserTokenDTO> request = new GsonRequest<UserTokenDTO>(Constants.API_TOKEN,
                     Method.GET, UserTokenDTO.class, headers,
-                    new GenericResponseListener<>(myCommand), new GenericErrorListener<>(myCommand));
+                    new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
             volleyManager.addToRequestQueue(request);
         }
     }
 
+    /**
+     * Retorna la cabecera de la petición necesaria para refrescar el token
+     * @param userTokenDTO
+     * @return
+     */
     private Map<String, String> getAuthHeader(UserTokenDTO userTokenDTO) {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put(Constants.HEADER_AUTH_NAME, userTokenDTO.getToken());
+        headers.put(Constants.HEADER_AUTH_NAME, userTokenDTO.getRefreshToken());
         return headers;
     }
 

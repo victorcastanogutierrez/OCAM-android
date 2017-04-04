@@ -27,4 +27,9 @@
         android:layout_height="wrap_content"
         android:visibility="invisible"/>
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/reciclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 </LinearLayout>

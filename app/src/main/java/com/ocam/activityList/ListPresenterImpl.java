@@ -5,12 +5,9 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
-import com.ocam.manager.UserManager;
 import com.ocam.manager.VolleyManager;
 import com.ocam.model.Activity;
-import com.ocam.model.UserTokenDTO;
 import com.ocam.util.Constants;
-import com.ocam.util.LoginPreferencesUtils;
 import com.ocam.volley.GsonRequest;
 import com.ocam.volley.listeners.GenericErrorListener;
 import com.ocam.volley.listeners.GenericResponseListener;
@@ -20,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Clase presentador para la lista de actividades
@@ -57,7 +53,7 @@ public class ListPresenterImpl implements ListPresenter {
         public void executeResponse(Activity[] response) {
             listActivityView.hideProgress();
             activities = Arrays.asList(response);
-            Log.d("Llega", ""+activities.size());
+            listActivityView.setUpRecyclerView(activities);
         }
 
         @Override

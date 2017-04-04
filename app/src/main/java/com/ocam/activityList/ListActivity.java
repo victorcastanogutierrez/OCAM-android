@@ -2,23 +2,27 @@ package com.ocam.activityList;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.ProgressBar;
+import com.ocam.activityList.DividerItemDecoration;
 
 import com.ocam.R;
 import com.ocam.login.LoginActivity;
+import com.ocam.model.Activity;
 
-import static android.R.attr.x;
+import java.util.List;
 
 public class ListActivity extends AppCompatActivity implements ListActivityView{
 
@@ -28,6 +32,7 @@ public class ListActivity extends AppCompatActivity implements ListActivityView{
     private ListPresenter listPresenter;
     private Dialog mOverlayDialog;
     private ProgressBar mProgress;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +57,6 @@ public class ListActivity extends AppCompatActivity implements ListActivityView{
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -113,5 +117,27 @@ public class ListActivity extends AppCompatActivity implements ListActivityView{
     public void hideProgress() {
         mOverlayDialog.cancel();
         this.mProgress.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void setUpRecyclerView(List<Activity> datos) {
+        this.recyclerView = (RecyclerView) findViewById(R.id.reciclerView);
+        this.recyclerView.setHasFixedSize(true);
+        final ActivityAdapter adapter = new ActivityAdapter(datos);
+
+        adapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("DemoRecView", "Pulsado el elemento " + recyclerView.getChildPosition(v));
+            }
+        });
+
+        this.recyclerView.setAdapter(adapter);
+        this.recyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
+
+        this.recyclerView.addItemDecoration(
+                new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+
+        this.recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 }

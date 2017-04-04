@@ -121,6 +121,7 @@ public class LoginPresenterImpl implements LoginPresenter {
         public void executeError(VolleyError error) {
             String errorMsg = "Error inesperado. Prueba más tarde.";
             if (error != null && error.getMessage() != null) {
+                Log.d("Error login:", ""+error.getMessage());
                 if (error.getMessage().contains(Constants.UNAUTHORIZED_ERROR_CODE)) {
                     errorMsg = "Credenciales inválidas.";
                     //Si las credenciales guardadas son inválidas, las eliminamos

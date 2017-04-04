@@ -5,28 +5,28 @@
             android:id="@+id/menu_seccion_1"
             android:title="Cambiame 1"/>
             <!--android:icon="@drawable/ic_menu"-->
-        <item
+        <!--<item
             android:id="@+id/menu_seccion_2"
             android:title="Cambiame 2"/>
-        <!--android:icon="@drawable/ic_menu"-->
+            android:icon="@drawable/ic_menu"
         <item
             android:id="@+id/menu_seccion_3"
             android:title="Cambiame 3"/>
-        <!--android:icon="@drawable/ic_menu"-->
+        android:icon="@drawable/ic_menu"-->
     </group>
 
     <item
         android:id="@+id/navigation_subheader"
-        android:title="Cambiame 3">
+        android:title="@string/cuenta">
         <menu>
             <item
-                android:id="@+id/menu_opcion_1"
-                android:title="Cambiame 2.1"/>
+                android:id="@+id/menu_cerrar_sesion"
+                android:title="@string/cerrar_sesion"/>
             <!--android:icon="@drawable/ic_menu"-->
-        <item
-            android:id="@+id/menu_opcion_2"
-            android:title="Cambiame 2.2"/>
-            <!--android:icon="@drawable/ic_menu"-->
+            <!--<item
+                android:id="@+id/menu_opcion_2"
+                android:title="Cambiame 2.2"/>
+                ndroid:icon="@drawable/ic_menu"-->
     </menu>
 </item>
 </menu>

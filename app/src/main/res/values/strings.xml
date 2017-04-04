@@ -4,4 +4,7 @@
     <string name="hint_password">Password</string>
     <string name="login">Login</string>
     <string name="title">OCAM</string>
+    <string name="drawer_options_header">Opciones</string>
+    <string name="cerrar_sesion">Cerrar sesión</string>
+    <string name="cuenta">Cuenta</string>
 </resources>

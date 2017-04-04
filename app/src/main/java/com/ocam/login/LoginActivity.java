@@ -49,8 +49,11 @@ public class LoginActivity extends Activity implements LoginView {
         this.cbRecuerda = (CheckBox) findViewById(R.id.cbRecuerda);
         this.mOverlayDialog = new Dialog(LoginActivity.this, android.R.style.Theme_Panel);
 
-        displayProgress();
-        this.loginPresenter.checkUserLogged();
+        Boolean cierraSesion = getIntent().getBooleanExtra("CIERRA_SESION", Boolean.FALSE);
+        if (Boolean.FALSE.equals(cierraSesion)) {
+            displayProgress();
+            this.loginPresenter.checkUserLogged();
+        }
     }
 
     /**

@@ -7,13 +7,13 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:src="@drawable/mountain_home"
+        android:src="@drawable/navheader"
         android:scaleType="centerCrop" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cambiame 4"
+        android:text="@string/drawer_options_header"
         android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse"
         android:textStyle="bold"
         android:layout_gravity="bottom"

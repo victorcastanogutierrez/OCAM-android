@@ -1,5 +1,6 @@
 package com.ocam.activityList;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -10,15 +11,23 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.ocam.R;
 import com.ocam.login.LoginActivity;
 
-public class ListActivity extends AppCompatActivity {
+import static android.R.attr.x;
+
+public class ListActivity extends AppCompatActivity implements ListActivityView{
 
     private Toolbar appbar;
     private DrawerLayout drawerLayout;
     private NavigationView navView;
+    private ListPresenter listPresenter;
+    private Dialog mOverlayDialog;
+    private ProgressBar mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +36,9 @@ public class ListActivity extends AppCompatActivity {
 
         this.appbar = (Toolbar)findViewById(R.id.appbar);
         this.navView = (NavigationView)findViewById(R.id.navview);
+        this.listPresenter = new ListPresenterImpl(this, ListActivity.this);
+        this.mOverlayDialog = new Dialog(ListActivity.this, android.R.style.Theme_Panel);
+        this.mProgress = (ProgressBar) findViewById(R.id.progressBar);
         setSupportActionBar(this.appbar);
         setUpNavView();
 
@@ -34,6 +46,8 @@ public class ListActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+
+        listPresenter.loadActivities();
     }
 
     @Override
@@ -86,5 +100,18 @@ public class ListActivity extends AppCompatActivity {
                         return true;
                     }
                 });
+    }
+
+    @Override
+    public void showProgress() {
+        mOverlayDialog.setCancelable(false);
+        mOverlayDialog.show();
+        this.mProgress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        mOverlayDialog.cancel();
+        this.mProgress.setVisibility(View.INVISIBLE);
     }
 }

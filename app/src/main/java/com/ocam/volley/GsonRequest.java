@@ -11,6 +11,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.ocam.manager.UserManager;
 import com.ocam.util.Constants;
@@ -24,7 +25,7 @@ import java.util.Map;
  * la aplicación
  */
 public class GsonRequest<T> extends Request<T> {
-    private final Gson gson = new Gson();
+    private final Gson gson;
     private final Class<T> clazz;
     private final Map<String, String> headers;
     private final Listener<T> listener;
@@ -42,6 +43,7 @@ public class GsonRequest<T> extends Request<T> {
         this.clazz = clazz;
         this.headers = headers;
         this.listener = listener;
+        this.gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
     }
 
     /**

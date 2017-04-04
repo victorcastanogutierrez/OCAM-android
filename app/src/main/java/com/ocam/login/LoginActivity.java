@@ -2,6 +2,7 @@ package com.ocam.login;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.ocam.R;
+import com.ocam.activityList.ListActivity;
 import com.ocam.model.UserTokenDTO;
 import com.ocam.volley.NukeSSLCerts;
 import com.ocam.util.ViewUtils;
@@ -47,8 +49,8 @@ public class LoginActivity extends Activity implements LoginView {
         this.cbRecuerda = (CheckBox) findViewById(R.id.cbRecuerda);
         this.mOverlayDialog = new Dialog(LoginActivity.this, android.R.style.Theme_Panel);
 
-        this.loginPresenter.checkUserLogged();
         displayProgress();
+        this.loginPresenter.checkUserLogged();
     }
 
     /**
@@ -98,6 +100,7 @@ public class LoginActivity extends Activity implements LoginView {
      */
     @Override
     public void loginSuccess(UserTokenDTO userTokenDTO) {
-        Log.d("Loguea", "Loguea");
+        Intent i = new Intent(LoginActivity.this, ListActivity.class);
+        startActivity(i);
     }
 }

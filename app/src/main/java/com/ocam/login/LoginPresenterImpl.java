@@ -123,6 +123,8 @@ public class LoginPresenterImpl implements LoginPresenter {
             if (error != null && error.getMessage() != null) {
                 if (error.getMessage().contains(Constants.UNAUTHORIZED_ERROR_CODE)) {
                     errorMsg = "Credenciales inválidas.";
+                    //Si las credenciales guardadas son inválidas, las eliminamos
+                    LoginPreferencesUtils.removeSavedCredentials(context);
                 }
             }
 

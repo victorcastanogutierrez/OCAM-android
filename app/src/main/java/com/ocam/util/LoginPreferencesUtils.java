@@ -2,6 +2,7 @@ package com.ocam.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.ocam.R;
 import com.ocam.login.LoginActivity;
@@ -42,5 +43,16 @@ public class LoginPreferencesUtils {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Método para eliminar las credenciales guardadas
+     * @param context
+     */
+    public static void removeSavedCredentials(Context context) {
+        SharedPreferences sharedPref = ((LoginActivity) context).getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.commit();
     }
 }

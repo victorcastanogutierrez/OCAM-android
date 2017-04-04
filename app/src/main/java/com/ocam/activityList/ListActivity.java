@@ -24,6 +24,8 @@ import com.ocam.model.Activity;
 
 import java.util.List;
 
+import static android.R.attr.id;
+
 public class ListActivity extends AppCompatActivity implements ListActivityView{
 
     private Toolbar appbar;
@@ -67,6 +69,10 @@ public class ListActivity extends AppCompatActivity implements ListActivityView{
         switch(item.getItemId()) {
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            case R.id.refreshButton:
+                //this.listPresenter.loadActivities();
+                //TODO: recargar lista
                 return true;
         }
 

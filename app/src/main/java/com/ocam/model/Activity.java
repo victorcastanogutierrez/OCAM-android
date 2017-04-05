@@ -129,6 +129,16 @@ public class Activity {
 	}
 
     public String getFormattedStatus() {
-        return new String("RUNNING").equals(this.status.toString()) ? "En curso" : "PENDIENTE";
+        return new String("RUNNING").equals(this.status.toString()) ? "EN CURSO" : "PENDIENTE";
     }
+
+	public String getFormattedLongDescription() {
+		return this.longDescription.length() > 45 ? this.longDescription.substring(0, 45) + "..." :
+					this.longDescription;
+	}
+
+	public String getFormattedShortDescription() {
+		return this.shortDescription.length() > 45 ? this.shortDescription.substring(0, 45) + "..." :
+				this.shortDescription;
+	}
 }

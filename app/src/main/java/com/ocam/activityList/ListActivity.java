@@ -3,11 +3,11 @@ package com.ocam.activityList;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -19,7 +19,6 @@ public class ListActivity extends AppCompatActivity {
     private Toolbar appbar;
     private DrawerLayout drawerLayout;
     private NavigationView navView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +36,8 @@ public class ListActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_nav_menu);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+
+        setSelectedMenuItem(navView.getMenu().getItem(0));
     }
 
     @Override
@@ -66,7 +67,8 @@ public class ListActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
 
-                       // boolean fragmentTransaction = false;
+                        Boolean fragmentTransaction = Boolean.FALSE;
+                        Fragment fragment = null;
 
                         switch (menuItem.getItemId()) {
                             case R.id.menu_cerrar_sesion:
@@ -76,26 +78,29 @@ public class ListActivity extends AppCompatActivity {
                                 startActivity(i);
                                 break;
                             case R.id.menu_item_1:
-                                i = new Intent(ListActivity.this, ListActivity.class);
-                                finish();
-                                startActivity(i);
+                                fragmentTransaction = Boolean.TRUE;
+                                fragment = new FragmentList();
                                 break;
                         }
 
-                        /*if(fragmentTransaction) {
+                        if(fragmentTransaction) {
                             getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.content_frame, fragment)
+                                    .replace(R.id.contenido, fragment)
                                     .commit();
 
-                            menuItem.setChecked(true);
-                            getSupportActionBar().setTitle(menuItem.getTitle());
-                        }*/
+                            setSelectedMenuItem(menuItem);
+                        }
 
                         drawerLayout.closeDrawers();
 
                         return true;
                     }
                 });
+    }
+
+    private void setSelectedMenuItem(MenuItem menuItem) {
+        menuItem.setChecked(true);
+        getSupportActionBar().setTitle(menuItem.getTitle());
     }
 
 

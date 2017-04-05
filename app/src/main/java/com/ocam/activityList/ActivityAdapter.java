@@ -77,8 +77,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
         }
 
         public void bindTitular(Activity activity) {
-            txDescripcion.setText(activity.getShortDescription());
-            txDetalle.setText(activity.getLongDescription());
+            txDescripcion.setText(activity.getFormattedShortDescription());
+            txDetalle.setText(activity.getFormattedLongDescription());
             txFecha.setText(activity.getStartDate().toString());
             txEstado.setText(activity.getFormattedStatus());
         }

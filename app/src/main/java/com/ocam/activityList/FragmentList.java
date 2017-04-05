@@ -52,7 +52,7 @@ public class FragmentList extends Fragment implements ListActivityView{
     public void showProgress() {
         mOverlayDialog.setCancelable(false);
         mOverlayDialog.show();
-        this.mProgress.setVisibility(View.VISIBLE);
+        //this.mProgress.setVisibility(View.VISIBLE);
     }
 
     @Override

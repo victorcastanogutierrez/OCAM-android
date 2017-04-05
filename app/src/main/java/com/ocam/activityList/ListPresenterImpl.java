@@ -26,13 +26,11 @@ public class ListPresenterImpl implements ListPresenter {
     private ListActivityView listActivityView;
     private VolleyManager volleyManager;
     private Context context;
-    private List<Activity> activities;
 
     public ListPresenterImpl(ListActivityView listActivityView, Context context) {
         this.listActivityView = listActivityView;
         this.context = context;
         this.volleyManager = VolleyManager.getInstance(this.context);
-        this.activities = new ArrayList<Activity>();
     }
 
     @Override
@@ -47,19 +45,45 @@ public class ListPresenterImpl implements ListPresenter {
         volleyManager.addToRequestQueue(request);
     }
 
-    private class MyCommand implements ICommand<Activity[]> {
+    @Override
+    public void reloadActivities() {
+        this.listActivityView.showProgress();
+
+        ICommand<Activity[]> myCommand = new MyUpdateCommand();
+        GsonRequest<Activity[]> request = new GsonRequest<Activity[]>(Constants.API_FIND_ALL_ACTIVITIES,
+                Request.Method.GET, Activity[].class, new HashMap<String, String>(),
+                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+
+        volleyManager.addToRequestQueue(request);
+    }
+
+    private class MyUpdateCommand implements ICommand<Activity[]> {
 
         @Override
         public void executeResponse(Activity[] response) {
             listActivityView.hideProgress();
-            activities = Arrays.asList(response);
-            listActivityView.setUpRecyclerView(activities);
+            listActivityView.setUpRecyclerView(Arrays.asList(response));
         }
 
         @Override
         public void executeError(VolleyError error) {
             listActivityView.hideProgress();
-            Log.d("Mal", ""+error.getMessage());
+            listActivityView.notifyError(Constants.ERROR_LOADING_ACTIVITIES);
+        }
+    }
+
+    private class MyCommand implements ICommand<Activity[]> {
+
+        @Override
+        public void executeResponse(Activity[] response) {
+            listActivityView.hideProgress();
+            listActivityView.setUpRecyclerView(Arrays.asList(response));
+        }
+
+        @Override
+        public void executeError(VolleyError error) {
+            listActivityView.hideProgress();
+            listActivityView.notifyError(Constants.ERROR_LOADING_ACTIVITIES);
         }
     }
 }

@@ -23,4 +23,7 @@ public class Constants {
     public static final String TOKEN_KEY = "USER-TOKEN";
     public static final String EMAIL_KEY = "USER-EMAIL";
     public static final String REFRESH_TOKEN_KEY = "REFRESH-TOKEN";
+
+    //Errors
+    public static final String ERROR_LOADING_ACTIVITIES = "Error cargando las actividades";
 }

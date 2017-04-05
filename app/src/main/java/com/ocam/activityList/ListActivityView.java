@@ -16,5 +16,7 @@ public interface ListActivityView {
 
     void setUpRecyclerView(List<Activity> datos);
 
+    void reloadRecyclerData(List<Activity> datos);
 
+    void notifyError(String err);
 }

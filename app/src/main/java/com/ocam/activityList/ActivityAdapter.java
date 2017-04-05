@@ -74,4 +74,12 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
             txDescripcion.setText(activity.getShortDescription());
         }
     }
+
+    public List<Activity> getData() {
+        return data;
+    }
+
+    public void setData(List<Activity> data) {
+        this.data = data;
+    }
 }

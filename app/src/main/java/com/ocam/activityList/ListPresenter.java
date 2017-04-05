@@ -7,4 +7,6 @@ package com.ocam.activityList;
 public interface ListPresenter {
 
     void loadActivities();
+
+    void reloadActivities();
 }

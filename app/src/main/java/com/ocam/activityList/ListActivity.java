@@ -16,15 +16,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import com.ocam.activityList.DividerItemDecoration;
+import android.widget.Toast;
 
 import com.ocam.R;
 import com.ocam.login.LoginActivity;
 import com.ocam.model.Activity;
+import com.ocam.util.ViewUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static android.R.attr.id;
+import static android.R.id.list;
 
 public class ListActivity extends AppCompatActivity implements ListActivityView{
 
@@ -35,6 +37,7 @@ public class ListActivity extends AppCompatActivity implements ListActivityView{
     private Dialog mOverlayDialog;
     private ProgressBar mProgress;
     private RecyclerView recyclerView;
+    private ActivityAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +74,7 @@ public class ListActivity extends AppCompatActivity implements ListActivityView{
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.refreshButton:
-                //this.listPresenter.loadActivities();
-                //TODO: recargar lista
+                this.listPresenter.reloadActivities();
                 return true;
         }
 
@@ -129,7 +131,7 @@ public class ListActivity extends AppCompatActivity implements ListActivityView{
     public void setUpRecyclerView(List<Activity> datos) {
         this.recyclerView = (RecyclerView) findViewById(R.id.reciclerView);
         this.recyclerView.setHasFixedSize(true);
-        final ActivityAdapter adapter = new ActivityAdapter(datos);
+        this.adapter = new ActivityAdapter(datos);
 
         adapter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,5 +147,17 @@ public class ListActivity extends AppCompatActivity implements ListActivityView{
                 new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
 
         this.recyclerView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    @Override
+    public void reloadRecyclerData(List<Activity> datos) {
+        adapter.setData(new ArrayList(datos));
+        recyclerView.removeAllViews();
+        adapter.notifyItemRangeInserted(0, datos.size()-1);
+    }
+
+    @Override
+    public void notifyError(String err) {
+        ViewUtils.showToast(ListActivity.this, Toast.LENGTH_SHORT, err);
     }
 }

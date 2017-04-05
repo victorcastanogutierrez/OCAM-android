@@ -127,4 +127,8 @@ public class Activity {
 	public void setReports(List<Report> reports) {
 		this.reports = reports;
 	}
+
+    public String getFormattedStatus() {
+        return new String("RUNNING").equals(this.status.toString()) ? "En curso" : "PENDIENTE";
+    }
 }

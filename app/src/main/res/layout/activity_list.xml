@@ -9,7 +9,7 @@
     android:fitsSystemWindows="true"
     tools:context=".activityList.ListActivity">
 
-    <include layout="@layout/content_list"/>
+    <include layout="@layout/content_app"/>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/navview"

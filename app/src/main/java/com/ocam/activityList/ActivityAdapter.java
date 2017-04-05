@@ -63,15 +63,24 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
             extends RecyclerView.ViewHolder {
 
         private TextView txDescripcion;
+        private TextView txDetalle;
+        private TextView txFecha;
+        private TextView txEstado;
 
         public ActivitiesViewHolder(View itemView) {
             super(itemView);
 
             txDescripcion = (TextView)itemView.findViewById(R.id.lbDescripcion);
+            txDetalle = (TextView)itemView.findViewById(R.id.lbDetalle);
+            txFecha = (TextView)itemView.findViewById(R.id.lbFecha);
+            txEstado = (TextView)itemView.findViewById(R.id.lbEstado);
         }
 
         public void bindTitular(Activity activity) {
             txDescripcion.setText(activity.getShortDescription());
+            txDetalle.setText(activity.getLongDescription());
+            txFecha.setText(activity.getStartDate().toString());
+            txEstado.setText(activity.getFormattedStatus());
         }
     }
 

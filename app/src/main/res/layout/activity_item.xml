@@ -12,14 +12,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:textSize="15sp"/>
+        android:textSize="15sp"
+        android:ellipsize="end"
+        android:maxLines="1"/>
 
     <TextView android:id="@+id/lbDetalle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:paddingTop="10sp"
-        android:textSize="14sp"/>
+        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1"/>
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

@@ -7,4 +7,7 @@
     <string name="drawer_options_header">Opciones</string>
     <string name="cerrar_sesion">Cerrar sesión</string>
     <string name="cuenta">Cuenta</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="navigation_drawer_open">Drawer Open</string>
+    <string name="navigation_drawer_close">Drawer Closed</string>
 </resources>

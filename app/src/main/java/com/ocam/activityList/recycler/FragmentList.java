@@ -1,9 +1,10 @@
-package com.ocam.activityList;
+package com.ocam.activityList.recycler;
 
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,15 +16,23 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.ocam.R;
+import com.ocam.activitiy.FragmentActivity;
+import com.ocam.activityList.ListActivityView;
+import com.ocam.activityList.ListPresenter;
+import com.ocam.activityList.ListPresenterImpl;
 import com.ocam.model.Activity;
 import com.ocam.util.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.R.attr.fragment;
 
-public class FragmentList extends Fragment implements ListActivityView{
+
+public class FragmentList extends Fragment implements ListActivityView
+{
 
     private ListPresenter listPresenter;
     private Dialog mOverlayDialog;
@@ -52,7 +61,7 @@ public class FragmentList extends Fragment implements ListActivityView{
     public void showProgress() {
         mOverlayDialog.setCancelable(false);
         mOverlayDialog.show();
-        //this.mProgress.setVisibility(View.VISIBLE);
+        this.mProgress.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -74,6 +83,13 @@ public class FragmentList extends Fragment implements ListActivityView{
                 new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST));
 
         this.recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        this.adapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activityDetail(adapter.getData().get(recyclerView.getChildAdapterPosition(v)));
+            }
+        });
     }
 
     @Override
@@ -98,5 +114,22 @@ public class FragmentList extends Fragment implements ListActivityView{
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Carga el fragment del detalle de actividad
+     * @param activity
+     */
+    public void activityDetail(Activity activity) {
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Actividad");
+        FragmentActivity fragmentActivity = new FragmentActivity();
+        Bundle args = new Bundle();
+        args.putString("activity", new Gson().toJson(activity));
+        fragmentActivity.setArguments(args);
+        this.getFragmentManager().beginTransaction()
+                .replace(R.id.contenido, fragmentActivity)
+                .addToBackStack(null)
+                .commit();
+
     }
 }

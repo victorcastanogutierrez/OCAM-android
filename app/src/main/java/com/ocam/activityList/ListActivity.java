@@ -4,14 +4,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.ocam.R;
+import com.ocam.activityList.recycler.FragmentList;
 import com.ocam.login.LoginActivity;
 
 public class ListActivity extends AppCompatActivity {
@@ -29,15 +33,46 @@ public class ListActivity extends AppCompatActivity {
         setSupportActionBar(this.appbar);
         setUpNavView();
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.contenido, new FragmentList())
-                .commit();
-
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_nav_menu);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
 
         setSelectedMenuItem(navView.getMenu().getItem(0));
+
+        setUpToolbar();
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.contenido, new FragmentList())
+                .commit();
+    }
+
+    private void setUpToolbar() {
+        final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, this.drawerLayout, this.appbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        this.drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true); // show back button
+                    appbar.setNavigationOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onBackPressed();
+                        }
+                    });
+                } else {
+                    //show hamburger
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    toggle.syncState();
+                    appbar.setNavigationOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            drawerLayout.openDrawer(GravityCompat.START);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override
@@ -102,6 +137,4 @@ public class ListActivity extends AppCompatActivity {
         menuItem.setChecked(true);
         getSupportActionBar().setTitle(menuItem.getTitle());
     }
-
-
 }

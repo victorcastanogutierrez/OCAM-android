@@ -1,4 +1,4 @@
-package com.ocam.activityList;
+package com.ocam.activityList.recycler;
 
 import android.content.Context;
 import android.content.res.TypedArray;

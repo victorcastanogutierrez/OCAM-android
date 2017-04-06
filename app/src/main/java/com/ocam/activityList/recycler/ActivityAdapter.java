@@ -1,6 +1,7 @@
-package com.ocam.activityList;
+package com.ocam.activityList.recycler;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +20,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
         implements View.OnClickListener
 {
 
-    private List<Activity> data;
     private View.OnClickListener listener;
+    private List<Activity> data;
 
     public ActivityAdapter(List<Activity> data) {
         this.data = data;
@@ -39,11 +40,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
     @Override
     public void onBindViewHolder(ActivitiesViewHolder holder, int position) {
         Activity item = data.get(position);
-        holder.bindTitular(item);
-    }
-
-    public void setOnClickListener(View.OnClickListener listener) {
-        this.listener = listener;
+        holder.bindActivity(item);
     }
 
     @Override
@@ -53,10 +50,13 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
 
     @Override
     public void onClick(View v) {
-        Log.d("TODO", "Click");
-       /* if(listener != null) {
-            listener.onClick(v);
-        }*/
+        if (this.listener != null) {
+            this.listener.onClick(v);
+        }
+    }
+
+    public void setOnClickListener(View.OnClickListener listener) {
+        this.listener = listener;
     }
 
     public static class ActivitiesViewHolder
@@ -76,10 +76,10 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
             txEstado = (TextView)itemView.findViewById(R.id.lbEstado);
         }
 
-        public void bindTitular(Activity activity) {
-            txDescripcion.setText(activity.getFormattedShortDescription());
-            txDetalle.setText(activity.getFormattedLongDescription());
-            txFecha.setText(activity.getStartDate().toString());
+        public void bindActivity(Activity activity) {
+            txDescripcion.setText(activity.getShortDescription());
+            txDetalle.setText(activity.getLabel());
+            txFecha.setText(com.ocam.util.DateUtils.formatDate(activity.getStartDate()));
             txEstado.setText(activity.getFormattedStatus());
         }
     }

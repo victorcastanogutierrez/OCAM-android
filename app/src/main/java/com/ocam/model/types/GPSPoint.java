@@ -2,6 +2,11 @@ package com.ocam.model.types;
 
 public class GPSPoint {
 
+	public GPSPoint(float lat, float lon) {
+		this.latitude = lat;
+		this.longitude = lon;
+	}
+
 	private float latitude;
 
 	private float longitude;

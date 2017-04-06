@@ -1,92 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="10sp"
-    android:paddingRight="10sp">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal" android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="10sp"
         android:paddingRight="10sp">
 
-        <TextView android:id="@+id/lbOrganizaText"
-            android:layout_width="wrap_content"
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal" android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="10sp">
+
+            <TextView android:id="@+id/lbEstadoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:paddingTop="30sp"
+                android:textSize="14sp"
+                android:text="Estado: "/>
+
+            <TextView android:id="@+id/lbEstado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="30sp"
+                android:textSize="14sp"
+                android:text="Victor"/>
+        </LinearLayout>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal" android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10sp"
+            android:paddingRight="30sp">
+
+            <TextView android:id="@+id/lbOrganizaText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:paddingTop="30sp"
+                android:textSize="14sp"
+                android:text="Organiza "/>
+
+            <TextView android:id="@+id/lbOrganiza"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="30sp"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:paddingTop="30sp"
+            android:background="@android:color/darker_gray"/>
+
+        <TextView android:id="@+id/lbDescripcionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:paddingTop="30sp"
+            android:textSize="16sp"
+            android:text="Descripción"/>
+
+        <TextView android:id="@+id/lbDescripcion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="15sp"
+            android:textSize="14sp"
+            android:paddingLeft="15sp"/>
+
+        <TextView android:id="@+id/lbFechaText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:paddingTop="30sp"
+            android:textSize="16sp"
+            android:text="Fecha prevista de realización"/>
+
+        <TextView android:id="@+id/lbFecha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="15sp"
+            android:textSize="14sp"
+            android:paddingLeft="15sp"/>
+
+        <TextView android:id="@+id/lbDetalleText"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:paddingTop="30sp"
             android:textSize="14sp"
-            android:text="Organiza "/>
+            android:text="Detalle de la actividad"/>
 
-        <TextView android:id="@+id/lbOrganiza"
-            android:layout_width="wrap_content"
+        <TextView android:id="@+id/lbDetalle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="30sp"
             android:textSize="14sp"
-            android:text="Victor"/>
+            android:visibility="gone"
+            android:paddingLeft="15sp"/>
+
+        <TextView android:id="@+id/lbMide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="30sp"
+            android:textSize="14sp"
+            android:visibility="gone"
+            android:paddingLeft="15sp"/>
+
+        <TextView android:id="@+id/lbPlazas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="30sp"
+            android:textSize="14sp"
+            android:visibility="gone"
+            android:paddingLeft="15sp"/>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal" android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10sp"
+            android:paddingRight="30sp"
+            android:paddingLeft="20sp">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="30sp"
+                app:srcCompat="@drawable/ic_terrain_black_18dp" />
+
+            <TextView android:id="@+id/lbTrackText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:paddingTop="30sp"
+                android:paddingLeft="15sp"
+                android:textSize="16sp"
+                android:textColor="@color/colorPrimary"
+                android:text="Ver track de la ruta"/>
+        </LinearLayout>
+
     </LinearLayout>
-
-    <TextView android:id="@+id/lbDescripcionText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:paddingTop="30sp"
-        android:textSize="16sp"
-        android:text="Descripción"/>
-
-    <TextView android:id="@+id/lbDescripcion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="15sp"
-        android:textSize="14sp"
-        android:paddingLeft="15sp"/>
-
-    <TextView android:id="@+id/lbFechaText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:paddingTop="30sp"
-        android:textSize="16sp"
-        android:text="Fecha prevista de realización"/>
-
-    <TextView android:id="@+id/lbFecha"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="15sp"
-        android:textSize="14sp"
-        android:paddingLeft="15sp"/>
-
-    <TextView android:id="@+id/lbDetalleText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:paddingTop="30sp"
-        android:textSize="14sp"
-        android:text="Detalle de la actividad"/>
-
-    <TextView android:id="@+id/lbDetalle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="30sp"
-        android:textSize="14sp"
-        android:visibility="gone"
-        android:paddingLeft="15sp"/>
-
-    <TextView android:id="@+id/lbMide"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="30sp"
-        android:textSize="14sp"
-        android:visibility="gone"
-        android:paddingLeft="15sp"/>
-
-    <TextView android:id="@+id/lbPlazas"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:paddingTop="30sp"
-        android:textSize="14sp"
-        android:visibility="gone"
-        android:paddingLeft="15sp"/>
-
-</LinearLayout>
+</ScrollView>

@@ -26,4 +26,5 @@ public class Constants {
 
     //Errors
     public static final String ERROR_LOADING_ACTIVITIES = "Error cargando las actividades";
+
 }

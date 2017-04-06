@@ -1,16 +1,32 @@
-package com.ocam.activitiy;
+package com.ocam.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.ocam.R;
+import com.ocam.activity.track.TrackActivity;
 import com.ocam.model.Activity;
-import com.ocam.util.DateUtils;
+import com.ocam.model.Track;
+import com.ocam.model.types.GPSPoint;
+import com.ocam.util.ViewUtils;
+import com.ocam.util.XMLUtils;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static com.ocam.util.DateUtils.formatDate;
 
@@ -25,9 +41,27 @@ public class FragmentActivity extends Fragment {
     private TextView txDetalle;
     private TextView txMide;
     private TextView txPlazas;
+    private TextView txEstado;
+    private TextView txTrack;
+    private Activity activity;
 
     public FragmentActivity() {
 
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    /**
+     * Eliminamos la opción de recarga
+     * @param menu
+     */
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
     }
 
     @Override
@@ -40,6 +74,14 @@ public class FragmentActivity extends Fragment {
         this.txDetalle = (TextView) v.findViewById(R.id.lbDetalle);
         this.txMide = (TextView) v.findViewById(R.id.lbMide);
         this.txPlazas = (TextView) v.findViewById(R.id.lbPlazas);
+        this.txEstado = (TextView) v.findViewById(R.id.lbEstado);
+        this.txTrack = (TextView) v.findViewById(R.id.lbTrackText);
+        this.txTrack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mostrarTrack();
+            }
+        });
         Bundle args = getArguments();
         setUpActivityData(new Gson().fromJson(args.getString("activity"), Activity.class));
         return v;
@@ -50,6 +92,8 @@ public class FragmentActivity extends Fragment {
      * @param activity
      */
     private void setUpActivityData(Activity activity) {
+        this.activity = activity;
+        this.txEstado.setText(activity.getFormattedStatus());
         this.txDescripcion.setText(activity.getShortDescription());
         this.txFecha.setText(formatDate(activity.getStartDate()));
         this.txOrganiza.setText(activity.getOwner().getEmail());
@@ -62,8 +106,25 @@ public class FragmentActivity extends Fragment {
             this.txMide.setVisibility(View.VISIBLE);
         }
         if (activity.getMaxPlaces() != null) {
-            this.txPlazas.setText("Plazas máximas: "+activity.getMaxPlaces().toString());
-            this.txMide.setVisibility(View.VISIBLE);
+            this.txPlazas.setText(activity.getMaxPlaces().toString()+" plazas máximas");
+            this.txPlazas.setVisibility(View.VISIBLE);
         }
+    }
+
+    /**
+     * Método onClick para ver el track de la ruta
+     */
+    public void mostrarTrack() {
+        InputStream stream = new ByteArrayInputStream(this.activity.getTrack().getBytes(StandardCharsets.UTF_8));
+        try {
+            List<GPSPoint> track = XMLUtils.parse(stream);
+            Log.d("Acaba" , ""+track.size());
+        } catch (XmlPullParserException | IOException e) {
+            Log.d("Error", e.getMessage()+"");
+            ViewUtils.showToast(getContext(), Toast.LENGTH_SHORT, "Error procesando el track de la ruta");
+        }
+        /*Intent i = new Intent(getContext(), TrackActivity.class);
+        i.putExtra("track", this.activity.getTrack());
+        startActivity(i);*/
     }
 }

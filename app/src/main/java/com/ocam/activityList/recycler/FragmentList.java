@@ -3,12 +3,10 @@ package com.ocam.activityList.recycler;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +16,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.ocam.R;
-import com.ocam.activitiy.FragmentActivity;
+import com.ocam.activity.FragmentActivity;
 import com.ocam.activityList.ListActivityView;
 import com.ocam.activityList.ListPresenter;
 import com.ocam.activityList.ListPresenterImpl;
@@ -27,8 +25,6 @@ import com.ocam.util.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.R.attr.fragment;
 
 
 public class FragmentList extends Fragment implements ListActivityView

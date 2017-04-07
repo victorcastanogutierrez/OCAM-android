@@ -3,7 +3,6 @@ package com.ocam.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -15,7 +14,6 @@ import com.google.gson.Gson;
 import com.ocam.R;
 import com.ocam.activity.track.TrackActivity;
 import com.ocam.model.Activity;
-import com.ocam.model.Track;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.util.ViewUtils;
 import com.ocam.util.XMLUtils;
@@ -115,16 +113,8 @@ public class FragmentActivity extends Fragment {
      * Método onClick para ver el track de la ruta
      */
     public void mostrarTrack() {
-        InputStream stream = new ByteArrayInputStream(this.activity.getTrack().getBytes(StandardCharsets.UTF_8));
-        try {
-            List<GPSPoint> track = XMLUtils.parse(stream);
-            Log.d("Acaba" , ""+track.size());
-        } catch (XmlPullParserException | IOException e) {
-            Log.d("Error", e.getMessage()+"");
-            ViewUtils.showToast(getContext(), Toast.LENGTH_SHORT, "Error procesando el track de la ruta");
-        }
-        /*Intent i = new Intent(getContext(), TrackActivity.class);
+        Intent i = new Intent(getContext(), TrackActivity.class);
         i.putExtra("track", this.activity.getTrack());
-        startActivity(i);*/
+        startActivity(i);
     }
 }

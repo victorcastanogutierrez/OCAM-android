@@ -47,4 +47,14 @@ public class UserTokenDTO {
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
+
+    @Override
+    public String toString() {
+        return "UserTokenDTO{" +
+                "email='" + email + '\'' +
+                ", login='" + login + '\'' +
+                ", token='" + token + '\'' +
+                ", refreshToken='" + refreshToken + '\'' +
+                '}';
+    }
 }

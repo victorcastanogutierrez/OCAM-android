@@ -109,8 +109,13 @@ public class LoginPresenterImpl implements LoginPresenter {
                 if (Boolean.TRUE.equals(recuerdaDatos)) {
                     LoginPreferencesUtils.saveUserLogin(context, response);
                 }
-                response.setLogin(username);
+                //En caso que venga de introducir los datos
+                //si no la propia response ya contiene el username
+                if (username != null) {
+                    response.setLogin(username);
+                }
                 UserManager userManager = UserManager.getInstance();
+                Log.d("Loguea:", response.toString());
                 userManager.setUserTokenDTO(response);
                 loginView.loginSuccess(response);
             }

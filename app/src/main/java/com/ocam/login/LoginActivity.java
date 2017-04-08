@@ -11,11 +11,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ocam.R;
 import com.ocam.activityList.ListActivity;
 import com.ocam.model.UserTokenDTO;
+import com.ocam.util.LoginPreferencesUtils;
 import com.ocam.volley.NukeSSLCerts;
 import com.ocam.util.ViewUtils;
 
@@ -53,6 +55,17 @@ public class LoginActivity extends Activity implements LoginView {
         if (Boolean.FALSE.equals(cierraSesion)) {
             displayProgress();
             this.loginPresenter.checkUserLogged();
+        }
+
+        test(); //Eliminar
+    }
+
+    //Eliminar
+    private void test() {
+        TextView username = (TextView) findViewById(R.id.txUser);
+        UserTokenDTO user = LoginPreferencesUtils.getUserLogged(LoginActivity.this);
+        if (user != null) {
+            username.setText("Token: "+user.getRefreshToken());
         }
     }
 

@@ -5,26 +5,18 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.ocam.R;
 import com.ocam.activity.track.TrackActivity;
 import com.ocam.model.Activity;
-import com.ocam.model.types.GPSPoint;
-import com.ocam.util.ViewUtils;
-import com.ocam.util.XMLUtils;
-
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import static com.ocam.util.DateUtils.formatDate;
 
@@ -40,8 +32,10 @@ public class FragmentActivity extends Fragment {
     private TextView txMide;
     private TextView txPlazas;
     private TextView txEstado;
-    private TextView txTrack;
     private Activity activity;
+    private ActivityPresenter activityPresenter;
+    private LinearLayout guiasLayout;
+    private Button btComenzar;
 
     public FragmentActivity() {
 
@@ -51,15 +45,14 @@ public class FragmentActivity extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        this.activityPresenter = new ActivityPresenterImpl();
     }
 
-    /**
-     * Eliminamos la opción de recarga
-     * @param menu
-     */
     @Override
-    public void onPrepareOptionsMenu(Menu menu) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
+        inflater.inflate(R.menu.menu_activity, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -73,13 +66,8 @@ public class FragmentActivity extends Fragment {
         this.txMide = (TextView) v.findViewById(R.id.lbMide);
         this.txPlazas = (TextView) v.findViewById(R.id.lbPlazas);
         this.txEstado = (TextView) v.findViewById(R.id.lbEstado);
-        this.txTrack = (TextView) v.findViewById(R.id.lbTrackText);
-        this.txTrack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mostrarTrack();
-            }
-        });
+        this.guiasLayout = (LinearLayout) v.findViewById(R.id.linearGuia);
+        this.btComenzar = (Button) v.findViewById(R.id.btComenzar);
         Bundle args = getArguments();
         setUpActivityData(new Gson().fromJson(args.getString("activity"), Activity.class));
         return v;
@@ -107,6 +95,24 @@ public class FragmentActivity extends Fragment {
             this.txPlazas.setText(activity.getMaxPlaces().toString()+" plazas máximas");
             this.txPlazas.setVisibility(View.VISIBLE);
         }
+        if (this.activityPresenter.isUserGuide(this.activity)) {
+            this.guiasLayout.setVisibility(View.VISIBLE);
+            if (!this.activityPresenter.assertActivityRunning(activity)) {
+                this.btComenzar.setEnabled(Boolean.TRUE);
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_track:
+                mostrarTrack();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
@@ -117,4 +123,6 @@ public class FragmentActivity extends Fragment {
         i.putExtra("track", this.activity.getTrack());
         startActivity(i);
     }
+
+
 }

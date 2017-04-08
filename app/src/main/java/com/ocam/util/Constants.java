@@ -10,7 +10,6 @@ public class Constants {
     public static final String SERVER_URL = "https://ocamserver.herokuapp.com";
     public static final String API_TOKEN = "/auth/token";
     public static final String API_AUTH_LOGIN = "/api/auth/login";
-    public static final String API_FIN_HIKER_BY_EMAIL = "/api/existsMail";
     public static final String API_FIND_ALL_ACTIVITIES = "/api/findAllPendingRunningActivities";
 
     //Header auth

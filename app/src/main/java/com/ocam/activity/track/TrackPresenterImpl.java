@@ -3,6 +3,9 @@ package com.ocam.activity.track;
 
 import android.widget.Toast;
 
+import com.ocam.manager.UserManager;
+import com.ocam.model.Activity;
+import com.ocam.model.Hiker;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.util.ViewUtils;
 import com.ocam.util.XMLUtils;

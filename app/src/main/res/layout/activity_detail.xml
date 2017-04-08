@@ -121,28 +121,40 @@
             android:paddingLeft="15sp"/>
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal" android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingBottom="10sp"
             android:paddingRight="30sp"
-            android:paddingLeft="20sp">
+            android:paddingLeft="10sp"
+            android:visibility="gone"
+            android:id="@+id/linearGuia">
 
-            <ImageView
-                android:id="@+id/imageView"
+            <View
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="1dp"
                 android:paddingTop="30sp"
-                app:srcCompat="@drawable/ic_terrain_black_18dp" />
+                android:background="@android:color/darker_gray"/>
 
-            <TextView android:id="@+id/lbTrackText"
-                android:layout_width="wrap_content"
+            <TextView android:id="@+id/lbGuiaText"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:paddingTop="30sp"
                 android:paddingLeft="15sp"
                 android:textSize="16sp"
-                android:textColor="@color/colorPrimary"
-                android:text="Ver track de la ruta"/>
+                style="@style/AppTheme"
+                android:text="Eres guía de la actividad"/>
+
+            <Button
+                android:id="@+id/btComenzar"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="Comenzar actividad" />
+
+
         </LinearLayout>
 
     </LinearLayout>

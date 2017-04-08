@@ -22,8 +22,6 @@ public class Activity {
 
 	private String password;
 
-	private String track;
-
 	private ActivityStatus status;
 
 	private Hiker owner;
@@ -80,14 +78,6 @@ public class Activity {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public String getTrack() {
-		return track;
-	}
-
-	public void setTrack(String track) {
-		this.track = track;
 	}
 
 	public ActivityStatus getStatus() {

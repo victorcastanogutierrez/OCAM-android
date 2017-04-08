@@ -24,7 +24,10 @@ import com.google.gson.Gson;
 import com.ocam.R;
 import com.ocam.activity.track.TrackActivity;
 import com.ocam.model.Activity;
+import com.ocam.model.types.GPSPoint;
 import com.ocam.util.ViewUtils;
+
+import java.util.List;
 
 import static com.ocam.util.DateUtils.formatDate;
 
@@ -134,11 +137,11 @@ public class FragmentActivity extends Fragment implements ActivityView {
     }
 
     /**
-     * Método onClick para ver el track de la ruta
+     * Método onClick para mostrar la actividad con el track de la ruta
      */
     public void mostrarTrack() {
         Intent i = new Intent(getContext(), TrackActivity.class);
-        i.putExtra("track", this.activity.getTrack());
+        i.putExtra("activityId", this.activity.getId());
         startActivity(i);
     }
 

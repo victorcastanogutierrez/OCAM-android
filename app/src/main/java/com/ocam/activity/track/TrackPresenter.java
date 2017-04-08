@@ -8,5 +8,7 @@ import java.util.List;
 
 public interface TrackPresenter {
 
-    List<GPSPoint> parseTrack(String track);
+    void getActivityTrack(Long activityId);
+
+
 }

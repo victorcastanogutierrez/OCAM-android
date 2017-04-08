@@ -1,5 +1,6 @@
 package com.ocam.util;
 
+import android.util.Log;
 import android.util.Xml;
 
 import com.ocam.model.types.GPSPoint;
@@ -22,6 +23,7 @@ public class XMLUtils {
     private static final String ns = null;
 
     public static List parse(InputStream in) throws XmlPullParserException, IOException {
+
         try {
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);

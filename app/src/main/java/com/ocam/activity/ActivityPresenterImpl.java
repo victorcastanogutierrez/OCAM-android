@@ -1,7 +1,6 @@
 package com.ocam.activity;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
@@ -115,7 +114,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         @Override
         public void executeError(VolleyError error) {
             activityView.hideProgress();
-            Log.d("Error", error.getMessage()+"");
+            activityView.showError("La actividad no puede ser iniciada.");
         }
     }
 }

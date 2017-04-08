@@ -1,6 +1,9 @@
 package com.ocam.activity;
 
 import com.ocam.model.Activity;
+import com.ocam.model.types.GPSPoint;
+
+import java.util.List;
 
 /**
  * Created by Victor on 08/04/2017.

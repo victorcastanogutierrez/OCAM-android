@@ -1,14 +1,21 @@
 package com.ocam.activity.track;
 
 
-import android.widget.Toast;
+import android.content.Context;
+import android.util.Log;
 
-import com.ocam.manager.UserManager;
-import com.ocam.model.Activity;
-import com.ocam.model.Hiker;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.google.gson.JsonObject;
+import com.ocam.manager.VolleyManager;
 import com.ocam.model.types.GPSPoint;
-import com.ocam.util.ViewUtils;
+import com.ocam.model.types.Track;
+import com.ocam.util.Constants;
 import com.ocam.util.XMLUtils;
+import com.ocam.volley.GsonRequest;
+import com.ocam.volley.listeners.GenericErrorListener;
+import com.ocam.volley.listeners.GenericResponseListener;
+import com.ocam.volley.listeners.ICommand;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -22,21 +29,52 @@ import java.util.List;
 public class TrackPresenterImpl implements TrackPresenter {
 
     private TrackView trackView;
+    private Context context;
 
-    public TrackPresenterImpl(TrackView trackView) {
+    public TrackPresenterImpl(TrackView trackView, Context context) {
         this.trackView = trackView;
+        this.context = context;
     }
 
-
     @Override
-    public List<GPSPoint> parseTrack(String track) {
+    public void getActivityTrack(Long activityId) {
+
+        ICommand<Track> myCommand = new MyCommand();
+        GsonRequest<Track> request = new GsonRequest<Track>(Constants.API_FIND_ACTIVITY + "/" + activityId,
+                Request.Method.GET, Track.class, null,
+                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+
+        VolleyManager.getInstance(this.context).addToRequestQueue(request);
+    }
+
+    private List<GPSPoint> parseTrack(String track) {
         InputStream stream = new ByteArrayInputStream(track.getBytes(StandardCharsets.UTF_8));
         List<GPSPoint> result = new ArrayList<GPSPoint>();
         try {
             result = XMLUtils.parse(stream);
         } catch (XmlPullParserException | IOException e) {
-            trackView.parseTrackError();
+            trackView.showError("Error procesando el track de la ruta");
         }
         return result;
+    }
+
+    private class MyCommand implements ICommand<Track> {
+
+        @Override
+        public void executeResponse(Track response) {
+            List<GPSPoint> track = parseTrack(response.getTrack());
+            trackView.hideProgress();
+            trackView.showTrack(track);
+        }
+
+        /**
+         * Muestra el error retornado por el servidor al usuario
+         * @param error
+         */
+        @Override
+        public void executeError(VolleyError error) {
+            trackView.showError("Error obteniendo el track de la ruta");
+            trackView.hideProgress();
+        }
     }
 }

@@ -8,6 +8,8 @@ import java.util.List;
 
 public class Activity {
 
+	private Long id;
+
 	private String shortDescription;
 
 	private String longDescription;
@@ -134,5 +136,13 @@ public class Activity {
 
     public String getLabel() {
 		return this.longDescription != null ? this.longDescription : this.mide;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 }

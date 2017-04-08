@@ -1,8 +1,12 @@
 package com.ocam.activity;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,20 +14,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.ocam.R;
 import com.ocam.activity.track.TrackActivity;
 import com.ocam.model.Activity;
+import com.ocam.util.ViewUtils;
 
 import static com.ocam.util.DateUtils.formatDate;
 
 /**
  * Fragment para la vista del detalle de una actividad
  */
-public class FragmentActivity extends Fragment {
+public class FragmentActivity extends Fragment implements ActivityView {
 
     private TextView txDescripcion;
     private TextView txFecha;
@@ -36,6 +44,8 @@ public class FragmentActivity extends Fragment {
     private ActivityPresenter activityPresenter;
     private LinearLayout guiasLayout;
     private Button btComenzar;
+    private ProgressBar mProgress;
+    private Dialog mOverlayDialog;
 
     public FragmentActivity() {
 
@@ -45,7 +55,6 @@ public class FragmentActivity extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        this.activityPresenter = new ActivityPresenterImpl();
     }
 
     @Override
@@ -59,6 +68,7 @@ public class FragmentActivity extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_detail, container, false);
+        this.activityPresenter = new ActivityPresenterImpl(this, v.getContext());
         this.txDescripcion = (TextView) v.findViewById(R.id.lbDescripcion);
         this.txFecha = (TextView) v.findViewById(R.id.lbFecha);
         this.txOrganiza = (TextView) v.findViewById(R.id.lbOrganiza);
@@ -68,8 +78,16 @@ public class FragmentActivity extends Fragment {
         this.txEstado = (TextView) v.findViewById(R.id.lbEstado);
         this.guiasLayout = (LinearLayout) v.findViewById(R.id.linearGuia);
         this.btComenzar = (Button) v.findViewById(R.id.btComenzar);
+        this.mProgress = (ProgressBar) v.findViewById(R.id.progressBar);
+        this.mOverlayDialog = new Dialog(v.getContext(), android.R.style.Theme_Panel);
         Bundle args = getArguments();
         setUpActivityData(new Gson().fromJson(args.getString("activity"), Activity.class));
+        btComenzar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPasswordDialog();
+            }
+        });
         return v;
     }
 
@@ -124,5 +142,67 @@ public class FragmentActivity extends Fragment {
         startActivity(i);
     }
 
+    /**
+     * Método que muestra el dialog de confirmacion de iniciar actividad
+     * con la solicitud de la password al usuario
+     */
+    private void showPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+        builder.setTitle("Introduce una password para la actividad");
 
+        final EditText input = new EditText(getView().getContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+        builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String pw = input.getText().toString();
+                if (assertPasswordValid(pw)) {
+                    activityPresenter.startActivity(activity.getId(), input.getText().toString());
+                } else {
+                    showError("Debes introducir una password");
+                }
+            }
+        });
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private Boolean assertPasswordValid(String password) {
+        return password != null && !password.isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void displayProgress() {
+        mOverlayDialog.setCancelable(false);
+        mOverlayDialog.show();
+        this.mProgress.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void hideProgress() {
+        mOverlayDialog.cancel();
+        this.mProgress.setVisibility(View.GONE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void showError(String error) {
+        ViewUtils.showToast(getView().getContext(), Toast.LENGTH_SHORT, error);
+    }
 }

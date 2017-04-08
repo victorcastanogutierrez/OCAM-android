@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -18,8 +17,8 @@ import com.ocam.R;
 import com.ocam.activityList.ListActivity;
 import com.ocam.model.UserTokenDTO;
 import com.ocam.util.LoginPreferencesUtils;
-import com.ocam.volley.NukeSSLCerts;
 import com.ocam.util.ViewUtils;
+import com.ocam.volley.NukeSSLCerts;
 
 public class LoginActivity extends Activity implements LoginView {
 

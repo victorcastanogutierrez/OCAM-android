@@ -1,6 +1,8 @@
 package com.ocam.volley;
 
 
+import android.util.Log;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -85,7 +87,9 @@ public class GsonRequest<T> extends Request<T> {
 
         UserManager userManager = UserManager.getInstance();
         if (userManager.getUserTokenDTO() != null) {
-            sendHeaders.put(Constants.HEADER_AUTH_NAME, userManager.getUserTokenDTO().getToken());
+            if (super.getUrl().startsWith(Constants.SERVER_URL + "/api/")) {
+                sendHeaders.put(Constants.HEADER_AUTH_NAME, userManager.getUserTokenDTO().getToken());
+            }
         }
         return sendHeaders;
     }

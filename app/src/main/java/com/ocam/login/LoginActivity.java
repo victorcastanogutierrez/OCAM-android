@@ -54,6 +54,8 @@ public class LoginActivity extends Activity implements LoginView {
         if (Boolean.FALSE.equals(cierraSesion)) {
             displayProgress();
             this.loginPresenter.checkUserLogged();
+        } else {
+            LoginPreferencesUtils.removeSavedCredentials(LoginActivity.this);
         }
 
         test(); //Eliminar

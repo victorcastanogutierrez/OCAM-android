@@ -13,6 +13,7 @@ public class Constants {
     public static final String API_FIND_ALL_ACTIVITIES = "/api/findAllPendingRunningActivities";
     public static final String API_START_ACTIVITY = "/api/startActivity";
     public static final String API_FIND_ACTIVITY = "/api/activity";
+    public static final String API_UPDATE_PASSWORD_ACTIVITY = "/api/updateActivityPassword";
 
     //Header auth
     public static final String HEADER_AUTH_NAME = "authorization";

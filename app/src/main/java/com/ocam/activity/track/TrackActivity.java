@@ -1,14 +1,18 @@
 package com.ocam.activity.track;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -22,7 +26,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.ocam.R;
-import com.ocam.login.LoginActivity;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.util.ViewUtils;
 
@@ -37,16 +40,10 @@ public class TrackActivity extends AppCompatActivity implements OnMapReadyCallba
     private List<GPSPoint> puntos;
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
+    private static final Integer PERMISSIONS_CODE = 123;
 
-    /**
-     * Porcentaje de puntos entre marcador y marcador de dirección que serán incluídos en la polylinea
-     */
-    private static final Double PORCENTAJE_DIERCCION = .10;
-
-    /**
-     * Máximo de puntos de dirección que serán incluídos en la polylinea
-     */
-    private static final Integer MAX_DIRECCION = 15;
+    private static final CharSequence[] MAP_TYPE_ITEMS =
+            {"Road Map", "Hybrid", "Satellite", "Terrain"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +52,10 @@ public class TrackActivity extends AppCompatActivity implements OnMapReadyCallba
         // Configuración de toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.trackToolbar);
         toolbar.setTitle("Track de la ruta");
+        toolbar.getBackground().setAlpha(180);
         setSupportActionBar(toolbar);
         // add back arrow to toolbar
-        if (getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
@@ -70,6 +68,12 @@ public class TrackActivity extends AppCompatActivity implements OnMapReadyCallba
         displayProgress();
         Bundle extras = getIntent().getExtras();
         this.trackPresenter.getActivityTrack(extras.getLong("activityId"));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_track, menu);
+        return true;
     }
 
     @Override
@@ -87,6 +91,9 @@ public class TrackActivity extends AppCompatActivity implements OnMapReadyCallba
         this.mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
     }
 
+    /**
+     * Muestra la barra de progreso e impide la interacción con cualquier elemento de la vista
+     */
     private void displayProgress() {
         mOverlayDialog.setCancelable(false);
         mOverlayDialog.show();
@@ -160,10 +167,63 @@ public class TrackActivity extends AppCompatActivity implements OnMapReadyCallba
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //Click en back button de la toolbar (cerramos la actividad)
-        if (item.getItemId() == android.R.id.home) {
-            finish();
+        switch (item.getItemId()) {
+            case R.id.trackMapType:
+                showMapTypeSelectorDialog();
+                return true;
+            case android.R.id.home:
+                //Click en back button de la toolbar (cerramos la actividad)
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Método obtenido de documentación para seleccionar el tipo de mapa
+     * entre los permitidos de Google Maps
+     */
+    private void showMapTypeSelectorDialog() {
+        // Prepare the dialog by setting up a Builder.
+        final String fDialogTitle = "Tipo de mapa";
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(fDialogTitle);
+
+        // Find the current map type to pre-check the item representing the current state.
+        int checkItem = mMap.getMapType() - 1;
+
+        // Add an OnClickListener to the dialog, so that the selection will be handled.
+        builder.setSingleChoiceItems(
+                MAP_TYPE_ITEMS,
+                checkItem,
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int item) {
+                        // Locally create a finalised object.
+
+                        // Perform an action depending on which item was selected.
+                        switch (item) {
+                            case 1:
+                                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                                break;
+                            case 2:
+                                mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                                break;
+                            case 3:
+                                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                                break;
+                            default:
+                                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                        }
+                        dialog.dismiss();
+                    }
+                }
+        );
+
+        // Build the dialog and show it.
+        AlertDialog fMapTypeDialog = builder.create();
+        fMapTypeDialog.setCanceledOnTouchOutside(true);
+        fMapTypeDialog.show();
     }
 }

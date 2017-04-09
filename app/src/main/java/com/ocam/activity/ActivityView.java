@@ -4,10 +4,10 @@ package com.ocam.activity;
 public interface ActivityView {
 
     /**
-     * Muestra un error en pantalla mediante Toast
-     * @param error contenido del error
+     * Muestra una notificación por pantalla al usuario
+     * @param notificationText contenido del error
      */
-    void showError(String error);
+    void notifyUser(String notificationText);
 
     /**
      * Muestra una barra de progreso con un layout superpuesto a la vista
@@ -19,4 +19,9 @@ public interface ActivityView {
      * Oculta la barra de progreso y el dialog superpuesto
      */
     void hideProgress();
+
+    /**
+     * Actualiza los datos de la actividad y actualiza los botones de comenzar y monitorizar
+     */
+    void onActivityOpen();
 }

@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
@@ -24,10 +25,8 @@ import com.google.gson.Gson;
 import com.ocam.R;
 import com.ocam.activity.track.TrackActivity;
 import com.ocam.model.Activity;
-import com.ocam.model.types.GPSPoint;
+import com.ocam.model.types.ActivityStatus;
 import com.ocam.util.ViewUtils;
-
-import java.util.List;
 
 import static com.ocam.util.DateUtils.formatDate;
 
@@ -47,8 +46,11 @@ public class FragmentActivity extends Fragment implements ActivityView {
     private ActivityPresenter activityPresenter;
     private LinearLayout guiasLayout;
     private Button btComenzar;
+    private Button btMonitorizar;
+    private Button btCambiarPassword;
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
+    private EditText input; // Dialog de password
 
     public FragmentActivity() {
 
@@ -81,14 +83,46 @@ public class FragmentActivity extends Fragment implements ActivityView {
         this.txEstado = (TextView) v.findViewById(R.id.lbEstado);
         this.guiasLayout = (LinearLayout) v.findViewById(R.id.linearGuia);
         this.btComenzar = (Button) v.findViewById(R.id.btComenzar);
+        this.btMonitorizar = (Button) v.findViewById(R.id.btMonitorizar);
+        this.btCambiarPassword = (Button) v.findViewById(R.id.btCambiarPassword);
         this.mProgress = (ProgressBar) v.findViewById(R.id.progressBar);
         this.mOverlayDialog = new Dialog(v.getContext(), android.R.style.Theme_Panel);
         Bundle args = getArguments();
         setUpActivityData(new Gson().fromJson(args.getString("activity"), Activity.class));
+
+        btCambiarPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPasswordDialog(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String pw = input.getText().toString();
+                        if (assertPasswordValid(pw)) {
+                            activity.setPassword(input.getText().toString());
+                            activityPresenter.updatePasswordActivity(activity.getId(), input.getText().toString());
+                        } else {
+                            notifyUser("Debes introducir una password (entre 3 y 12 caracteres)");
+                        }
+                    }
+                });
+            }
+        });
+
         btComenzar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPasswordDialog();
+                showPasswordDialog(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String pw = input.getText().toString();
+                        if (assertPasswordValid(pw)) {
+                            activity.setPassword(input.getText().toString());
+                            activityPresenter.startActivity(activity.getId(), input.getText().toString());
+                        } else {
+                            notifyUser("Debes introducir una password (entre 3 y 12 caracteres)");
+                        }
+                    }
+                });
             }
         });
         return v;
@@ -108,19 +142,32 @@ public class FragmentActivity extends Fragment implements ActivityView {
             this.txDetalle.setText(activity.getLongDescription());
             this.txDetalle.setVisibility(View.VISIBLE);
         }
+
         if (activity.getMide() != null) {
             this.txMide.setText("Enlace a detalle: "+activity.getMide());
             this.txMide.setVisibility(View.VISIBLE);
         }
+
         if (activity.getMaxPlaces() != null) {
             this.txPlazas.setText(activity.getMaxPlaces().toString()+" plazas máximas");
             this.txPlazas.setVisibility(View.VISIBLE);
         }
+
+        //Si es guía
         if (this.activityPresenter.isUserGuide(this.activity)) {
             this.guiasLayout.setVisibility(View.VISIBLE);
             if (!this.activityPresenter.assertActivityRunning(activity)) {
-                this.btComenzar.setEnabled(Boolean.TRUE);
+                this.btComenzar.setVisibility(View.VISIBLE);
+            } else {
+                this.btCambiarPassword.setVisibility(View.VISIBLE);
             }
+        }
+
+        //Actividad abierta y guía o participante
+        if (this.activityPresenter.puedeMonitorizar(this.activity)) {
+            this.btMonitorizar.setEnabled(Boolean.TRUE);
+        } else {
+            this.btMonitorizar.setVisibility(View.GONE);
         }
     }
 
@@ -149,25 +196,15 @@ public class FragmentActivity extends Fragment implements ActivityView {
      * Método que muestra el dialog de confirmacion de iniciar actividad
      * con la solicitud de la password al usuario
      */
-    private void showPasswordDialog() {
+    private void showPasswordDialog(DialogInterface.OnClickListener aceptarCallback) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
         builder.setTitle("Introduce una password para la actividad");
 
-        final EditText input = new EditText(getView().getContext());
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
+        this.input = new EditText(getView().getContext());
+        this.input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(this.input);
 
-        builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String pw = input.getText().toString();
-                if (assertPasswordValid(pw)) {
-                    activityPresenter.startActivity(activity.getId(), input.getText().toString());
-                } else {
-                    showError("Debes introducir una password");
-                }
-            }
-        });
+        builder.setPositiveButton("Aceptar", aceptarCallback);
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -179,7 +216,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
     }
 
     private Boolean assertPasswordValid(String password) {
-        return password != null && !password.isEmpty();
+        return password != null && !password.isEmpty() && password.length() >= 3 && password.length() <= 12;
     }
 
     /**
@@ -205,7 +242,28 @@ public class FragmentActivity extends Fragment implements ActivityView {
      * {@inheritDoc}
      */
     @Override
-    public void showError(String error) {
-        ViewUtils.showToast(getView().getContext(), Toast.LENGTH_SHORT, error);
+    public void onActivityOpen() {
+        this.activity.setStatus(ActivityStatus.RUNNING);
+        this.btComenzar.setVisibility(View.GONE);
+        btMonitorizar.setEnabled(Boolean.TRUE);
+        btMonitorizar.setVisibility(View.VISIBLE);
+        btCambiarPassword.setVisibility(View.VISIBLE);
+        this.txEstado.setText(this.activity.getFormattedStatus());
+        Snackbar.make(getView(), "Actividad abierta. Password: "+this.activity.getPassword(), Snackbar.LENGTH_LONG)
+            .setAction("OK", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                }
+            })
+            .setActionTextColor(getResources().getColor(android.R.color.holo_red_light ))
+            .show();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void notifyUser(String notificationText) {
+        ViewUtils.showToast(getView().getContext(), Toast.LENGTH_SHORT, notificationText);
     }
 }

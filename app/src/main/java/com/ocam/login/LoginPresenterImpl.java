@@ -1,7 +1,6 @@
 package com.ocam.login;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
@@ -21,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Victor on 01/04/2017.
+ * Presentador de la actividad de login
  */
 public class LoginPresenterImpl implements LoginPresenter {
 

@@ -98,39 +98,39 @@ public class ListActivity extends AppCompatActivity {
 
     private void setUpNavView() {
         this.navView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+            new NavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(MenuItem menuItem) {
 
-                        Boolean fragmentTransaction = Boolean.FALSE;
-                        Fragment fragment = null;
+                    Boolean fragmentTransaction = Boolean.FALSE;
+                    Fragment fragment = null;
 
-                        switch (menuItem.getItemId()) {
-                            case R.id.menu_cerrar_sesion:
-                                Intent i = new Intent(ListActivity.this, LoginActivity.class);
-                                i.putExtra("CIERRA_SESION", Boolean.TRUE);
-                                finish();
-                                startActivity(i);
-                                break;
-                            case R.id.menu_item_1:
-                                fragmentTransaction = Boolean.TRUE;
-                                fragment = new FragmentList();
-                                break;
-                        }
-
-                        if(fragmentTransaction) {
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.contenido, fragment)
-                                    .commit();
-
-                            setSelectedMenuItem(menuItem);
-                        }
-
-                        drawerLayout.closeDrawers();
-
-                        return true;
+                    switch (menuItem.getItemId()) {
+                        case R.id.menu_cerrar_sesion:
+                            Intent i = new Intent(ListActivity.this, LoginActivity.class);
+                            i.putExtra("CIERRA_SESION", Boolean.TRUE);
+                            finish();
+                            startActivity(i);
+                            break;
+                        case R.id.menu_item_1:
+                            fragmentTransaction = Boolean.TRUE;
+                            fragment = new FragmentList();
+                            break;
                     }
-                });
+
+                    if(fragmentTransaction) {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.contenido, fragment)
+                                .commit();
+
+                        setSelectedMenuItem(menuItem);
+                    }
+
+                    drawerLayout.closeDrawers();
+
+                    return true;
+                }
+            });
     }
 
     private void setSelectedMenuItem(MenuItem menuItem) {

@@ -33,4 +33,19 @@ public interface ActivityPresenter {
      * @param password
      */
     void startActivity(Long activityId, String password);
+
+    /**
+     * Método que evalua si el usuario logueado puede monitorizar. Podrá en caso que la actividad
+     * esté en curso, sea guía o bien participante
+     * @param activity
+     * @return
+     */
+    Boolean puedeMonitorizar(Activity activity);
+
+    /**
+     * Actualiza la password a la actividad pasada por parámetro
+     * @param activityId
+     * @param password
+     */
+    void updatePasswordActivity(Long activityId, String password);
 }

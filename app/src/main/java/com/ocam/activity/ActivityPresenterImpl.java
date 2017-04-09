@@ -69,6 +69,41 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Boolean puedeMonitorizar(Activity activity) {
+        if (!assertActivityRunning(activity)) {
+            return Boolean.FALSE;
+        }
+        if (isUserGuide(activity)) {
+            return Boolean.TRUE;
+        }
+        String loggedHiker = UserManager.getInstance().getUserTokenDTO().getLogin();
+        for (Hiker h : activity.getHikers()) {
+            if (h.getEmail().equals(loggedHiker)) {
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updatePasswordActivity(Long activityId, String password) {
+        this.activityView.displayProgress();
+        ICommand<Void> myCommand = new MyUpdateCommand();
+        GsonRequest<Void> request = new GsonRequest<Void>(
+                Constants.API_UPDATE_PASSWORD_ACTIVITY + '/' + activityId + '/' + password,
+                Request.Method.POST, Void.class, null,
+                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+
+        VolleyManager.getInstance(this.context).addToRequestQueue(request);
+    }
+
+    /**
      * Método que construye un String (JSON) con la información de la actividad para hacer la petición
      * POST a la API
      * @return
@@ -104,7 +139,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         @Override
         public void executeResponse(Void response) {
             activityView.hideProgress();
-
+            activityView.onActivityOpen();
         }
 
         /**
@@ -114,7 +149,35 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         @Override
         public void executeError(VolleyError error) {
             activityView.hideProgress();
-            activityView.showError("La actividad no puede ser iniciada.");
+            activityView.notifyUser("La actividad no puede ser iniciada.");
+        }
+    }
+
+    /**
+     * Command genérico para manejar la respuesta HTTP a la llamada a la API del servidor
+     * para actualizar la password de una actividad
+     */
+    private class MyUpdateCommand implements ICommand<Void> {
+
+        /**
+         * Oculta la barra de progreso y notifica al usuario de la actualización
+         * de la password
+         * @param response
+         */
+        @Override
+        public void executeResponse(Void response) {
+            activityView.hideProgress();
+            activityView.notifyUser("Password actualizada");
+        }
+
+        /**
+         * Muestra el error retornado por el servidor al usuario
+         * @param error
+         */
+        @Override
+        public void executeError(VolleyError error) {
+            activityView.hideProgress();
+            activityView.notifyUser("No se ha podido actualizar la password");
         }
     }
 }

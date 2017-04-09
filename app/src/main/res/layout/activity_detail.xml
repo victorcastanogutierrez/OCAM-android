@@ -128,6 +128,17 @@
             android:visibility="gone"
             android:paddingLeft="15sp"/>
 
+        <Button
+            android:id="@+id/btUnirse"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
+            android:paddingTop="15sp"
+            android:text="Participar en la actividad" />
+
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:orientation="vertical"
             android:layout_width="wrap_content"

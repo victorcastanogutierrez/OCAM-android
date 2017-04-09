@@ -48,4 +48,17 @@ public interface ActivityPresenter {
      * @param password
      */
     void updatePasswordActivity(Long activityId, String password);
+
+    /**
+     * Método que evalua si el usuario logueado puede unirse a la actividad
+     * @param activity
+     * @return
+     */
+    Boolean puedeUnirse(Activity activity);
+
+    /**
+     * Une al usuario logueado en la actividad
+     * @param activity
+     */
+    void unirseActividad(Activity activity);
 }

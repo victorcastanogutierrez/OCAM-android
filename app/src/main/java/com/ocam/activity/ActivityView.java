@@ -24,4 +24,9 @@ public interface ActivityView {
      * Actualiza los datos de la actividad y actualiza los botones de comenzar y monitorizar
      */
     void onActivityOpen();
+
+    /**
+     * Actualiza los datos de la actividad y la vista al unirse
+     */
+    void onHikerJoinActivity();
 }

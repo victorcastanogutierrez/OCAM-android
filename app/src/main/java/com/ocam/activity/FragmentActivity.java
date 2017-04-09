@@ -48,6 +48,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
     private Button btComenzar;
     private Button btMonitorizar;
     private Button btCambiarPassword;
+    private Button btUnirse;
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
     private EditText input; // Dialog de password
@@ -85,6 +86,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
         this.btComenzar = (Button) v.findViewById(R.id.btComenzar);
         this.btMonitorizar = (Button) v.findViewById(R.id.btMonitorizar);
         this.btCambiarPassword = (Button) v.findViewById(R.id.btCambiarPassword);
+        this.btUnirse = (Button) v.findViewById(R.id.btUnirse);
         this.mProgress = (ProgressBar) v.findViewById(R.id.progressBar);
         this.mOverlayDialog = new Dialog(v.getContext(), android.R.style.Theme_Panel);
         Bundle args = getArguments();
@@ -123,6 +125,13 @@ public class FragmentActivity extends Fragment implements ActivityView {
                         }
                     }
                 });
+            }
+        });
+
+        btUnirse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showConfirmJoinDialog();
             }
         });
         return v;
@@ -168,6 +177,12 @@ public class FragmentActivity extends Fragment implements ActivityView {
             this.btMonitorizar.setEnabled(Boolean.TRUE);
         } else {
             this.btMonitorizar.setVisibility(View.GONE);
+        }
+
+        if (this.activityPresenter.puedeUnirse(this.activity)) {
+            this.btUnirse.setVisibility(View.VISIBLE);
+        } else {
+            this.btUnirse.setVisibility(View.GONE);
         }
     }
 
@@ -263,7 +278,36 @@ public class FragmentActivity extends Fragment implements ActivityView {
      * {@inheritDoc}
      */
     @Override
+    public void onHikerJoinActivity() {
+        this.btUnirse.setVisibility(View.GONE);
+        this.btMonitorizar.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void notifyUser(String notificationText) {
         ViewUtils.showToast(getView().getContext(), Toast.LENGTH_SHORT, notificationText);
+    }
+
+    private void showConfirmJoinDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+        builder.setTitle(R.string.app_name);
+        builder.setTitle("Monitorización actividad");
+        builder.setMessage("Al unirte a la actividad y mientras esté en curso, enviaremos tu posición cada cierto tiempo para mantenerte monitorizado. También podrás ver la posición del resto del grupo.");
+        builder.setPositiveButton("Unirme", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+                activityPresenter.unirseActividad(activity);
+            }
+        });
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }

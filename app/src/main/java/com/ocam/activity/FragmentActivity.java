@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.ocam.R;
+import com.ocam.activity.monitorization.MonitorizationActivity;
 import com.ocam.activity.track.TrackActivity;
 import com.ocam.model.Activity;
 import com.ocam.model.types.ActivityStatus;
@@ -134,7 +135,26 @@ public class FragmentActivity extends Fragment implements ActivityView {
                 showConfirmJoinDialog();
             }
         });
+
+
+        btMonitorizar.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                iniciarMonitorizationFragment();
+            }
+        });
         return v;
+    }
+
+    /**
+     * Inicia el fragment de la monitorización pasando la ID de la actividad
+     * por parámetro
+     */
+    private void iniciarMonitorizationFragment() {
+        Intent i = new Intent(getActivity(), MonitorizationActivity.class);
+        i.putExtra("activityId", activity.getId());
+        startActivity(i);
     }
 
     /**
@@ -281,6 +301,8 @@ public class FragmentActivity extends Fragment implements ActivityView {
     public void onHikerJoinActivity() {
         this.btUnirse.setVisibility(View.GONE);
         this.btMonitorizar.setVisibility(View.VISIBLE);
+        this.btMonitorizar.setEnabled(Boolean.TRUE);
+        iniciarMonitorizationFragment();
     }
 
     /**

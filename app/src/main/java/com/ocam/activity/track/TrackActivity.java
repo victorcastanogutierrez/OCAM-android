@@ -1,15 +1,11 @@
 package com.ocam.activity.track;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.view.GravityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -41,9 +37,6 @@ public class TrackActivity extends AppCompatActivity implements OnMapReadyCallba
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
     private static final Integer PERMISSIONS_CODE = 123;
-
-    private static final CharSequence[] MAP_TYPE_ITEMS =
-            {"Road Map", "Hybrid", "Satellite", "Terrain"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,7 +162,7 @@ public class TrackActivity extends AppCompatActivity implements OnMapReadyCallba
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.trackMapType:
-                showMapTypeSelectorDialog();
+                ViewUtils.showMapTypeSelectorDialog(TrackActivity.this, mMap);
                 return true;
             case android.R.id.home:
                 //Click en back button de la toolbar (cerramos la actividad)
@@ -178,52 +171,5 @@ public class TrackActivity extends AppCompatActivity implements OnMapReadyCallba
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    /**
-     * Método obtenido de documentación para seleccionar el tipo de mapa
-     * entre los permitidos de Google Maps
-     */
-    private void showMapTypeSelectorDialog() {
-        // Prepare the dialog by setting up a Builder.
-        final String fDialogTitle = "Tipo de mapa";
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(fDialogTitle);
-
-        // Find the current map type to pre-check the item representing the current state.
-        int checkItem = mMap.getMapType() - 1;
-
-        // Add an OnClickListener to the dialog, so that the selection will be handled.
-        builder.setSingleChoiceItems(
-                MAP_TYPE_ITEMS,
-                checkItem,
-                new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int item) {
-                        // Locally create a finalised object.
-
-                        // Perform an action depending on which item was selected.
-                        switch (item) {
-                            case 1:
-                                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                                break;
-                            case 2:
-                                mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-                                break;
-                            case 3:
-                                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                                break;
-                            default:
-                                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                        }
-                        dialog.dismiss();
-                    }
-                }
-        );
-
-        // Build the dialog and show it.
-        AlertDialog fMapTypeDialog = builder.create();
-        fMapTypeDialog.setCanceledOnTouchOutside(true);
-        fMapTypeDialog.show();
     }
 }

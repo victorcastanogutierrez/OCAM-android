@@ -30,6 +30,8 @@
         <activity
             android:name=".activity.track.TrackActivity"
             android:label="@string/title_activity_track"></activity>
+        <activity
+            android:name=".activity.monitorization.MonitorizationActivity"></activity>
     </application>
 
 </manifest>

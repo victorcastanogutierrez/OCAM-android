@@ -1,0 +1,85 @@
+package com.ocam.activity.monitorization;
+
+
+import android.content.Context;
+
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.ocam.manager.VolleyManager;
+import com.ocam.model.types.GPSPoint;
+import com.ocam.model.types.Track;
+import com.ocam.util.Constants;
+import com.ocam.util.XMLUtils;
+import com.ocam.volley.GsonRequest;
+import com.ocam.volley.listeners.GenericErrorListener;
+import com.ocam.volley.listeners.GenericResponseListener;
+import com.ocam.volley.listeners.ICommand;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
+
+    private Context context;
+    private MonitorizacionView monitorizacionView;
+
+    public MonitorizacionPresenterImpl(Context context, MonitorizacionView monitorizacionView) {
+        this.context = context;
+        this.monitorizacionView = monitorizacionView;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadHikersData(Long activityId) {
+        monitorizacionView.displayProgress();
+        ICommand<Track> myCommand = new trackCommand();
+        GsonRequest<Track> request = new GsonRequest<Track>(Constants.API_FIND_ACTIVITY + "/" + activityId,
+                Request.Method.GET, Track.class, null,
+                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+
+        VolleyManager.getInstance(this.context).addToRequestQueue(request);
+    }
+
+    private List<GPSPoint> parseTrack(String track) {
+        InputStream stream = new ByteArrayInputStream(track.getBytes(StandardCharsets.UTF_8));
+        List<GPSPoint> result = new ArrayList<GPSPoint>();
+        try {
+            result = XMLUtils.parse(stream);
+        } catch (XmlPullParserException | IOException e) {
+            monitorizacionView.notifyText("Error procesando el track de la ruta");
+        }
+        return result;
+    }
+
+    /**
+     * Command genérico para manejar la respuesta HTTP a la llamada a la API del servidor
+     * para obtener el track de la ruta
+     */
+    private class trackCommand implements ICommand<Track> {
+
+        @Override
+        public void executeResponse(Track response) {
+            List<GPSPoint> track = parseTrack(response.getTrack());
+            monitorizacionView.hideProgress();
+            monitorizacionView.showTrack(track);
+        }
+
+        /**
+         * Muestra el error retornado por el servidor al usuario
+         * @param error
+         */
+        @Override
+        public void executeError(VolleyError error) {
+            monitorizacionView.notifyText("Error obteniendo el track de la ruta");
+            monitorizacionView.hideProgress();
+        }
+    }
+}

@@ -12,7 +12,7 @@ public interface MonitorizacionView {
     /**
      * Instancia la vista con los datos de los hiker
      */
-    void setUpRecyclerView(List<Report> datos);
+    void refreshHikersData(List<Report> datos);
 
     /**
      * Muestra una barra de progreso con un layout superpuesto a la vista

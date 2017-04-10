@@ -4,14 +4,6 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="match_parent"
-        android:layout_marginTop="30sp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
-
     <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/monitorizationToolbar"
@@ -32,10 +24,18 @@
         android:layout_weight=".60"
         tools:context="com.ocam.activity.monitorization.MonitorizationActivity" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerHikers"
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swiperefreshMonitorization"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight=".40"/>
+        android:layout_weight=".40">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerHikers"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".40"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>

@@ -7,7 +7,6 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.ocam.manager.VolleyManager;
-import com.ocam.model.Hiker;
 import com.ocam.model.Report;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.model.types.Track;
@@ -111,7 +110,7 @@ public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
         public void executeResponse(Report[] response) {
             monitorizacionView.hideProgress();
             reports = Arrays.asList(response);
-            monitorizacionView.setUpRecyclerView(reports);
+            monitorizacionView.refreshHikersData(reports);
         }
 
         /**

@@ -9,6 +9,13 @@
         android:title="Title"
         android:tint="@color/colorPrimary"
         app:showAsAction="ifRoom">
+    </item>
 
+    <item
+        android:id="@+id/refreshHikers"
+        android:icon="@drawable/ic_refresh_black_24dp"
+        android:title="Title"
+        android:tint="@color/colorPrimary"
+        app:showAsAction="ifRoom">
     </item>
 </menu>

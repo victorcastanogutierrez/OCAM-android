@@ -3,6 +3,7 @@ package com.ocam.activity.monitorization;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,12 +17,10 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -30,16 +29,16 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.ocam.R;
-import com.ocam.model.Hiker;
 import com.ocam.model.Report;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.util.ViewUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.os.Build.VERSION_CODES.M;
+import static com.ocam.R.id.map;
 
 /**
  * Activity para la vista de la monitorización de una actividad
@@ -48,13 +47,13 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
 
     private Long activityId;
     private RecyclerView recyclerView;
-    private ProgressBar mProgress;
-    private Dialog mOverlayDialog;
     private MonitorizacionPresenter monitorizationPresenter;
     private List<GPSPoint> puntos;
     private GoogleMap mMap;
     private HikerAdapter hikerAdapter;
     private Map<String, Marker> markers;
+    private LatLngBounds bounds;
+    private SwipeRefreshLayout refreshLayout;
 
     public MonitorizationActivity() {
 
@@ -63,12 +62,13 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.markers = new HashMap<>();
         setContentView(R.layout.activity_monitorization);
+        setUpSwipeRefresh();
+        setUpRecyclerData();
+        this.markers = new HashMap<>();
         this.activityId = getActivityParameter();
-        this.mProgress = (ProgressBar) findViewById(R.id.progressBar);
-        this.mOverlayDialog = new Dialog(MonitorizationActivity.this, android.R.style.Theme_Panel);
         this.monitorizationPresenter = new MonitorizacionPresenterImpl(MonitorizationActivity.this, this);
+
         setUpToolbar();
         this.monitorizationPresenter.loadActivityData(activityId);
     }
@@ -83,13 +83,13 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
 
         LatLngBounds.Builder b = new LatLngBounds.Builder();
         PolylineOptions polylineOptions = getPolylineOptions(b);
-        LatLngBounds bounds = b.build();
+        this.bounds = b.build();
         this.mMap.addPolyline(polylineOptions);
         this.addStartFinishMarkers();
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;
         int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
-        this.mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
+        this.mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(this.bounds, width, height, padding));
     }
 
     @Override
@@ -103,6 +103,9 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
         switch (item.getItemId()) {
             case R.id.tiposMapa:
                 ViewUtils.showMapTypeSelectorDialog(MonitorizationActivity.this, mMap);
+                return true;
+            case R.id.refreshHikers:
+                this.monitorizationPresenter.loadReportsData(this.activityId);
                 return true;
             case android.R.id.home:
                 //Click en back button de la toolbar (cerramos la actividad)
@@ -118,9 +121,7 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
      */
     @Override
     public void displayProgress() {
-        mOverlayDialog.setCancelable(false);
-        mOverlayDialog.show();
-        this.mProgress.setVisibility(View.VISIBLE);
+        this.refreshLayout.setRefreshing(true);
     }
 
     /**
@@ -128,8 +129,7 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
      */
     @Override
     public void hideProgress() {
-        mOverlayDialog.cancel();
-        this.mProgress.setVisibility(View.GONE);
+        this.refreshLayout.setRefreshing(false);
     }
 
     /**
@@ -148,7 +148,7 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
         this.puntos = puntos;
 
         SupportMapFragment mapFrag = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(map);
         mapFrag.getMapAsync(this);
 
         //Una vez mostrado el track descargamos los datos de los hikers
@@ -222,16 +222,13 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
      * {@inheritDoc}
      */
     @Override
-    public void setUpRecyclerView(List<Report> datos) {
-
-        this.recyclerView = (RecyclerView) findViewById(R.id.recyclerHikers);
-        this.recyclerView.setHasFixedSize(true);
-        this.hikerAdapter = new HikerAdapter(datos, this);
-
-        this.recyclerView.setAdapter(this.hikerAdapter);
-        this.recyclerView.setLayoutManager(new LinearLayoutManager(MonitorizationActivity.this,LinearLayoutManager.VERTICAL,false));
-
-        this.recyclerView.setItemAnimator(new DefaultItemAnimator());
+    public void refreshHikersData(List<Report> datos) {
+        this.hikerAdapter.setData(new ArrayList<>(datos));
+        this.hikerAdapter.notifyDataSetChanged();
+        for (Map.Entry<String, Marker> entry : this.markers.entrySet()) {
+            entry.getValue().remove();
+        }
+        this.markers.clear();
     }
 
     /**
@@ -251,10 +248,8 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
                     .title(login)));
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(markerPos)      // Sets the center of the map to Mountain View
-                    .zoom(30)                   // Sets the zoom
-                    .bearing(90)                // Sets the orientation of the camera to east
-                    .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                    .target(markerPos)
+                    .zoom(18)
                     .build();
             this.mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
@@ -262,5 +257,34 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
             this.markers.get(login).remove();
             this.markers.remove(login);
         }
+    }
+
+    /**
+     * Instancia el recyclerView sin datos
+     */
+    private void setUpRecyclerData() {
+        this.recyclerView = (RecyclerView) findViewById(R.id.recyclerHikers);
+        this.recyclerView.setHasFixedSize(true);
+        this.hikerAdapter = new HikerAdapter(new ArrayList<Report>(), this);
+
+        this.recyclerView.setAdapter(this.hikerAdapter);
+        this.recyclerView.setLayoutManager(new LinearLayoutManager(MonitorizationActivity.this,LinearLayoutManager.VERTICAL,false));
+
+        this.recyclerView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    /**
+     * Configura el SwiftRefreshLayout
+     */
+    private void setUpSwipeRefresh() {
+        this.refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefreshMonitorization);
+        this.refreshLayout.setColorSchemeResources(
+                R.color.colorPrimary, R.color.colorAccent);
+        this.refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                monitorizationPresenter.loadReportsData(activityId);
+            }
+        });
     }
 }

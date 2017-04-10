@@ -5,9 +5,9 @@ import com.ocam.model.types.GPSPoint;
 import java.util.Date;
 
 
-public class Report implements Comparable<Report> {
+public class Report {
 
-	private Date date;
+	private Long date;
 
 	private Activity activity;
 
@@ -15,11 +15,11 @@ public class Report implements Comparable<Report> {
 
 	private GPSPoint point;
 
-	public Date getDate() {
+	public Long getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(Long date) {
 		this.date = date;
 	}
 
@@ -45,11 +45,6 @@ public class Report implements Comparable<Report> {
 
 	public void setPoint(GPSPoint point) {
 		this.point = point;
-	}
-
-	@Override
-	public int compareTo(Report o) {
-		return this.date.compareTo(o.getDate());
 	}
 
 }

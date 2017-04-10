@@ -9,6 +9,8 @@ public class Hiker {
 
 	private String login;
 
+	private String username;
+
 	private String password;
 
 	private Boolean active = Boolean.FALSE;
@@ -93,5 +95,13 @@ public class Hiker {
 
 	public void setOwneds(List<Activity> owneds) {
 		this.owneds = owneds;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }

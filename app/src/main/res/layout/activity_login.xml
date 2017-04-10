@@ -57,11 +57,22 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:text="@string/login"
         android:id="@+id/btLogin"
         android:layout_marginTop="30sp"
         android:background="#04b486"
         android:onClick="login"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:text="@string/register"
+        android:id="@+id/btRegistro"
+        android:layout_marginTop="30sp"
+        android:background="#04b486"
+        android:onClick="register"/>
 
     <ProgressBar
         android:id="@+id/progressBar"

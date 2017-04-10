@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.ocam.R;
 import com.ocam.activityList.ListActivity;
 import com.ocam.model.UserTokenDTO;
+import com.ocam.register.RegisterActivity;
 import com.ocam.util.LoginPreferencesUtils;
 import com.ocam.util.ViewUtils;
 import com.ocam.volley.NukeSSLCerts;
@@ -84,6 +85,15 @@ public class LoginActivity extends Activity implements LoginView {
             this.displayProgress();
             this.loginPresenter.login(username, password, cbRecuerda.isChecked());
         }
+    }
+
+    /**
+     * Método ejecutado cuando se pulsa el botón de registro
+     * @param view
+     */
+    public void register(View view) {
+        Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
+        startActivity(i);
     }
 
     private Boolean assertEmailPassword(String email, String password) {

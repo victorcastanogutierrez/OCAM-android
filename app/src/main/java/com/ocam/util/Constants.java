@@ -16,6 +16,7 @@ public class Constants {
     public static final String API_UPDATE_PASSWORD_ACTIVITY = "/api/updateActivityPassword";
     public static final String API_UNIRSE_ACTIVIDAD = "/api/joinActivity";
     public static final String API_FIND_ACTIVITY_REPORTS = "/api/lastActivityReports";
+    public static final String API_REGISTER_HIKER = "/hiker";
 
     //Header auth
     public static final String HEADER_AUTH_NAME = "authorization";

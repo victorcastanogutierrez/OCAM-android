@@ -14,18 +14,17 @@
         android:clickable="true"
         tools:context=".activityList.ListActivity">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="match_parent"
-            android:layout_marginTop="30sp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
+        <android.support.v4.widget.SwipeRefreshLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swiperefreshActivities"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/reciclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/reciclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </android.support.v4.widget.SwipeRefreshLayout>
 
     </LinearLayout>
 </FrameLayout>

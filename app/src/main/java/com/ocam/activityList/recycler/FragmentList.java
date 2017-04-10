@@ -3,6 +3,7 @@ package com.ocam.activityList.recycler;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,10 +32,9 @@ public class FragmentList extends Fragment implements ListActivityView
 {
 
     private ListPresenter listPresenter;
-    private Dialog mOverlayDialog;
-    private ProgressBar mProgress;
     private RecyclerView recyclerView;
     private ActivityAdapter adapter;
+    private SwipeRefreshLayout refreshLayout;
 
     public FragmentList() {
 
@@ -45,25 +45,26 @@ public class FragmentList extends Fragment implements ListActivityView
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_list, container, false);
         setHasOptionsMenu(true);
+        setUpSwipeRefresh(view);
         this.listPresenter = new ListPresenterImpl(this, getContext());
-        this.mOverlayDialog = new Dialog(getContext(), android.R.style.Theme_Panel);
-        this.mProgress = (ProgressBar) view.findViewById(R.id.progressBar);
         listPresenter.loadActivities();
-
         return view;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void showProgress() {
-        mOverlayDialog.setCancelable(false);
-        mOverlayDialog.show();
-        this.mProgress.setVisibility(View.VISIBLE);
+        this.refreshLayout.setRefreshing(true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void hideProgress() {
-        mOverlayDialog.cancel();
-        this.mProgress.setVisibility(View.GONE);
+        this.refreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -127,5 +128,20 @@ public class FragmentList extends Fragment implements ListActivityView
                 .addToBackStack(null)
                 .commit();
 
+    }
+
+    /**
+     * Configura el SwiftRefreshLayout
+     */
+    private void setUpSwipeRefresh(View view) {
+        this.refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefreshActivities);
+        this.refreshLayout.setColorSchemeResources(
+                R.color.colorPrimary, R.color.colorAccent);
+        this.refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                listPresenter.reloadActivities();
+            }
+        });
     }
 }

@@ -121,7 +121,8 @@ public class Activity {
 	}
 
     public String getFormattedStatus() {
-        return new String("RUNNING").equals(this.status.toString()) ? "EN CURSO" : "PENDIENTE";
+        return new String("RUNNING").equals(this.status.toString()) ? "EN CURSO" :
+				new String("CLOSED").equals(this.status.toString()) ? "FINALIZADA" : "PENDIENTE";
     }
 
     public String getLabel() {

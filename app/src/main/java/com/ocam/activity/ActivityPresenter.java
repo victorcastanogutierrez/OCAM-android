@@ -60,5 +60,11 @@ public interface ActivityPresenter {
      * Une al usuario logueado en la actividad
      * @param activity
      */
-    void unirseActividad(Activity activity);
+    void joinActivity(Activity activity);
+
+    /**
+     * Cierra la actividad en curso cambiándola el estado a CLOSED
+     * @param activity
+     */
+    void closeActivity(Activity activity);
 }

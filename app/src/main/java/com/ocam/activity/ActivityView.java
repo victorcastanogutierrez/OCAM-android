@@ -29,4 +29,9 @@ public interface ActivityView {
      * Actualiza los datos de la actividad y la vista al unirse
      */
     void onHikerJoinActivity();
+
+    /**
+     * Ejecutado al cerrarse la actividad
+     */
+    void onActivityClosed();
 }

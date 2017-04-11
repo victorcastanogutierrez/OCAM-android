@@ -200,5 +200,16 @@
             android:paddingTop="15sp"
             android:text="Monitorizar actividad" />
 
+        <Button
+            android:id="@+id/btCerrar"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
+            android:paddingTop="15sp"
+            android:visibility="gone"
+            android:text="Cerrar actividad" />
+
     </LinearLayout>
 </ScrollView>

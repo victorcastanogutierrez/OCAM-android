@@ -50,6 +50,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
     private Button btMonitorizar;
     private Button btCambiarPassword;
     private Button btUnirse;
+    private Button btCerrar;
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
     private EditText input; // Dialog de password
@@ -88,6 +89,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
         this.btMonitorizar = (Button) v.findViewById(R.id.btMonitorizar);
         this.btCambiarPassword = (Button) v.findViewById(R.id.btCambiarPassword);
         this.btUnirse = (Button) v.findViewById(R.id.btUnirse);
+        this.btCerrar = (Button) v.findViewById(R.id.btCerrar);
         this.mProgress = (ProgressBar) v.findViewById(R.id.progressBar);
         this.mOverlayDialog = new Dialog(v.getContext(), android.R.style.Theme_Panel);
         Bundle args = getArguments();
@@ -144,6 +146,13 @@ public class FragmentActivity extends Fragment implements ActivityView {
                 iniciarMonitorizationFragment();
             }
         });
+
+        btCerrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showConfirmCerrarDialog();
+            }
+        });
         return v;
     }
 
@@ -188,7 +197,9 @@ public class FragmentActivity extends Fragment implements ActivityView {
             if (!this.activityPresenter.assertActivityRunning(activity)) {
                 this.btComenzar.setVisibility(View.VISIBLE);
             } else {
+                //Siendo guía y estando activa, la puede cerrar o cambiar la password
                 this.btCambiarPassword.setVisibility(View.VISIBLE);
+                this.btCerrar.setVisibility(View.VISIBLE);
             }
         }
 
@@ -290,7 +301,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
                 public void onClick(View view) {
                 }
             })
-            .setActionTextColor(getResources().getColor(android.R.color.holo_red_light ))
+            .setActionTextColor(getResources().getColor(android.R.color.holo_green_light ))
             .show();
     }
 
@@ -309,10 +320,34 @@ public class FragmentActivity extends Fragment implements ActivityView {
      * {@inheritDoc}
      */
     @Override
+    public void onActivityClosed() {
+        Snackbar.make(getView(), "Actividad cerrada", Snackbar.LENGTH_LONG)
+                .setAction("OK", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                    }
+                })
+                .setActionTextColor(getResources().getColor(android.R.color.holo_green_light ))
+                .show();
+
+        activity.setStatus(ActivityStatus.CLOSED);
+        btCerrar.setVisibility(View.GONE);
+        btMonitorizar.setVisibility(View.GONE);
+        btCambiarPassword.setVisibility(View.GONE);
+        txEstado.setText(activity.getFormattedStatus());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void notifyUser(String notificationText) {
         ViewUtils.showToast(getView().getContext(), Toast.LENGTH_SHORT, notificationText);
     }
 
+    /**
+     * Confirmación visual de unirse a una actividad
+     */
     private void showConfirmJoinDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
         builder.setTitle(R.string.app_name);
@@ -321,7 +356,30 @@ public class FragmentActivity extends Fragment implements ActivityView {
         builder.setPositiveButton("Unirme", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
-                activityPresenter.unirseActividad(activity);
+                activityPresenter.joinActivity(activity);
+            }
+        });
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    /**
+     * Confirmación visual para cerrar una actividad
+     */
+    private void showConfirmCerrarDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+        builder.setTitle(R.string.app_name);
+        builder.setTitle("Concluir actividad");
+        builder.setMessage("Al dar por concluída la actividad se parará la monitorización y no se podrá volver a abrir");
+        builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+                activityPresenter.closeActivity(activity);
             }
         });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {

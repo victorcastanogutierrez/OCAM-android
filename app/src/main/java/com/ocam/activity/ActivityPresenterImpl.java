@@ -113,12 +113,26 @@ public class ActivityPresenterImpl implements ActivityPresenter {
      * {@inheritDoc}
      */
     @Override
-    public void unirseActividad(Activity activity) {
+    public void joinActivity(Activity activity) {
         this.activityView.displayProgress();
         UserManager userManager = UserManager.getInstance();
         ICommand<Void> myCommand = new MyJoinActivityCommand();
         GsonRequest<Void> request = new GsonRequest<Void>(
                 Constants.API_UNIRSE_ACTIVIDAD + '/' + activity.getId() + '/' + userManager.getUserTokenDTO().getLogin(),
+                Request.Method.POST, Void.class, null,
+                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+
+        VolleyManager.getInstance(this.context).addToRequestQueue(request);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void closeActivity(Activity activity) {
+        this.activityView.displayProgress();
+        ICommand<Void> myCommand = new CloseActivityCommand();
+        GsonRequest<Void> request = new GsonRequest<Void>(Constants.API_CLOSE_ACTIVITY + '/' + activity.getId(),
                 Request.Method.POST, Void.class, null,
                 new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
@@ -243,6 +257,34 @@ public class ActivityPresenterImpl implements ActivityPresenter {
             activityView.hideProgress();
             JsonObject objError = new Gson().fromJson(error.getMessage(), JsonObject.class);
             activityView.notifyUser(objError.get("message").getAsString());
+        }
+    }
+
+    /**
+     * Command genérico para manejar la respuesta HTTP a la llamada a la API del servidor
+     * para dar por concluida una actividad
+     */
+    private class CloseActivityCommand implements ICommand<Void> {
+
+        /**
+         * Oculta la barra de progreso y notifica al usuario de la actualización
+         * del estado de la actividad
+         * @param response
+         */
+        @Override
+        public void executeResponse(Void response) {
+            activityView.hideProgress();
+            activityView.onActivityClosed();
+        }
+
+        /**
+         * Muestra el error retornado por el servidor al usuario
+         * @param error
+         */
+        @Override
+        public void executeError(VolleyError error) {
+            activityView.hideProgress();
+            activityView.notifyUser("La actividad no pudo ser cerrada debido a un error.");
         }
     }
 }

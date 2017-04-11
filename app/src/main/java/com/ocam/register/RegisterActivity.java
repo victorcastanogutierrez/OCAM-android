@@ -1,6 +1,7 @@
 package com.ocam.register;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -15,9 +16,11 @@ import android.widget.Toast;
 
 import com.ocam.R;
 import com.ocam.activity.track.TrackActivity;
+import com.ocam.login.LoginActivity;
 import com.ocam.util.ViewUtils;
 
 import static com.ocam.R.id.ilUsername;
+import static com.ocam.R.id.start;
 
 
 public class RegisterActivity extends AppCompatActivity implements RegisterView, RegisterListener {
@@ -50,7 +53,9 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView,
         switch (item.getItemId()) {
             case android.R.id.home:
                 //Click en back button de la toolbar (vuelve al login)
+                Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
                 finish();
+                startActivity(i);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -142,7 +147,10 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView,
      */
     @Override
     public void onRegister() {
-        ViewUtils.showToast(RegisterActivity.this, Toast.LENGTH_SHORT, "Se ha enviado un correo electrónico para verificar la cuenta");
+        Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
+        finish();
+        startActivity(i);
+        ViewUtils.showToast(RegisterActivity.this, Toast.LENGTH_LONG, "Se ha enviado un correo electrónico para verificar la cuenta");
     }
 }
 

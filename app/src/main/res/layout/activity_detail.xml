@@ -211,5 +211,18 @@
             android:visibility="gone"
             android:text="Cerrar actividad" />
 
+
+
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:text="@string/register"
+            android:id="@+id/prueba"
+            android:layout_marginTop="30sp"
+            android:background="#04b486"
+            android:onClick="test"/>
+
     </LinearLayout>
 </ScrollView>

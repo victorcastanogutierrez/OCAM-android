@@ -7,7 +7,7 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.ocam.manager.VolleyManager;
-import com.ocam.model.Report;
+import com.ocam.model.ReportDTO;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.model.types.Track;
 import com.ocam.util.Constants;
@@ -31,7 +31,7 @@ public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
 
     private Context context;
     private MonitorizacionView monitorizacionView;
-    private List<Report> reports;
+    private List<ReportDTO> reportDTOs;
 
     public MonitorizacionPresenterImpl(Context context, MonitorizacionView monitorizacionView) {
         this.context = context;
@@ -58,9 +58,9 @@ public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
     @Override
     public void loadReportsData(Long activityId) {
         monitorizacionView.displayProgress();
-        ICommand<Report[]> reportsCommand = new reportsCommand();
-        GsonRequest<Report[]> hikersRequest = new GsonRequest<Report[]>(Constants.API_FIND_ACTIVITY_REPORTS + "/" + activityId,
-                Request.Method.GET, Report[].class, null,
+        ICommand<ReportDTO[]> reportsCommand = new reportsCommand();
+        GsonRequest<ReportDTO[]> hikersRequest = new GsonRequest<ReportDTO[]>(Constants.API_FIND_ACTIVITY_REPORTS + "/" + activityId,
+                Request.Method.GET, ReportDTO[].class, null,
                 new GenericResponseListener<>(reportsCommand), new GenericErrorListener(reportsCommand));
 
         VolleyManager.getInstance(this.context).addToRequestQueue(hikersRequest);
@@ -104,13 +104,13 @@ public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
      * Command genérico para manejar la respuesta HTTP a la llamada a la API del servidor
      * para obtener los reportes de los hikers de la actividad
      */
-    private class reportsCommand implements ICommand<Report[]> {
+    private class reportsCommand implements ICommand<ReportDTO[]> {
 
         @Override
-        public void executeResponse(Report[] response) {
+        public void executeResponse(ReportDTO[] response) {
             monitorizacionView.hideProgress();
-            reports = Arrays.asList(response);
-            monitorizacionView.refreshHikersData(reports);
+            reportDTOs = Arrays.asList(response);
+            monitorizacionView.refreshHikersData(reportDTOs);
         }
 
         /**

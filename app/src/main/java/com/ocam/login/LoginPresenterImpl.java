@@ -10,7 +10,7 @@ import com.ocam.manager.UserManager;
 import com.ocam.manager.VolleyManager;
 import com.ocam.model.UserTokenDTO;
 import com.ocam.util.Constants;
-import com.ocam.util.LoginPreferencesUtils;
+import com.ocam.util.PreferencesUtils;
 import com.ocam.volley.GsonRequest;
 import com.ocam.volley.listeners.GenericErrorListener;
 import com.ocam.volley.listeners.GenericResponseListener;
@@ -63,7 +63,7 @@ public class LoginPresenterImpl implements LoginPresenter {
      */
     @Override
     public void checkUserLogged() {
-        UserTokenDTO userTokenDTO = LoginPreferencesUtils.getUserLogged(this.context);
+        UserTokenDTO userTokenDTO = PreferencesUtils.getUserLogged(this.context);
         if (userTokenDTO == null) {
             loginView.hideProgress();
         } else {
@@ -106,7 +106,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                 loginView.showErrorMessage("Error inesperado. Prueba más tarde");
             } else {
                 if (Boolean.TRUE.equals(recuerdaDatos)) {
-                    LoginPreferencesUtils.saveUserLogin(context, response);
+                    PreferencesUtils.saveUserLogin(context, response);
                 }
                 //En caso que venga de introducir los datos
                 //si no la propia response ya contiene el username
@@ -116,6 +116,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                 UserManager userManager = UserManager.getInstance();
                 Log.d("Loguea:", response.toString());
                 userManager.setUserTokenDTO(response);
+                PreferencesUtils.setMonitorizationHiker(context, UserManager.getInstance().getUserTokenDTO().getLogin());
                 loginView.loginSuccess(response);
             }
             loginView.hideProgress();
@@ -129,7 +130,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                 if (error.getMessage().contains(Constants.UNAUTHORIZED_ERROR_CODE)) {
                     errorMsg = "Credenciales inválidas.";
                     //Si las credenciales guardadas son inválidas, las eliminamos
-                    LoginPreferencesUtils.removeSavedCredentials(context);
+                    PreferencesUtils.removeSavedCredentials(context);
                 }
             }
 

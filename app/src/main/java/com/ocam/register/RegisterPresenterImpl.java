@@ -8,7 +8,7 @@ import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.ocam.manager.VolleyManager;
-import com.ocam.model.Hiker;
+import com.ocam.model.HikerDTO;
 import com.ocam.util.Constants;
 import com.ocam.volley.GsonRequest;
 import com.ocam.volley.listeners.GenericErrorListener;
@@ -45,11 +45,11 @@ public class RegisterPresenterImpl implements RegisterPresenter {
      * @return
      */
     private String getBody(String email, String login, String password) {
-        Hiker hiker = new Hiker();
-        hiker.setEmail(email);
-        hiker.setUsername(login);
-        hiker.setPassword(password);
-        return new Gson().toJson(hiker).toString();
+        HikerDTO hikerDTO = new HikerDTO();
+        hikerDTO.setEmail(email);
+        hikerDTO.setUsername(login);
+        hikerDTO.setPassword(password);
+        return new Gson().toJson(hikerDTO).toString();
     }
 
     /**

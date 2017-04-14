@@ -25,7 +25,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.ocam.R;
-import com.ocam.model.Report;
+import com.ocam.model.ReportDTO;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.util.ViewUtils;
 
@@ -218,7 +218,7 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
      * {@inheritDoc}
      */
     @Override
-    public void refreshHikersData(List<Report> datos) {
+    public void refreshHikersData(List<ReportDTO> datos) {
         this.hikerAdapter.setData(new ArrayList<>(datos));
         this.hikerAdapter.notifyDataSetChanged();
         for (Map.Entry<String, Marker> entry : this.markers.entrySet()) {
@@ -231,12 +231,12 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
      * {@inheritDoc}
      */
     @Override
-    public void onClick(Report report) {
-        String login = report.getHiker().getLogin();
+    public void onClick(ReportDTO reportDTO) {
+        String login = reportDTO.getHikerDTO().getLogin();
         if (!this.markers.containsKey(login)) {
             LatLng markerPos = new LatLng(
-                    report.getPoint().getLatitude(),
-                    report.getPoint().getLongitude());
+                    reportDTO.getPoint().getLatitude(),
+                    reportDTO.getPoint().getLongitude());
             this.markers.put(login, this.mMap.addMarker(new MarkerOptions()
                     .position(markerPos)
                     .icon(BitmapDescriptorFactory
@@ -261,7 +261,7 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
     private void setUpRecyclerData() {
         this.recyclerView = (RecyclerView) findViewById(R.id.recyclerHikers);
         this.recyclerView.setHasFixedSize(true);
-        this.hikerAdapter = new HikerAdapter(new ArrayList<Report>(), this);
+        this.hikerAdapter = new HikerAdapter(new ArrayList<ReportDTO>(), this);
 
         this.recyclerView.setAdapter(this.hikerAdapter);
         this.recyclerView.setLayoutManager(new LinearLayoutManager(MonitorizationActivity.this,LinearLayoutManager.VERTICAL,false));

@@ -1,7 +1,6 @@
 package com.ocam.activity;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
@@ -10,7 +9,7 @@ import com.google.gson.JsonObject;
 import com.ocam.manager.UserManager;
 import com.ocam.manager.VolleyManager;
 import com.ocam.model.Activity;
-import com.ocam.model.Hiker;
+import com.ocam.model.HikerDTO;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.util.Constants;
 import com.ocam.volley.GsonRequest;
@@ -20,8 +19,6 @@ import com.ocam.volley.listeners.ICommand;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static android.R.attr.password;
 
 /**
  * Presentador para la vista de detalles de una actividad
@@ -42,7 +39,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     @Override
     public Boolean isUserGuide(Activity activity) {
         UserManager userManager = UserManager.getInstance();
-        for (Hiker h : activity.getGuides()){
+        for (HikerDTO h : activity.getGuides()){
             if (h.getEmail().equals(userManager.getUserTokenDTO().getEmail())) {
                 return Boolean.TRUE;
             }
@@ -146,7 +143,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
      */
     private Boolean esParticipante(Activity activity) {
         String loggedHiker = UserManager.getInstance().getUserTokenDTO().getLogin();
-        for (Hiker h : activity.getHikers()) {
+        for (HikerDTO h : activity.getHikerDTOs()) {
             if (h.getLogin().equals(loggedHiker)) {
                 return Boolean.TRUE;
             }
@@ -256,7 +253,11 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         public void executeError(VolleyError error) {
             activityView.hideProgress();
             JsonObject objError = new Gson().fromJson(error.getMessage(), JsonObject.class);
-            activityView.notifyUser(objError.get("message").getAsString());
+            if (Constants.HTTP_422.equals(objError.get("status").getAsString())) {
+                activityView.notifyUser(objError.get("message").getAsString());
+            } else {
+                activityView.notifyUser("No te has podido unir. Prueba de nuevo más tarde");
+            }
         }
     }
 

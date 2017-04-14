@@ -1,14 +1,13 @@
 package com.ocam.activity.monitorization;
 
-import com.ocam.model.Hiker;
-import com.ocam.model.Report;
+import com.ocam.model.ReportDTO;
 
 
 public interface HikerClickListener {
 
     /**
      * Maneja el click sobre el checkbox de cada hiker
-     * @param Report
+     * @param ReportDTO
      */
-    void onClick(Report Report);
+    void onClick(ReportDTO ReportDTO);
 }

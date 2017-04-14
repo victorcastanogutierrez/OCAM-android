@@ -1,14 +1,43 @@
 package com.ocam.model.types;
 
+import android.location.Location;
+
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.Generated;
+
+@Entity
 public class GPSPoint {
 
-	public GPSPoint(float lat, float lon) {
-		this.latitude = lat;
-		this.longitude = lon;
+	@Id
+	private Long id;
+
+	public GPSPoint(float latitude, float longitude) {
+		this.latitude = latitude;
+		this.longitude = longitude;
 	}
 
+	@Generated(hash = 1190344889)
+	public GPSPoint(Long id, float latitude, float longitude) {
+		this.id = id;
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
+
+	public GPSPoint(Location location) {
+		this.latitude = (float) location.getLatitude();
+		this.longitude = (float) location.getLongitude();
+	}
+
+	@Generated(hash = 332693450)
+	public GPSPoint() {
+	}
+
+	@NotNull
 	private float latitude;
 
+	@NotNull
 	private float longitude;
 
 	public float getLatitude() {
@@ -25,5 +54,13 @@ public class GPSPoint {
 
 	public void setLongitude(float longitude) {
 		this.longitude = longitude;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 }

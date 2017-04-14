@@ -1,13 +1,23 @@
 package com.ocam.activity;
 
+import android.Manifest;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,10 +35,23 @@ import com.google.gson.Gson;
 import com.ocam.R;
 import com.ocam.activity.monitorization.MonitorizationActivity;
 import com.ocam.activity.track.TrackActivity;
+import com.ocam.manager.App;
+import com.ocam.manager.UserManager;
 import com.ocam.model.Activity;
+import com.ocam.model.DaoSession;
 import com.ocam.model.types.ActivityStatus;
+import com.ocam.periodicTasks.GPSLocation;
+import com.ocam.periodicTasks.ReportSender;
+import com.ocam.periodicTasks.state.DisconnectedState;
+import com.ocam.util.ConnectionUtil;
+import com.ocam.util.Constants;
+import com.ocam.util.PreferencesUtils;
 import com.ocam.util.ViewUtils;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.content.Context.ALARM_SERVICE;
+import static com.ocam.periodicTasks.GPSLocation.checkPermission;
 import static com.ocam.util.DateUtils.formatDate;
 
 /**
@@ -153,7 +176,61 @@ public class FragmentActivity extends Fragment implements ActivityView {
                 showConfirmCerrarDialog();
             }
         });
+
+
+        Button prueba = (Button) v.findViewById(R.id.prueba);
+        prueba.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (!GPSLocation.checkPermission(getContext())) {
+                    requestPermissions(
+                            new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
+                            123);
+                }
+
+                DaoSession daoSession = ((App) getContext().getApplicationContext()).getDaoSession();
+                daoSession.getReportDao().deleteAll();
+                daoSession.getGPSPointDao().deleteAll();
+
+                Intent intent = new Intent(getContext(), ReportSender.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), Constants.BROADCAST_INTENT, intent, 0);
+                AlarmManager alarm = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+                alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10000, 60000, pendingIntent);
+                Log.d("ReportSender", "Comienza proceso");
+            }
+        });
+
         return v;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 123: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Intent intent = new Intent(getContext(), ReportSender.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), Constants.BROADCAST_INTENT, intent, 0);
+                    AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pendingIntent);
+                    Log.d("REPORTE", "Inicia proceso");
+
+                    NotificationManager notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                    Notification notification = new NotificationCompat.Builder(getContext())
+                            .setContentTitle("Participas en una actividad en curso")
+                            .setContentText("Aún no se ha enviado ningún reporte")
+                            .setOngoing(true)
+                            .setSmallIcon(R.drawable.mountain_home)
+                            .build();
+
+                    notificationManager.notify(Constants.ONGOING_NOTIFICATION_ID, notification);
+                } else {
+                    ViewUtils.showToast(getContext(), Toast.LENGTH_LONG, "Sin los permisos necesarios no podemos iniciar la actividad");
+                }
+                return;
+            }
+        }
     }
 
     /**

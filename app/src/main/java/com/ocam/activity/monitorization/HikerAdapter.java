@@ -9,12 +9,8 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.ocam.R;
-import com.ocam.model.Activity;
-import com.ocam.model.Hiker;
-import com.ocam.model.Report;
+import com.ocam.model.ReportDTO;
 import com.ocam.util.DateUtils;
-
-import org.w3c.dom.Text;
 
 import java.util.Date;
 import java.util.List;
@@ -25,10 +21,10 @@ import java.util.List;
 public class HikerAdapter extends RecyclerView.Adapter<HikerAdapter.HikersViewHolder>
 {
 
-    private List<Report> data;
+    private List<ReportDTO> data;
     private static HikerClickListener listener;
 
-    public HikerAdapter(List<Report> data, HikerClickListener list) {
+    public HikerAdapter(List<ReportDTO> data, HikerClickListener list) {
         this.data = data;
         listener = list;
     }
@@ -44,7 +40,7 @@ public class HikerAdapter extends RecyclerView.Adapter<HikerAdapter.HikersViewHo
 
     @Override
     public void onBindViewHolder(HikersViewHolder holder, int position) {
-        Report item = data.get(position);
+        ReportDTO item = data.get(position);
         holder.bindActivity(item);
     }
 
@@ -66,23 +62,23 @@ public class HikerAdapter extends RecyclerView.Adapter<HikerAdapter.HikersViewHo
             dateTextView = (TextView)itemView.findViewById(R.id.txReporte);
         }
 
-        public void bindActivity(final Report report) {
-            hikerLogin.setText(report.getHiker().getLogin());
+        public void bindActivity(final ReportDTO reportDTO) {
+            hikerLogin.setText(reportDTO.getHikerDTO().getLogin());
             hikerLogin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
-                    listener.onClick(report);
+                    listener.onClick(reportDTO);
                 }
             });
-            dateTextView.setText(DateUtils.formatDate(new Date(report.getDate()), "HH:mm"));
+            dateTextView.setText(DateUtils.formatDate(new Date(reportDTO.getDate()), "HH:mm"));
         }
     }
 
-    public List<Report> getData() {
+    public List<ReportDTO> getData() {
         return data;
     }
 
-    public void setData(List<Report> data) {
+    public void setData(List<ReportDTO> data) {
         this.data = data;
     }
 }

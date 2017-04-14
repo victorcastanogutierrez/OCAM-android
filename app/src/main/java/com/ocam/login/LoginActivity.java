@@ -17,7 +17,7 @@ import com.ocam.R;
 import com.ocam.activityList.ListActivity;
 import com.ocam.model.UserTokenDTO;
 import com.ocam.register.RegisterActivity;
-import com.ocam.util.LoginPreferencesUtils;
+import com.ocam.util.PreferencesUtils;
 import com.ocam.util.ViewUtils;
 import com.ocam.volley.NukeSSLCerts;
 
@@ -34,13 +34,13 @@ public class LoginActivity extends Activity implements LoginView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new NukeSSLCerts().nuke();
 
         //Elimina el titulo
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         //Confiar en todos los certificados: solo para desarrollo
-        new NukeSSLCerts().nuke();
         this.loginPresenter = new LoginPresenterImpl(this, LoginActivity.this);
 
         setContentView(R.layout.activity_login);
@@ -56,7 +56,7 @@ public class LoginActivity extends Activity implements LoginView {
             displayProgress();
             this.loginPresenter.checkUserLogged();
         } else {
-            LoginPreferencesUtils.removeSavedCredentials(LoginActivity.this);
+            PreferencesUtils.removeSavedCredentials(LoginActivity.this);
         }
 
         test(); //Eliminar
@@ -65,7 +65,7 @@ public class LoginActivity extends Activity implements LoginView {
     //Eliminar
     private void test() {
         TextView username = (TextView) findViewById(R.id.txUser);
-        UserTokenDTO user = LoginPreferencesUtils.getUserLogged(LoginActivity.this);
+        UserTokenDTO user = PreferencesUtils.getUserLogged(LoginActivity.this);
         if (user != null) {
             username.setText("Token: "+user.getRefreshToken());
         }

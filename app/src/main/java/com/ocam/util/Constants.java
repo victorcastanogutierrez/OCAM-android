@@ -18,6 +18,7 @@ public class Constants {
     public static final String API_FIND_ACTIVITY_REPORTS = "/api/lastActivityReports";
     public static final String API_REGISTER_HIKER = "/hiker";
     public static final String API_CLOSE_ACTIVITY = "/api/closeActivity";
+    public static final String API_SAVE_REPORT = "/report/save";
 
     //Header auth
     public static final String HEADER_AUTH_NAME = "authorization";
@@ -26,11 +27,18 @@ public class Constants {
     public static final String UNAUTHORIZED_ERROR_CODE =  "401";
 
     //Shared preferences
+    public static final String SHARED_PREFS = "sharedocam";
     public static final String TOKEN_KEY = "USER-TOKEN";
     public static final String EMAIL_KEY = "USER-EMAIL";
     public static final String REFRESH_TOKEN_KEY = "REFRESH-TOKEN";
+    public static final String LOGIN_MONITORIZATION = "LOGIN-MONITORIZATION";
 
     //Errors
     public static final String ERROR_LOADING_ACTIVITIES = "Error cargando las actividades";
+    public static final String HTTP_422 = "UNPROCESSABLE_ENTITY";
+
+    //Notifications
+    public static final Integer ONGOING_NOTIFICATION_ID = 687326891;
+    public static final Integer BROADCAST_INTENT = 234324243;
 
 }

@@ -1,8 +1,7 @@
 package com.ocam.activity.monitorization;
 
 
-import com.ocam.model.Hiker;
-import com.ocam.model.Report;
+import com.ocam.model.ReportDTO;
 import com.ocam.model.types.GPSPoint;
 
 import java.util.List;
@@ -12,7 +11,7 @@ public interface MonitorizacionView {
     /**
      * Instancia la vista con los datos de los hiker
      */
-    void refreshHikersData(List<Report> datos);
+    void refreshHikersData(List<ReportDTO> datos);
 
     /**
      * Muestra una barra de progreso con un layout superpuesto a la vista

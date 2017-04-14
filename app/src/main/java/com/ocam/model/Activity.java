@@ -24,13 +24,13 @@ public class Activity {
 
 	private ActivityStatus status;
 
-	private Hiker owner;
+	private HikerDTO owner;
 
-	private List<Hiker> hikers = new ArrayList<Hiker>();
+	private List<HikerDTO> hikerDTOs = new ArrayList<HikerDTO>();
 
-	private List<Hiker> guides = new ArrayList<Hiker>();
+	private List<HikerDTO> guides = new ArrayList<HikerDTO>();
 
-	private List<Report> reports = new ArrayList<Report>();
+	private List<ReportDTO> reportDTOs = new ArrayList<ReportDTO>();
 
 	public String getShortDescription() {
 		return shortDescription;
@@ -88,36 +88,36 @@ public class Activity {
 		this.status = status;
 	}
 
-	public Hiker getOwner() {
+	public HikerDTO getOwner() {
 		return owner;
 	}
 
-	public void setOwner(Hiker owner) {
+	public void setOwner(HikerDTO owner) {
 		this.owner = owner;
 	}
 
-	public List<Hiker> getHikers() {
-		return hikers;
+	public List<HikerDTO> getHikerDTOs() {
+		return hikerDTOs;
 	}
 
-	public void setHikers(List<Hiker> hikers) {
-		this.hikers = hikers;
+	public void setHikerDTOs(List<HikerDTO> hikerDTOs) {
+		this.hikerDTOs = hikerDTOs;
 	}
 
-	public List<Hiker> getGuides() {
+	public List<HikerDTO> getGuides() {
 		return guides;
 	}
 
-	public void setGuides(List<Hiker> guides) {
+	public void setGuides(List<HikerDTO> guides) {
 		this.guides = guides;
 	}
 
-	public List<Report> getReports() {
-		return reports;
+	public List<ReportDTO> getReportDTOs() {
+		return reportDTOs;
 	}
 
-	public void setReports(List<Report> reports) {
-		this.reports = reports;
+	public void setReportDTOs(List<ReportDTO> reportDTOs) {
+		this.reportDTOs = reportDTOs;
 	}
 
     public String getFormattedStatus() {

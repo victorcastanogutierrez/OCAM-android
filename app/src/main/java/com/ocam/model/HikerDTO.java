@@ -3,7 +3,7 @@ package com.ocam.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Hiker {
+public class HikerDTO {
 
 	private String email;
 
@@ -21,7 +21,7 @@ public class Hiker {
 
 	private List<Activity> activityGuide = new ArrayList<Activity>();
 
-	private List<Report> reports = new ArrayList<Report>();
+	private List<ReportDTO> reportDTOs = new ArrayList<ReportDTO>();
 
 	private List<Activity> owneds = new ArrayList<Activity>();
 
@@ -81,12 +81,12 @@ public class Hiker {
 		this.activityGuide = activityGuide;
 	}
 
-	public List<Report> getReports() {
-		return reports;
+	public List<ReportDTO> getReportDTOs() {
+		return reportDTOs;
 	}
 
-	public void setReports(List<Report> reports) {
-		this.reports = reports;
+	public void setReportDTOs(List<ReportDTO> reportDTOs) {
+		this.reportDTOs = reportDTOs;
 	}
 
 	public List<Activity> getOwneds() {

@@ -34,15 +34,15 @@ public class Constants {
     public static final String EMAIL_KEY = "USER-EMAIL";
     public static final String REFRESH_TOKEN_KEY = "REFRESH-TOKEN";
     public static final String LOGIN_MONITORIZATION = "LOGIN-MONITORIZATION";
+    public static final String TOKEN_MONITORIZATION = "TOKEN-MONITORIZATION";
 
     //Errors
-    public static final String ERROR_CODE = "errorCode";
     public static final String ERROR_LOADING_ACTIVITIES = "Error cargando las actividades";
     public static final String HTTP_422 = "UNPROCESSABLE_ENTITY";
-    public static final String EXPIRED_TOKEN_ERROR_CODE = "11";
 
     //Notifications
     public static final Integer ONGOING_NOTIFICATION_ID = 687326891;
     public static final Integer BROADCAST_INTENT = 234324243;
 
+    public static final long REPORTS_PERIODICITY = 60 * 1000;
 }

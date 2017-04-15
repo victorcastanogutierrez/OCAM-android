@@ -61,7 +61,7 @@ public class VolleyManager {
 
     public <T> void addToRequestQueue(Request<T> req) {
         req.setRetryPolicy(new DefaultRetryPolicy(
-                10000,
+                15000,
                 0,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         getRequestQueue().add(req);

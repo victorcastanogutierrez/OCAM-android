@@ -66,7 +66,7 @@ public class LoginPresenterImpl implements LoginPresenter {
         UserTokenDTO userTokenDTO = PreferencesUtils.getUserLogged(this.context);
         if (userTokenDTO == null) {
             loginView.hideProgress();
-        } else {
+        } else { // Sesión guardada de otros logins
             ICommand<UserTokenDTO> myCommand = new MyCommand();
             Map<String, String> headers = getAuthHeader(userTokenDTO);
             GsonRequest<UserTokenDTO> request = new GsonRequest<UserTokenDTO>(Constants.API_TOKEN,
@@ -117,7 +117,8 @@ public class LoginPresenterImpl implements LoginPresenter {
                 UserManager userManager = UserManager.getInstance();
                 Log.d("Loguea:", response.toString());
                 userManager.setUserTokenDTO(response);
-                PreferencesUtils.setMonitorizationHiker(context, UserManager.getInstance().getUserTokenDTO().getLogin());
+                PreferencesUtils.setMonitorizationHiker(context, UserManager.getInstance().getUserTokenDTO().getLogin(),
+                        UserManager.getInstance().getUserTokenDTO().getToken());
                 loginView.loginSuccess(response);
             }
             loginView.hideProgress();

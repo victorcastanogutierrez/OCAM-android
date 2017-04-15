@@ -1,18 +1,13 @@
 package com.ocam.periodicTasks.state;
 
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.support.v4.app.NotificationCompat;
+import android.location.Location;
 
-import com.ocam.R;
-import com.ocam.manager.UserManager;
 import com.ocam.model.Report;
-import com.ocam.model.ReportDao;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.periodicTasks.GPSLocation;
-import com.ocam.util.Constants;
+import com.ocam.util.NotificationUtils;
 
 import java.util.Date;
 
@@ -33,17 +28,6 @@ public class DisconnectedState extends BaseReportState {
     @Override
     public void doReport() {
         saveReport();
-
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(Constants.ONGOING_NOTIFICATION_ID); // Cancelamos la que hay para recrearla
-        Notification notification = new NotificationCompat.Builder(context)
-                .setContentTitle("Guarda local")
-                .setContentText("-")
-                .setSmallIcon(R.drawable.mountain_home)
-                .build();
-
-        notificationManager.notify(01, notification);
     }
 
     /**
@@ -51,13 +35,20 @@ public class DisconnectedState extends BaseReportState {
      * @return
      */
     private void saveReport() {
-        GPSPoint gpsPoint = new GPSPoint(GPSLocation.getLastKnownLocation(this.context));
-        Long pointId = this.gpsPointDao.insert(gpsPoint);
+        Location location = GPSLocation.getLastKnownLocation(this.context);
+        if (location != null) {
+            GPSPoint gpsPoint = new GPSPoint(location);
+            Long pointId = this.gpsPointDao.insert(gpsPoint);
 
-        Report report = new Report();
-        report.setDate(new Date());
-        report.setPoint(gpsPoint);
-        reportDao.insert(report);
-        report.setGpsPointId(pointId);
+            Report report = new Report();
+            report.setDate(new Date());
+            report.setPoint(gpsPoint);
+            reportDao.insert(report);
+            report.setGpsPointId(pointId);
+        } else {
+            NotificationUtils.sendNotification(context, 01,
+                    "Localización error", "No hemos podido obtener la localización del dispositivo!",
+                    Boolean.FALSE);
+        }
     }
 }

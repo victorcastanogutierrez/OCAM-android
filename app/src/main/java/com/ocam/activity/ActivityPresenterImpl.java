@@ -181,13 +181,15 @@ public class ActivityPresenterImpl implements ActivityPresenter {
 
         /**
          * Oculta la barra de progreso y notifica al usuario de la actualización
-         * del estado de la actividad
+         * del estado de la actividad.
+         * Comienza el broadcast para recogida de los datos
          * @param response
          */
         @Override
         public void executeResponse(Void response) {
             activityView.hideProgress();
             activityView.onActivityOpen();
+            activityView.iniciarMonitorizacion();
         }
 
         /**
@@ -243,6 +245,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         public void executeResponse(Void response) {
             activityView.hideProgress();
             activityView.onHikerJoinActivity();
+            activityView.iniciarMonitorizacion();
         }
 
         /**

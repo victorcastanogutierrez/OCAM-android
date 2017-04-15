@@ -61,19 +61,23 @@ public class PreferencesUtils {
     }
 
     /**
-     * Guarda el login del usuario que está siendo monitorizado. En el caso en que se cierre la aplicación
+     * Guarda el login y el token del usuario que está siendo monitorizado. En el caso en que se cierre la aplicación
      * y por tanto no sea posible obtenerlo de la memoria del dispositivo, se guarda este valor en
      * SharedPreferences para que persista tras cerrar la app.
      * @param context
      * @param login
      */
-    public static void setMonitorizationHiker(Context context, String login) {
+    public static void setMonitorizationHiker(Context context, String login, String token) {
         SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         if (sharedPref.contains(Constants.LOGIN_MONITORIZATION)) {
             editor.remove(Constants.LOGIN_MONITORIZATION);
         }
+        if (sharedPref.contains(Constants.TOKEN_MONITORIZATION)) {
+            editor.remove(Constants.TOKEN_MONITORIZATION);
+        }
         editor.putString(Constants.LOGIN_MONITORIZATION, login);
+        editor.putString(Constants.TOKEN_MONITORIZATION, token);
         editor.commit();
     }
 
@@ -87,5 +91,17 @@ public class PreferencesUtils {
     public static String getMonitorizationHiker(Context context) {
         SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         return sharedPref.getString(Constants.LOGIN_MONITORIZATION, null);
+    }
+
+    /**
+     * Retorna el token de usuario del último login en la aplicación.
+     * Para aquellos casos en los que no sea posible obtenerlo del manager correspondiente
+     * por haberse cerrado la app.
+     * @param context
+     * @return
+     */
+    public static String getMonitorizationTokenHiker(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        return sharedPref.getString(Constants.TOKEN_MONITORIZATION, null);
     }
 }

@@ -34,4 +34,10 @@ public interface ActivityView {
      * Ejecutado al cerrarse la actividad
      */
     void onActivityClosed();
+
+    /**
+     * Comienza el broadcast que se ejecuta para enviar los reportes al servidor
+     * y envía una notificación al usuario
+     */
+    void iniciarMonitorizacion();
 }

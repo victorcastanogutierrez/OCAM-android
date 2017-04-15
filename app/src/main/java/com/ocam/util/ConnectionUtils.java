@@ -5,7 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 
-public class ConnectionUtil {
+public class ConnectionUtils {
 
     /**
      * Método para obtener el estado de conexión del dispositivo

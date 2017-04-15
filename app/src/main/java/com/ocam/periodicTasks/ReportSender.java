@@ -4,14 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.ocam.manager.App;
-import com.ocam.model.DaoSession;
-import com.ocam.model.Report;
-import com.ocam.model.types.GPSPoint;
 import com.ocam.periodicTasks.state.ConnectionState;
 import com.ocam.periodicTasks.state.DisconnectedState;
 import com.ocam.periodicTasks.state.ReportState;
-import com.ocam.util.ConnectionUtil;
+import com.ocam.util.ConnectionUtils;
 
 /**
  * BroadcastReceiver ejecutado periódicamente cuando el usuario está en una actividad en curso.
@@ -44,7 +40,7 @@ public class ReportSender extends BroadcastReceiver {
             report.setGpsPointId(pointId);
         }*/
 
-        return ConnectionUtil.isConnected(context) ? new ConnectionState(context, goAsync()) :
+        return ConnectionUtils.isConnected(context) ? new ConnectionState(context, goAsync()) :
                 new DisconnectedState(context);
     }
 }

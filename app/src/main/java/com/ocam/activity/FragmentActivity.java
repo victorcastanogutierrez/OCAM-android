@@ -1,6 +1,5 @@
 package com.ocam.activity;
 
-import android.Manifest;
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.Notification;
@@ -12,7 +11,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
@@ -35,23 +33,17 @@ import com.google.gson.Gson;
 import com.ocam.R;
 import com.ocam.activity.monitorization.MonitorizationActivity;
 import com.ocam.activity.track.TrackActivity;
-import com.ocam.manager.App;
-import com.ocam.manager.UserManager;
 import com.ocam.model.Activity;
-import com.ocam.model.DaoSession;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.periodicTasks.GPSLocation;
 import com.ocam.periodicTasks.ReportSender;
-import com.ocam.periodicTasks.state.DisconnectedState;
-import com.ocam.util.ConnectionUtil;
 import com.ocam.util.Constants;
-import com.ocam.util.PreferencesUtils;
+import com.ocam.util.NotificationUtils;
 import com.ocam.util.ViewUtils;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.content.Context.ALARM_SERVICE;
-import static com.ocam.periodicTasks.GPSLocation.checkPermission;
 import static com.ocam.util.DateUtils.formatDate;
 
 /**
@@ -139,18 +131,13 @@ public class FragmentActivity extends Fragment implements ActivityView {
         btComenzar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPasswordDialog(new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String pw = input.getText().toString();
-                        if (assertPasswordValid(pw)) {
-                            activity.setPassword(input.getText().toString());
-                            activityPresenter.startActivity(activity.getId(), input.getText().toString());
-                        } else {
-                            notifyUser("Debes introducir una password (entre 3 y 12 caracteres)");
-                        }
-                    }
-                });
+                if (!GPSLocation.checkPermission(getContext())) {
+                    requestPermissions(
+                            new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
+                            02);
+                } else {
+                    mostrarPasswordDialog();
+                }
             }
         });
 
@@ -176,31 +163,6 @@ public class FragmentActivity extends Fragment implements ActivityView {
                 showConfirmCerrarDialog();
             }
         });
-
-
-        Button prueba = (Button) v.findViewById(R.id.prueba);
-        prueba.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (!GPSLocation.checkPermission(getContext())) {
-                    requestPermissions(
-                            new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
-                            123);
-                }
-
-                DaoSession daoSession = ((App) getContext().getApplicationContext()).getDaoSession();
-                daoSession.getReportDao().deleteAll();
-                daoSession.getGPSPointDao().deleteAll();
-
-                Intent intent = new Intent(getContext(), ReportSender.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), Constants.BROADCAST_INTENT, intent, 0);
-                AlarmManager alarm = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-                alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10000, 60000, pendingIntent);
-                Log.d("ReportSender", "Comienza proceso");
-            }
-        });
-
         return v;
     }
 
@@ -208,29 +170,38 @@ public class FragmentActivity extends Fragment implements ActivityView {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case 123: {
+            case 01: { // Unirse
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Intent intent = new Intent(getContext(), ReportSender.class);
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), Constants.BROADCAST_INTENT, intent, 0);
-                    AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
-                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pendingIntent);
-                    Log.d("REPORTE", "Inicia proceso");
-
-                    NotificationManager notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-                    Notification notification = new NotificationCompat.Builder(getContext())
-                            .setContentTitle("Participas en una actividad en curso")
-                            .setContentText("Aún no se ha enviado ningún reporte")
-                            .setOngoing(true)
-                            .setSmallIcon(R.drawable.mountain_home)
-                            .build();
-
-                    notificationManager.notify(Constants.ONGOING_NOTIFICATION_ID, notification);
+                    activityPresenter.joinActivity(activity);
+                } else {
+                    ViewUtils.showToast(getContext(), Toast.LENGTH_LONG, "Sin los permisos necesarios no podemos unirte a la actividad");
+                }
+                break;
+            }
+            case 02: { // Iniciar actividad
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mostrarPasswordDialog();
                 } else {
                     ViewUtils.showToast(getContext(), Toast.LENGTH_LONG, "Sin los permisos necesarios no podemos iniciar la actividad");
                 }
-                return;
+                break;
             }
         }
+    }
+
+    private void mostrarPasswordDialog() {
+        showPasswordDialog(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String pw = input.getText().toString();
+                if (assertPasswordValid(pw)) {
+                    activity.setPassword(input.getText().toString());
+                    activityPresenter.startActivity(activity.getId(), input.getText().toString());
+                } else {
+                    notifyUser("Debes introducir una password (entre 3 y 12 caracteres)");
+                }
+            }
+        });
     }
 
     /**
@@ -418,6 +389,22 @@ public class FragmentActivity extends Fragment implements ActivityView {
      * {@inheritDoc}
      */
     @Override
+    public void iniciarMonitorizacion() {
+        Intent intent = new Intent(getContext(), ReportSender.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), Constants.BROADCAST_INTENT, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), Constants.REPORTS_PERIODICITY, pendingIntent);
+        Log.d("REPORTES", "Inicia proceso");
+
+        NotificationUtils.sendNotification(getContext(), Constants.ONGOING_NOTIFICATION_ID,
+                "Participas en una actividad en curso", "Aún no se ha enviado ningún reporte",
+                Boolean.TRUE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void notifyUser(String notificationText) {
         ViewUtils.showToast(getView().getContext(), Toast.LENGTH_SHORT, notificationText);
     }
@@ -433,7 +420,13 @@ public class FragmentActivity extends Fragment implements ActivityView {
         builder.setPositiveButton("Unirme", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
-                activityPresenter.joinActivity(activity);
+                if (!GPSLocation.checkPermission(getContext())) {
+                    requestPermissions(
+                            new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
+                            01);
+                } else {
+                    activityPresenter.joinActivity(activity);
+                }
             }
         });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -467,4 +460,6 @@ public class FragmentActivity extends Fragment implements ActivityView {
         AlertDialog alert = builder.create();
         alert.show();
     }
+
+
 }

@@ -13,8 +13,11 @@ import com.ocam.volley.listeners.GenericErrorListener;
 import com.ocam.volley.listeners.GenericResponseListener;
 import com.ocam.volley.listeners.ICommand;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Clase presentador para la lista de actividades
@@ -53,6 +56,22 @@ public class ListPresenterImpl implements ListPresenter {
                 new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
         volleyManager.addToRequestQueue(request);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param date
+     * @param originalData
+     * @return
+     */
+    public List<Activity> getFilteredList(Date date, List<Activity> originalData) {
+        List<Activity> result = new ArrayList<Activity>();
+        for (Activity activity : originalData) {
+            if (activity.getStartDate().compareTo(date) <= 0) {
+                result.add(activity);
+            }
+        }
+        return result;
     }
 
     private class MyUpdateCommand implements ICommand<Activity[]> {

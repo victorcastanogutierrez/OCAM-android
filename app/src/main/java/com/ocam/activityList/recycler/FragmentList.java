@@ -1,16 +1,22 @@
 package com.ocam.activityList.recycler;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -22,7 +28,10 @@ import com.ocam.activityList.ListPresenterImpl;
 import com.ocam.model.Activity;
 import com.ocam.util.ViewUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -33,6 +42,8 @@ public class FragmentList extends Fragment implements ListActivityView
     private RecyclerView recyclerView;
     private ActivityAdapter adapter;
     private SwipeRefreshLayout refreshLayout;
+    private List<Activity> originalData;
+    private Calendar myCal;
 
     public FragmentList() {
 
@@ -46,6 +57,7 @@ public class FragmentList extends Fragment implements ListActivityView
         setUpSwipeRefresh(view);
         this.listPresenter = new ListPresenterImpl(this, getContext());
         listPresenter.loadActivities();
+        myCal = Calendar.getInstance();
         return view;
     }
 
@@ -67,9 +79,11 @@ public class FragmentList extends Fragment implements ListActivityView
 
     @Override
     public void setUpRecyclerView(List<Activity> datos) {
+        this.originalData = datos;
         this.recyclerView = (RecyclerView) getView().findViewById(R.id.reciclerView);
         this.recyclerView.setHasFixedSize(true);
-        this.adapter = new ActivityAdapter(datos);
+        this.adapter = new ActivityAdapter();
+        this.adapter.add(datos);
 
         this.recyclerView.setAdapter(adapter);
         this.recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
@@ -89,9 +103,8 @@ public class FragmentList extends Fragment implements ListActivityView
 
     @Override
     public void reloadRecyclerData(List<Activity> datos) {
-        adapter.setData(new ArrayList(datos));
-        recyclerView.removeAllViews();
-        adapter.notifyItemRangeInserted(0, datos.size()-1);
+        originalData = datos;
+        adapter.replaceAll(new ArrayList(datos));
     }
 
     @Override
@@ -106,9 +119,62 @@ public class FragmentList extends Fragment implements ListActivityView
             case R.id.refreshButton:
                 this.listPresenter.reloadActivities();
                 return true;
+            case R.id.filterButton:
+                DatePickerFragment newFragment = getDatePicker();
+                Bundle arguments = new Bundle();
+                arguments.putLong("date", myCal.getTimeInMillis());
+                newFragment.setArguments(arguments);
+                newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Devuelve un DatePicker
+     * @return
+     */
+    private DatePickerFragment getDatePicker() {
+        DatePickerFragment newFragment = new DatePickerFragment();
+        newFragment.setOnDateCallback(new DatePickerDialog.OnDateSetListener() {
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                myCal.set(Calendar.YEAR, year);
+                myCal.set(Calendar.MONTH, monthOfYear);
+                myCal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                filtrarPorFecha(myCal.getTime());
+                String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(myCal.getTime());
+                Snackbar.make(getView(), "Filtrado con fecha inferior a "+formattedDate, Snackbar.LENGTH_LONG)
+                    .setAction("Deshacer", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            deshacerFiltros();
+                        }
+                    })
+                    .setActionTextColor(getResources().getColor(android.R.color.holo_green_light ))
+                    .show();
+            }
+        });
+        return newFragment;
+    }
+
+    /**
+     * Método que filtra la lista de actividades por fechas inferiores a la pasada por parámetro
+     * @param date
+     */
+    private void filtrarPorFecha(Date date) {
+        this.recyclerView.scrollToPosition(0);
+        List<Activity> filtered = this.listPresenter.getFilteredList(date, this.originalData);
+        Log.d("Se queda con ", filtered.size()+"");
+        this.adapter.replaceAll(filtered);
+    }
+
+    /**
+     * Método que deshace los filtros aplicados en la lista
+     */
+    private void deshacerFiltros() {
+        this.adapter.replaceAll(this.originalData);
     }
 
     /**

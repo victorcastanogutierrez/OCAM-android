@@ -342,7 +342,9 @@ public class FragmentActivity extends Fragment implements ActivityView {
         btMonitorizar.setEnabled(Boolean.TRUE);
         btMonitorizar.setVisibility(View.VISIBLE);
         btCambiarPassword.setVisibility(View.VISIBLE);
+        btCerrar.setVisibility(View.VISIBLE);
         this.txEstado.setText(this.activity.getFormattedStatus());
+        iniciarMonitorizationFragment();
         Snackbar.make(getView(), "Actividad abierta. Password: "+this.activity.getPassword(), Snackbar.LENGTH_LONG)
             .setAction("OK", new View.OnClickListener() {
                 @Override
@@ -443,9 +445,8 @@ public class FragmentActivity extends Fragment implements ActivityView {
      */
     private void showConfirmCerrarDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-        builder.setTitle(R.string.app_name);
         builder.setTitle("Concluir actividad");
-        builder.setMessage("Al dar por concluída la actividad se parará la monitorización y no se podrá volver a abrir");
+        builder.setMessage("Al dar por concluida la actividad se parará la monitorización y no se podrá volver a abrir");
         builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();

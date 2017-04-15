@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
-import com.ocam.manager.VolleyManager;
+import com.ocam.volley.VolleyManager;
 import com.ocam.model.Activity;
 import com.ocam.util.Constants;
 import com.ocam.volley.GsonRequest;
@@ -13,10 +13,8 @@ import com.ocam.volley.listeners.GenericErrorListener;
 import com.ocam.volley.listeners.GenericResponseListener;
 import com.ocam.volley.listeners.ICommand;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Clase presentador para la lista de actividades

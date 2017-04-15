@@ -2,12 +2,10 @@ package com.ocam.activity.track;
 
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
-import com.google.gson.JsonObject;
-import com.ocam.manager.VolleyManager;
+import com.ocam.volley.VolleyManager;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.model.types.Track;
 import com.ocam.util.Constants;

@@ -7,7 +7,7 @@ import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.ocam.manager.UserManager;
-import com.ocam.manager.VolleyManager;
+import com.ocam.volley.VolleyManager;
 import com.ocam.model.Activity;
 import com.ocam.model.HikerDTO;
 import com.ocam.model.types.ActivityStatus;

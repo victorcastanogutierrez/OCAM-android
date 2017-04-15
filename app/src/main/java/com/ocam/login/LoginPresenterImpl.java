@@ -7,7 +7,7 @@ import android.util.Log;
 import com.android.volley.Request.Method;
 import com.android.volley.VolleyError;
 import com.ocam.manager.UserManager;
-import com.ocam.manager.VolleyManager;
+import com.ocam.volley.VolleyManager;
 import com.ocam.model.UserTokenDTO;
 import com.ocam.util.Constants;
 import com.ocam.util.PreferencesUtils;
@@ -84,7 +84,8 @@ public class LoginPresenterImpl implements LoginPresenter {
      */
     private Map<String, String> getAuthHeader(UserTokenDTO userTokenDTO) {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put(Constants.HEADER_AUTH_NAME, userTokenDTO.getRefreshToken());
+        headers.put(Constants.HEADER_REFRESH_NAME, userTokenDTO.getRefreshToken());
+        headers.put(Constants.HEADER_EMAIL_AUTHT, userTokenDTO.getEmail());
         return headers;
     }
 

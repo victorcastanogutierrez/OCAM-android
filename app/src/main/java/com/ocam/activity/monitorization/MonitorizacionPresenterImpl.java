@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
-import com.ocam.manager.VolleyManager;
+import com.ocam.volley.VolleyManager;
 import com.ocam.model.ReportDTO;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.model.types.Track;

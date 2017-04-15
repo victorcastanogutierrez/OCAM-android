@@ -58,17 +58,6 @@ public class LoginActivity extends Activity implements LoginView {
         } else {
             PreferencesUtils.removeSavedCredentials(LoginActivity.this);
         }
-
-        test(); //Eliminar
-    }
-
-    //Eliminar
-    private void test() {
-        TextView username = (TextView) findViewById(R.id.txUser);
-        UserTokenDTO user = PreferencesUtils.getUserLogged(LoginActivity.this);
-        if (user != null) {
-            username.setText("Token: "+user.getRefreshToken());
-        }
     }
 
     /**

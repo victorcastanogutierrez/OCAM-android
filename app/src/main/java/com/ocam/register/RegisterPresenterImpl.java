@@ -7,7 +7,7 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.ocam.manager.VolleyManager;
+import com.ocam.volley.VolleyManager;
 import com.ocam.model.HikerDTO;
 import com.ocam.util.Constants;
 import com.ocam.volley.GsonRequest;

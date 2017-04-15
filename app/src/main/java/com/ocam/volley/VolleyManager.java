@@ -1,4 +1,4 @@
-package com.ocam.manager;
+package com.ocam.volley;
 
 
 import android.content.Context;
@@ -10,8 +10,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-
-import java.util.Map;
 
 /**
  * Clase que implementa el patrón Singleton y que encapsula la lógica de realizar peticiones
@@ -62,7 +60,10 @@ public class VolleyManager {
     }
 
     public <T> void addToRequestQueue(Request<T> req) {
-        req.setRetryPolicy(new DefaultRetryPolicy(15000, 1, 1));
+        req.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         getRequestQueue().add(req);
     }
 

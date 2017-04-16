@@ -166,7 +166,6 @@ public class FragmentList extends Fragment implements ListActivityView
     private void filtrarPorFecha(Date date) {
         this.recyclerView.scrollToPosition(0);
         List<Activity> filtered = this.listPresenter.getFilteredList(date, this.originalData);
-        Log.d("Se queda con ", filtered.size()+"");
         this.adapter.replaceAll(filtered);
     }
 
@@ -174,6 +173,7 @@ public class FragmentList extends Fragment implements ListActivityView
      * Método que deshace los filtros aplicados en la lista
      */
     private void deshacerFiltros() {
+        this.myCal.setTime(new Date());
         this.adapter.replaceAll(this.originalData);
     }
 

@@ -19,6 +19,7 @@ public class Constants {
     public static final String API_REGISTER_HIKER = "/hiker";
     public static final String API_CLOSE_ACTIVITY = "/api/closeActivity";
     public static final String API_SAVE_REPORT = "/api/report/save";
+    public static final String API_LEAVE_ACTIVITY = "/api/activity/leaveActivity";
 
     //Header auth
     public static final String HEADER_AUTH_NAME = "authorization";

@@ -1,21 +1,14 @@
 package com.ocam.activity;
 
-import android.app.AlarmManager;
 import android.app.Dialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,17 +26,18 @@ import com.google.gson.Gson;
 import com.ocam.R;
 import com.ocam.activity.monitorization.MonitorizationActivity;
 import com.ocam.activity.track.TrackActivity;
+import com.ocam.manager.UserManager;
 import com.ocam.model.Activity;
+import com.ocam.model.HikerDTO;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.periodicTasks.GPSLocation;
-import com.ocam.periodicTasks.ReportSender;
+import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.util.Constants;
 import com.ocam.util.NotificationUtils;
 import com.ocam.util.ViewUtils;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.content.Context.ALARM_SERVICE;
 import static com.ocam.util.DateUtils.formatDate;
 
 /**
@@ -66,6 +60,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
     private Button btCambiarPassword;
     private Button btUnirse;
     private Button btCerrar;
+    private Button btAbandonar;
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
     private EditText input; // Dialog de password
@@ -107,13 +102,14 @@ public class FragmentActivity extends Fragment implements ActivityView {
         this.btCerrar = (Button) v.findViewById(R.id.btCerrar);
         this.mProgress = (ProgressBar) v.findViewById(R.id.progressBar);
         this.mOverlayDialog = new Dialog(v.getContext(), android.R.style.Theme_Panel);
+        this.btAbandonar = (Button) v.findViewById(R.id.btAbandonar);
         Bundle args = getArguments();
         setUpActivityData(new Gson().fromJson(args.getString("activity"), Activity.class));
 
         btCambiarPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPasswordDialog(new DialogInterface.OnClickListener() {
+                showPasswordDialog("Introduce una password para la actividad", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String pw = input.getText().toString();
@@ -148,6 +144,13 @@ public class FragmentActivity extends Fragment implements ActivityView {
             }
         });
 
+        btAbandonar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showConfirmAbandonDialog();
+            }
+        });
+
 
         btMonitorizar.setOnClickListener(new View.OnClickListener() {
 
@@ -172,7 +175,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
         switch (requestCode) {
             case 01: { // Unirse
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    activityPresenter.joinActivity(activity);
+                    showPasswordDialog();
                 } else {
                     ViewUtils.showToast(getContext(), Toast.LENGTH_LONG, "Sin los permisos necesarios no podemos unirte a la actividad");
                 }
@@ -190,7 +193,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
     }
 
     private void mostrarPasswordDialog() {
-        showPasswordDialog(new DialogInterface.OnClickListener() {
+        showPasswordDialog("Introduce una password para la actividad", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String pw = input.getText().toString();
@@ -249,6 +252,11 @@ public class FragmentActivity extends Fragment implements ActivityView {
                 this.btCambiarPassword.setVisibility(View.VISIBLE);
                 this.btCerrar.setVisibility(View.VISIBLE);
             }
+        } else {
+            //Si no es guía y ya está unido
+            if (!this.activityPresenter.puedeUnirse(this.activity)) {
+                this.btAbandonar.setVisibility(View.VISIBLE);
+            }
         }
 
         //Actividad abierta y guía o participante
@@ -290,9 +298,9 @@ public class FragmentActivity extends Fragment implements ActivityView {
      * Método que muestra el dialog de confirmacion de iniciar actividad
      * con la solicitud de la password al usuario
      */
-    private void showPasswordDialog(DialogInterface.OnClickListener aceptarCallback) {
+    private void showPasswordDialog(String title, DialogInterface.OnClickListener aceptarCallback) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-        builder.setTitle("Introduce una password para la actividad");
+        builder.setTitle(title);
 
         this.input = new EditText(getView().getContext());
         this.input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -360,9 +368,13 @@ public class FragmentActivity extends Fragment implements ActivityView {
      */
     @Override
     public void onHikerJoinActivity() {
+        HikerDTO hikerDTO = new HikerDTO();
+        hikerDTO.setLogin(UserManager.getInstance().getUserTokenDTO().getLogin());
+        this.activity.getHikers().add(hikerDTO);
         this.btUnirse.setVisibility(View.GONE);
         this.btMonitorizar.setVisibility(View.VISIBLE);
         this.btMonitorizar.setEnabled(Boolean.TRUE);
+        this.btAbandonar.setVisibility(View.VISIBLE);
         iniciarMonitorizationFragment();
     }
 
@@ -392,15 +404,19 @@ public class FragmentActivity extends Fragment implements ActivityView {
      */
     @Override
     public void iniciarMonitorizacion() {
-        Intent intent = new Intent(getContext(), ReportSender.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), Constants.BROADCAST_INTENT, intent, 0);
-        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), Constants.REPORTS_PERIODICITY, pendingIntent);
-        Log.d("REPORTES", "Inicia proceso");
-
+        PeriodicTask.iniciarBroadcast(getContext());
         NotificationUtils.sendNotification(getContext(), Constants.ONGOING_NOTIFICATION_ID,
                 "Participas en una actividad en curso", "Aún no se ha enviado ningún reporte",
                 Boolean.TRUE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onLeaveActivity() {
+        hideProgress();
+        getActivity().onBackPressed();
     }
 
     /**
@@ -415,20 +431,63 @@ public class FragmentActivity extends Fragment implements ActivityView {
      * Confirmación visual de unirse a una actividad
      */
     private void showConfirmJoinDialog() {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
         builder.setTitle(R.string.app_name);
-        builder.setTitle("Monitorización actividad");
-        builder.setMessage("Al unirte a la actividad y mientras esté en curso, enviaremos tu posición cada cierto tiempo para mantenerte monitorizado. También podrás ver la posición del resto del grupo.");
+        builder.setTitle("Unirte a la actividad");
+        builder.setMessage("Al unirte a la actividad y mientras esté en curso, enviaremos tu " +
+                "posición cada cierto tiempo para mantenerte monitorizado. También podrás ver la" +
+                " posición del resto del grupo");
         builder.setPositiveButton("Unirme", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
                 if (!GPSLocation.checkPermission(getContext())) {
                     requestPermissions(
                             new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
                             01);
                 } else {
-                    activityPresenter.joinActivity(activity);
+                    showPasswordDialog();
                 }
+            }
+        });
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    /**
+     * Dialog para introducir la password del usuario
+     */
+    private void showPasswordDialog() {
+        showPasswordDialog("Introduce la password de la actividad:",
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String pw = input.getText().toString();
+                    if (assertPasswordValid(pw)) {
+                        activityPresenter.joinActivity(activity, pw);
+                    } else {
+                        notifyUser("Debes introducir una password (entre 3 y 12 caracteres)");
+                    }
+                }
+            });
+    }
+
+    /**
+     * Confirmación visual de abandonar una actividad
+     */
+    private void showConfirmAbandonDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+        builder.setTitle(R.string.app_name);
+        builder.setTitle("Abandonar actividad");
+        builder.setMessage("Al abandonar la actividad dejarás de ser monitorizado. ¿Estás seguro?");
+        builder.setPositiveButton("Abandonar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+                activityPresenter.leaveActivity(activity);
             }
         });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -461,6 +520,4 @@ public class FragmentActivity extends Fragment implements ActivityView {
         AlertDialog alert = builder.create();
         alert.show();
     }
-
-
 }

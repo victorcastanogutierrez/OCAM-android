@@ -5,10 +5,6 @@ import com.ocam.model.types.GPSPoint;
 
 import java.util.List;
 
-/**
- * Created by Victor on 08/04/2017.
- */
-
 public interface ActivityPresenter {
 
     /**
@@ -60,11 +56,17 @@ public interface ActivityPresenter {
      * Une al usuario logueado en la actividad
      * @param activity
      */
-    void joinActivity(Activity activity);
+    void joinActivity(Activity activity, String password);
 
     /**
      * Cierra la actividad en curso cambiándola el estado a CLOSED
      * @param activity
      */
     void closeActivity(Activity activity);
+
+    /**
+     * Saca al hiker de la actividad
+     * @param activity
+     */
+    void leaveActivity(Activity activity);
 }

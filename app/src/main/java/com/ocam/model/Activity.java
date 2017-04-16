@@ -26,7 +26,7 @@ public class Activity {
 
 	private HikerDTO owner;
 
-	private List<HikerDTO> hikerDTOs = new ArrayList<HikerDTO>();
+	private List<HikerDTO> hikers = new ArrayList<HikerDTO>();
 
 	private List<HikerDTO> guides = new ArrayList<HikerDTO>();
 
@@ -96,12 +96,12 @@ public class Activity {
 		this.owner = owner;
 	}
 
-	public List<HikerDTO> getHikerDTOs() {
-		return hikerDTOs;
+	public List<HikerDTO> getHikers() {
+		return hikers;
 	}
 
-	public void setHikerDTOs(List<HikerDTO> hikerDTOs) {
-		this.hikerDTOs = hikerDTOs;
+	public void setHikers(List<HikerDTO> hikers) {
+		this.hikers = hikers;
 	}
 
 	public List<HikerDTO> getGuides() {

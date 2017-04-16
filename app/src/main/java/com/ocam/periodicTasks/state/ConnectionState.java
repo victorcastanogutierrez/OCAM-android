@@ -18,6 +18,7 @@ import com.ocam.model.Report;
 import com.ocam.model.ReportDTO;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.periodicTasks.GPSLocation;
+import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.periodicTasks.ReportSender;
 import com.ocam.util.Constants;
 import com.ocam.util.DateUtils;
@@ -176,19 +177,9 @@ public class ConnectionState extends BaseReportState {
                 NotificationUtils.sendNotification(context, Constants.ONGOING_NOTIFICATION_ID,
                         "Actividad concluida", "La monitorización de la actividad finalizó",
                         Boolean.FALSE);
-                cancelBroadcast();
+                PeriodicTask.cancelBroadcast(context);
             }
             result.finish();
-        }
-
-        /**
-         * Cancela el broadcast y la notificación permanente
-         */
-        public void cancelBroadcast() {
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-            Intent intent = new Intent(context, ReportSender.class);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Constants.BROADCAST_INTENT, intent, 0);
-            alarmManager.cancel(pendingIntent);
         }
     }
 }

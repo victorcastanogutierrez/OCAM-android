@@ -28,18 +28,6 @@ public class ReportSender extends BroadcastReceiver {
      * @return
      */
     public ReportState getConnection(Context context) {
-       /*
-
-        for (int i = 0; i < 10; i++) {
-            GPSPoint gpsPoint = new GPSPoint(GPSLocation.getLastKnownLocation(context));
-            Long pointId = daoSession.getGPSPointDao().insert(gpsPoint);
-
-            Report report = new Report();
-            report.setPoint(gpsPoint);
-            daoSession.getReportDao().insert(report);
-            report.setGpsPointId(pointId);
-        }*/
-
         return ConnectionUtils.isConnected(context) ? new ConnectionState(context, goAsync()) :
                 new DisconnectedState(context);
     }

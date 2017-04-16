@@ -40,4 +40,9 @@ public interface ActivityView {
      * y envía una notificación al usuario
      */
     void iniciarMonitorizacion();
+
+    /**
+     * Ejecutado al dejar con éxito una actividad
+     */
+    void onLeaveActivity();
 }

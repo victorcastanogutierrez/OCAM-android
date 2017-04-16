@@ -1,12 +1,16 @@
 package com.ocam.activity;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.ocam.manager.UserManager;
+import com.ocam.periodicTasks.PeriodicTask;
+import com.ocam.util.NotificationUtils;
+import com.ocam.util.ViewUtils;
 import com.ocam.volley.VolleyManager;
 import com.ocam.model.Activity;
 import com.ocam.model.HikerDTO;
@@ -18,6 +22,7 @@ import com.ocam.volley.listeners.GenericResponseListener;
 import com.ocam.volley.listeners.ICommand;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -110,12 +115,13 @@ public class ActivityPresenterImpl implements ActivityPresenter {
      * {@inheritDoc}
      */
     @Override
-    public void joinActivity(Activity activity) {
+    public void joinActivity(Activity activity, String password) {
         this.activityView.displayProgress();
         UserManager userManager = UserManager.getInstance();
         ICommand<Void> myCommand = new MyJoinActivityCommand();
         GsonRequest<Void> request = new GsonRequest<Void>(
-                Constants.API_UNIRSE_ACTIVIDAD + '/' + activity.getId() + '/' + userManager.getUserTokenDTO().getLogin(),
+                Constants.API_UNIRSE_ACTIVIDAD + '/' + activity.getId() +
+                        '/' + userManager.getUserTokenDTO().getLogin() + '/' + password,
                 Request.Method.POST, Void.class, null,
                 new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
@@ -137,13 +143,50 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     }
 
     /**
+     * {@inheritDoc}
+     * @param activity
+     */
+    @Override
+    public void leaveActivity(Activity activity) {
+        String loggedHiker = UserManager.getInstance().getUserTokenDTO().getLogin();
+        this.activityView.displayProgress();
+        removeHikerFromList(activity);
+        PeriodicTask.cancelBroadcast(this.context);
+        NotificationUtils.sendNotification(this.context, Constants.ONGOING_NOTIFICATION_ID, "Abandonaste la actividad", "Se ha interrumpido la monitorización.", Boolean.FALSE);
+
+        ICommand<Void> myCommand = new MyLeaveCommand();
+        GsonRequest<Void> request = new GsonRequest<Void>(Constants.API_LEAVE_ACTIVITY + '/' +
+                activity.getId() + '/' + loggedHiker,
+                Request.Method.POST, Void.class, null,
+                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+
+        VolleyManager.getInstance(this.context).addToRequestQueue(request);
+        activityView.onLeaveActivity();
+    }
+
+    /**
+     * Elimina al usuario identificado en la aplicación de entre los participantes de la actividad
+     * @param activity
+     */
+    private void removeHikerFromList(Activity activity) {
+        String loggedHiker = UserManager.getInstance().getUserTokenDTO().getLogin();
+        for (Iterator<HikerDTO> iterator = activity.getHikers().iterator(); iterator.hasNext();) {
+            HikerDTO hiker = iterator.next();
+            if (hiker.getLogin().equals(loggedHiker)) {
+                iterator.remove();
+                break;
+            }
+        }
+    }
+
+    /**
      * Comprueba si el usuario logueado es participante de la actividad
      * @param activity
      * @return
      */
     private Boolean esParticipante(Activity activity) {
         String loggedHiker = UserManager.getInstance().getUserTokenDTO().getLogin();
-        for (HikerDTO h : activity.getHikerDTOs()) {
+        for (HikerDTO h : activity.getHikers()) {
             if (h.getLogin().equals(loggedHiker)) {
                 return Boolean.TRUE;
             }
@@ -289,6 +332,31 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         public void executeError(VolleyError error) {
             activityView.hideProgress();
             activityView.notifyUser("La actividad no pudo ser cerrada debido a un error.");
+        }
+    }
+
+    /**
+     * Command genérico para manejar la respuesta HTTP a la llamada a la API del servidor
+     * para eliminar a un hiker de la actividad
+     */
+    private class MyLeaveCommand implements ICommand<Void> {
+
+        /**
+         * Notifica al usuario
+         * @param response
+         */
+        @Override
+        public void executeResponse(Void response) {
+            ViewUtils.showToast(context, Toast.LENGTH_SHORT, "Abandonaste la actividad.");
+        }
+
+        /**
+         * Muestra el error retornado por el servidor al usuario
+         * @param error
+         */
+        @Override
+        public void executeError(VolleyError error) {
+            ViewUtils.showToast(context, Toast.LENGTH_SHORT, "No has podido abandonar pero se interrumpe la monitorización.");
         }
     }
 }

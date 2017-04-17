@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.google.android.gms.location.LocationServices;
 import com.ocam.util.Constants;
 
 import static android.content.Context.ALARM_SERVICE;
@@ -17,25 +18,20 @@ import static android.content.Context.ALARM_SERVICE;
 public class PeriodicTask {
 
     /**
-     * Cancela el broadcast
+     * Cancela el servicio
      * @param context
      */
-    public static void cancelBroadcast(Context context) {
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        Intent intent = new Intent(context, ReportSender.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Constants.BROADCAST_INTENT, intent, 0);
-        alarmManager.cancel(pendingIntent);
+    public static void cancelService(Context context) {
+        context.stopService(new Intent(context, LocService.class));
     }
 
     /**
-     * Crea e inicia el broadcast para notificaciones
+     * Inicia el servicio para notificaciones
      * @param context
      */
-    public static void iniciarBroadcast(Context context) {
-        Intent intent = new Intent(context, ReportSender.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Constants.BROADCAST_INTENT, intent, 0);
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), Constants.REPORTS_PERIODICITY, pendingIntent);
+    public static void startService(Context context) {
+        Intent intent = new Intent (context, LocService.class);
+        context.startService(intent);
         Log.d("REPORTES", "Inicia proceso");
     }
 }

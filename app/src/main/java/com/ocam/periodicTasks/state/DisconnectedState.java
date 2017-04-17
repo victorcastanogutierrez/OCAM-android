@@ -26,16 +26,16 @@ public class DisconnectedState extends BaseReportState {
      * Almacena el report de manera local
      */
     @Override
-    public void doReport() {
-        saveReport();
+    public void doReport(Location location) {
+        saveReport(location);
     }
 
     /**
      * Crea el report con los datos necesarios
      * @return
      */
-    private void saveReport() {
-        Location location = GPSLocation.getLastKnownLocation(this.context);
+    private void saveReport(Location location) {
+        //Location location = GPSLocation.getLastKnownLocation(this.context);
         if (location != null) {
             GPSPoint gpsPoint = new GPSPoint(location);
             Long pointId = this.gpsPointDao.insert(gpsPoint);

@@ -1,11 +1,7 @@
 package com.ocam.periodicTasks.state;
 
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver.PendingResult;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.util.Log;
 
@@ -17,9 +13,7 @@ import com.ocam.model.HikerDTO;
 import com.ocam.model.Report;
 import com.ocam.model.ReportDTO;
 import com.ocam.model.types.GPSPoint;
-import com.ocam.periodicTasks.GPSLocation;
 import com.ocam.periodicTasks.PeriodicTask;
-import com.ocam.periodicTasks.ReportSender;
 import com.ocam.util.Constants;
 import com.ocam.util.DateUtils;
 import com.ocam.util.NotificationUtils;
@@ -37,22 +31,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.content.Context.ALARM_SERVICE;
-
 /**
  * Clase que implementa el patrón state en el estado de conexión del dispositivo. Envía el reporte
  * al servidor mediante una petición POST
  */
 public class ConnectionState extends BaseReportState {
 
-    private PendingResult result;
+   // private PendingResult result;
     private List<Request<Void>> requests = new ArrayList<>();
     private VolleyManager volleyManager;
-    private Map<String, String> headers;
+    private ActivityFinishListener listener;
 
-    public ConnectionState(Context context, PendingResult result) {
+    public ConnectionState(Context context, ActivityFinishListener listener) {
         super(context);
-        this.result = result;
+        this.listener = listener;
         this.volleyManager = VolleyManager.getInstance(context);
     }
 
@@ -61,9 +53,9 @@ public class ConnectionState extends BaseReportState {
      * {@inheritDoc}
      */
     @Override
-    public void doReport() {
+    public void doReport(Location location) {
         new NukeSSLCerts().nuke();
-        Location location = GPSLocation.getLastKnownLocation(context);
+        //Location location = GPSLocation.getLastKnownLocation(context);
         if (location != null) {
             sendServerLocation(location, context);
         } else {
@@ -162,24 +154,25 @@ public class ConnectionState extends BaseReportState {
                             DateUtils.formatDate(new Date(), "HH:mm"), Boolean.TRUE);
             if (requests.size() > 0) {
                 volleyManager.addToRequestQueue(requests.remove(0));
-            } else {
-                result.finish();
             }
         }
 
         @Override
         public void executeError(VolleyError error) {
             Log.d("No exito", error.getMessage());
-            JsonObject objError = new Gson().fromJson(error.getMessage(), JsonObject.class);
-            //Si la actividad cerró, deja de enviar reportes
-            if(objError.get("status").getAsString().equals(Constants.HTTP_422)) {
-                Log.d("Cerrada", "Cierra la actividad");
-                NotificationUtils.sendNotification(context, Constants.ONGOING_NOTIFICATION_ID,
-                        "Actividad concluida", "La monitorización de la actividad finalizó",
-                        Boolean.FALSE);
-                PeriodicTask.cancelBroadcast(context);
+            if (error != null && error.getMessage() != null) {
+                Log.d("Error", error.getMessage());
+                JsonObject objError = new Gson().fromJson(error.getMessage(), JsonObject.class);
+                //Si la actividad cerró, deja de enviar reportes
+                if(objError.get("status").getAsString().equals(Constants.HTTP_422)) {
+                    Log.d("Cerrada", "Cierra la actividad");
+                    listener.onActivityFinish();
+                    NotificationUtils.sendNotification(context, Constants.ONGOING_NOTIFICATION_ID,
+                            "Actividad concluida", "La monitorización de la actividad finalizó",
+                            Boolean.FALSE);
+                    PeriodicTask.cancelService(context);
+                }
             }
-            result.finish();
         }
     }
 }

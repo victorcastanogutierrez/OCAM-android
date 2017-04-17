@@ -37,8 +37,7 @@
             android:name=".register.RegisterActivity">
         </activity>
 
-        <receiver android:name=".periodicTasks.ReportSender" >
-        </receiver>
+        <service android:name="com.ocam.periodicTasks.LocService" />
 
     </application>
 

@@ -1,5 +1,6 @@
 package com.ocam.activityList.recycler;
 
+import android.graphics.Color;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.google.gson.reflect.TypeToken;
 import com.ocam.R;
 import com.ocam.model.Activity;
+import com.ocam.model.types.ActivityStatus;
 
 import java.util.List;
 
@@ -118,7 +120,6 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
             extends RecyclerView.ViewHolder {
 
         private TextView txDescripcion;
-        private TextView txDetalle;
         private TextView txFecha;
         private TextView txEstado;
 
@@ -126,16 +127,21 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
             super(itemView);
 
             txDescripcion = (TextView)itemView.findViewById(R.id.lbDescripcion);
-            txDetalle = (TextView)itemView.findViewById(R.id.lbDetalle);
             txFecha = (TextView)itemView.findViewById(R.id.lbFecha);
             txEstado = (TextView)itemView.findViewById(R.id.lbEstado);
         }
 
         public void bindActivity(Activity activity) {
             txDescripcion.setText(activity.getShortDescription());
-            txDetalle.setText(activity.getLabel());
             txFecha.setText(com.ocam.util.DateUtils.formatDate(activity.getStartDate()));
             txEstado.setText(activity.getFormattedStatus());
+            if (ActivityStatus.RUNNING.equals(activity.getStatus())) {
+                txEstado.setTextColor(Color.parseColor("#4CAF50"));
+            } else if (ActivityStatus.PENDING.equals(activity.getStatus())) {
+                txEstado.setTextColor(Color.parseColor("#EF5350"));
+            } else if (ActivityStatus.CLOSED.equals(activity.getStatus())) {
+                txEstado.setTextColor(Color.parseColor("#90A4AE"));
+            }
         }
     }
 }

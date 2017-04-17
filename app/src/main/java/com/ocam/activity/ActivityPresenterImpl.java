@@ -164,6 +164,11 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         activityView.onLeaveActivity();
     }
 
+    @Override
+    public Boolean puedeAbandonar(Activity activity) {
+        return !isUserGuide(activity) && esParticipante(activity) && assertActivityRunning(activity);
+    }
+
     /**
      * Elimina al usuario identificado en la aplicación de entre los participantes de la actividad
      * @param activity

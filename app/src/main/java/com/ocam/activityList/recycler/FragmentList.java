@@ -88,9 +88,6 @@ public class FragmentList extends Fragment implements ListActivityView
         this.recyclerView.setAdapter(adapter);
         this.recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
 
-        this.recyclerView.addItemDecoration(
-                new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST));
-
         this.recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         this.adapter.setOnClickListener(new View.OnClickListener() {

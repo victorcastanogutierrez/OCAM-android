@@ -79,7 +79,7 @@ public class ListPresenterImpl implements ListPresenter {
         @Override
         public void executeResponse(Activity[] response) {
             listActivityView.hideProgress();
-            listActivityView.setUpRecyclerView(Arrays.asList(response));
+            listActivityView.reloadRecyclerData(Arrays.asList(response));
         }
 
         @Override

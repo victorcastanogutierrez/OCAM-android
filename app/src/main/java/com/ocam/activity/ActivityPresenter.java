@@ -69,4 +69,11 @@ public interface ActivityPresenter {
      * @param activity
      */
     void leaveActivity(Activity activity);
+
+    /**
+     * Evalúa si el usuario puede abandonar la actividad
+     * @param activity
+     * @return
+     */
+    Boolean puedeAbandonar(Activity activity);
 }

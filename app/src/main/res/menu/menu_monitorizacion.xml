@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/refreshHikers"
-        android:icon="@drawable/ic_refresh_black_24dp"
+        android:icon="@drawable/ic_refresh_white_24dp"
         android:title="Title"
         android:tint="@color/colorPrimary"
         app:showAsAction="ifRoom">

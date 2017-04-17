@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/refreshButton2"
-        android:icon="@drawable/ic_more_vert_black_24dp"
+        android:icon="@drawable/ic_expand_more_white_24dp"
         android:title="Title"
         android:tint="@color/colorPrimary"
         app:showAsAction="ifRoom">
@@ -13,7 +13,7 @@
             <item
                 android:id="@+id/action_track"
                 android:title="Ver track"
-                android:icon="@drawable/ic_terrain_black_18dp"/>
+                android:icon="@drawable/ic_terrain_black_24dp"/>
         </menu>
     </item>
 </menu>

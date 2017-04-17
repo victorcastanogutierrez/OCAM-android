@@ -254,7 +254,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
             }
         } else {
             //Si no es guía y ya está unido
-            if (!this.activityPresenter.puedeUnirse(this.activity)) {
+            if (this.activityPresenter.puedeAbandonar(this.activity)) {
                 this.btAbandonar.setVisibility(View.VISIBLE);
             }
         }

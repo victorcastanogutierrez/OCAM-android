@@ -404,7 +404,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
      */
     @Override
     public void iniciarMonitorizacion() {
-        PeriodicTask.startService(getContext());
+        PeriodicTask.startBroadcast(getContext());
         NotificationUtils.sendNotification(getContext(), Constants.ONGOING_NOTIFICATION_ID,
                 "Participas en una actividad en curso", "Aún no se ha enviado ningún reporte",
                 Boolean.TRUE);

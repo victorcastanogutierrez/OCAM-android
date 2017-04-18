@@ -21,17 +21,23 @@ public class PeriodicTask {
      * Cancela el servicio
      * @param context
      */
-    public static void cancelService(Context context) {
-        context.stopService(new Intent(context, LocService.class));
+    public static void stopBroadcast(Context context) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        Intent intent = new Intent(context, ReportSender.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Constants.BROADCAST_INTENT, intent, 0);
+        alarmManager.cancel(pendingIntent);
+        Log.d("REPORTES", "Para proceso");
     }
 
     /**
      * Inicia el servicio para notificaciones
      * @param context
      */
-    public static void startService(Context context) {
-        Intent intent = new Intent (context, LocService.class);
-        context.startService(intent);
+    public static void startBroadcast(Context context) {
+        Intent intent = new Intent(context, ReportSender.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Constants.BROADCAST_INTENT, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, Constants.REPORTS_PERIODICITY, pendingIntent);
         Log.d("REPORTES", "Inicia proceso");
     }
 }

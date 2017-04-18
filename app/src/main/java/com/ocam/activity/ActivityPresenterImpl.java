@@ -151,7 +151,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         String loggedHiker = UserManager.getInstance().getUserTokenDTO().getLogin();
         this.activityView.displayProgress();
         removeHikerFromList(activity);
-        PeriodicTask.cancelService(this.context);
+        PeriodicTask.stopBroadcast(this.context);
         NotificationUtils.sendNotification(this.context, Constants.ONGOING_NOTIFICATION_ID, "Abandonaste la actividad", "Se ha interrumpido la monitorización.", Boolean.FALSE);
 
         ICommand<Void> myCommand = new MyLeaveCommand();

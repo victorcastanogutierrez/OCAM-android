@@ -1,6 +1,8 @@
 package com.ocam.periodicTasks.state;
 
 
+import android.content.BroadcastReceiver;
+import android.content.BroadcastReceiver.PendingResult;
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
@@ -40,11 +42,11 @@ public class ConnectionState extends BaseReportState {
    // private PendingResult result;
     private List<Request<Void>> requests = new ArrayList<>();
     private VolleyManager volleyManager;
-    private ActivityFinishListener listener;
+    private BroadcastReceiver.PendingResult result;
 
-    public ConnectionState(Context context, ActivityFinishListener listener) {
+    public ConnectionState(Context context, PendingResult result) {
         super(context);
-        this.listener = listener;
+        this.result = result;
         this.volleyManager = VolleyManager.getInstance(context);
     }
 
@@ -55,7 +57,6 @@ public class ConnectionState extends BaseReportState {
     @Override
     public void doReport(Location location) {
         new NukeSSLCerts().nuke();
-        //Location location = GPSLocation.getLastKnownLocation(context);
         if (location != null) {
             sendServerLocation(location, context);
         } else {
@@ -154,6 +155,8 @@ public class ConnectionState extends BaseReportState {
                             DateUtils.formatDate(new Date(), "HH:mm"), Boolean.TRUE);
             if (requests.size() > 0) {
                 volleyManager.addToRequestQueue(requests.remove(0));
+            } else {
+                result.finish();
             }
         }
 
@@ -164,15 +167,15 @@ public class ConnectionState extends BaseReportState {
                 Log.d("Error", error.getMessage());
                 JsonObject objError = new Gson().fromJson(error.getMessage(), JsonObject.class);
                 //Si la actividad cerró, deja de enviar reportes
-                if(objError.get("status").getAsString().equals(Constants.HTTP_422)) {
+                if (objError.get("status").getAsString().equals(Constants.HTTP_422)) {
                     Log.d("Cerrada", "Cierra la actividad");
-                    listener.onActivityFinish();
                     NotificationUtils.sendNotification(context, Constants.ONGOING_NOTIFICATION_ID,
                             "Actividad concluida", "La monitorización de la actividad finalizó",
                             Boolean.FALSE);
-                    PeriodicTask.cancelService(context);
+                    PeriodicTask.stopBroadcast(context);
                 }
             }
+            result.finish();
         }
     }
 }

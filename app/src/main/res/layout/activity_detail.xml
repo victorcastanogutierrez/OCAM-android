@@ -166,23 +166,21 @@
 
             <Button
                 android:id="@+id/btComenzar"
-                style="@style/Widget.AppCompat.Button.Colored"
+                android:background="@color/colorPrimary"
+                android:textColor="@android:color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:paddingLeft="10sp"
-                android:paddingRight="10sp"
-                android:paddingTop="15sp"
+                android:layout_marginTop="15sp"
                 android:text="Comenzar actividad" />
 
             <Button
                 android:id="@+id/btCambiarPassword"
-                style="@style/Widget.AppCompat.Button.Colored"
+                android:background="@color/colorPrimary"
+                android:textColor="@android:color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10sp"
-                android:paddingRight="10sp"
-                android:paddingTop="15sp"
+                android:layout_marginTop="15sp"
                 android:visibility="gone"
                 android:text="Cambiar password" />
 
@@ -191,34 +189,31 @@
 
         <Button
             android:id="@+id/btAbandonar"
-            style="@style/Widget.AppCompat.Button.Colored"
+            android:background="@color/colorPrimary"
+            android:textColor="@android:color/white"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10sp"
-            android:paddingRight="10sp"
-            android:paddingTop="15sp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="15sp"
             android:visibility="gone"
             android:text="Abandonar actividad" />
 
         <Button
             android:id="@+id/btMonitorizar"
-            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            android:textColor="@android:color/white"
             android:enabled="false"
-            android:paddingLeft="10sp"
-            android:paddingRight="10sp"
-            android:paddingTop="15sp"
             android:text="Monitorizar actividad" />
 
         <Button
             android:id="@+id/btCerrar"
-            style="@style/Widget.AppCompat.Button.Colored"
+            android:background="#90A4AE"
+            android:textColor="@android:color/white"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10sp"
-            android:paddingRight="10sp"
-            android:paddingTop="15sp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="15sp"
+            android:layout_marginBottom="15sp"
             android:visibility="gone"
             android:text="Cerrar actividad" />
 

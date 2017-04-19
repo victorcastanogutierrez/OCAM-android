@@ -1,6 +1,7 @@
 package com.ocam.activityList.recycler;
 
 import android.app.DatePickerDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class FragmentList extends Fragment implements ListActivityView
@@ -117,6 +119,13 @@ public class FragmentList extends Fragment implements ListActivityView
                 this.listPresenter.reloadActivities();
                 return true;
             case R.id.filterButton:
+                Locale locale;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    locale = getContext().getResources().getConfiguration().getLocales().get(0);
+                } else {
+                    locale = getContext().getResources().getConfiguration().locale;
+                }
+                Locale.setDefault(locale);
                 DatePickerFragment newFragment = getDatePicker();
                 Bundle arguments = new Bundle();
                 arguments.putLong("date", myCal.getTimeInMillis());

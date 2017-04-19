@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,6 +65,10 @@ public class FragmentActivity extends Fragment implements ActivityView {
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
     private EditText input; // Dialog de password
+    private static final String AVISO_GPS =
+            "Con el fin de mejorar la experiencia " +
+            "y que los datos de posición sean más precisos y sin conexión a internet, " +
+            "es necesario que actives la localización GPS de tu móvil, y el modo sea el adecuado.";
 
     public FragmentActivity() {
 
@@ -127,12 +132,37 @@ public class FragmentActivity extends Fragment implements ActivityView {
         btComenzar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!GPSLocation.checkPermission(getContext())) {
-                    requestPermissions(
-                            new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
-                            02);
+                if (!GPSLocation.checkGPSEnabled(getContext())) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage(AVISO_GPS)
+                            .setCancelable(false)
+                            .setPositiveButton("Activar", new DialogInterface.OnClickListener() {
+                                public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                    dialog.dismiss();
+                                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                                }
+                            })
+                            .setNegativeButton("No me interesa", new DialogInterface.OnClickListener() {
+                                public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                    if (!GPSLocation.checkPermission(getContext())) {
+                                        requestPermissions(
+                                                new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
+                                                02);
+                                    } else {
+                                        mostrarPasswordDialog();
+                                    }
+                                }
+                            });
+                    final AlertDialog alert = builder.create();
+                    alert.show();
                 } else {
-                    mostrarPasswordDialog();
+                    if (!GPSLocation.checkPermission(getContext())) {
+                        requestPermissions(
+                                new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
+                                02);
+                    } else {
+                        mostrarPasswordDialog();
+                    }
                 }
             }
         });
@@ -140,7 +170,26 @@ public class FragmentActivity extends Fragment implements ActivityView {
         btUnirse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showConfirmJoinDialog();
+
+                if (!GPSLocation.checkGPSEnabled(getContext())) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage(AVISO_GPS)
+                        .setCancelable(false)
+                        .setPositiveButton("Activar", new DialogInterface.OnClickListener() {
+                            public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            }
+                        })
+                        .setNegativeButton("No me interesa", new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                showConfirmJoinDialog();
+                            }
+                        });
+                    final AlertDialog alert = builder.create();
+                    alert.show();
+                } else {
+                    showConfirmJoinDialog();
+                }
             }
         });
 

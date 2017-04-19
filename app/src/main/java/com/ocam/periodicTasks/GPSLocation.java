@@ -21,4 +21,14 @@ public class GPSLocation {
         return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
+
+    /**
+     * Comprueba que sea posible obtener la posición del dispositivo vía GPS
+     * @param context
+     * @return
+     */
+    public static boolean checkGPSEnabled(final Context context) {
+        final LocationManager manager = (LocationManager) context.getSystemService( Context.LOCATION_SERVICE );
+        return manager.isProviderEnabled(LocationManager.GPS_PROVIDER );
+    }
 }

@@ -16,6 +16,11 @@ public class UserTokenDTO {
         this.email = email;
     }
 
+    public UserTokenDTO(String token, String refreshToken, String email, String login) {
+        this(token, refreshToken, email);
+        this.login = login;
+    }
+
     public String getEmail() {
         return email;
     }

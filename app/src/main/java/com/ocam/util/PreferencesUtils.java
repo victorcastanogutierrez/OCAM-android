@@ -29,6 +29,7 @@ public class PreferencesUtils {
         editor.putString(Constants.TOKEN_KEY, data.getToken());
         editor.putString(Constants.EMAIL_KEY, data.getEmail());
         editor.putString(Constants.REFRESH_TOKEN_KEY, data.getRefreshToken());
+        editor.putString(Constants.LOGIN_KEY, data.getLogin());
         editor.commit();
     }
 
@@ -43,7 +44,8 @@ public class PreferencesUtils {
             String token = sharedPref.getString(Constants.TOKEN_KEY, null);
             String refreshToken = sharedPref.getString(Constants.REFRESH_TOKEN_KEY, null);
             String email = sharedPref.getString(Constants.EMAIL_KEY, null);
-            return new UserTokenDTO(token, refreshToken, email);
+            String login = sharedPref.getString(Constants.LOGIN_KEY, null);
+            return new UserTokenDTO(token, refreshToken, email, login);
         } else {
             return null;
         }

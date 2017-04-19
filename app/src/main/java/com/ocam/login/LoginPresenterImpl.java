@@ -7,6 +7,7 @@ import android.util.Log;
 import com.android.volley.Request.Method;
 import com.android.volley.VolleyError;
 import com.ocam.manager.UserManager;
+import com.ocam.util.ConnectionUtils;
 import com.ocam.volley.VolleyManager;
 import com.ocam.model.UserTokenDTO;
 import com.ocam.util.Constants;
@@ -67,13 +68,21 @@ public class LoginPresenterImpl implements LoginPresenter {
         if (userTokenDTO == null) {
             loginView.hideProgress();
         } else { // Sesión guardada de otros logins
-            ICommand<UserTokenDTO> myCommand = new MyCommand();
-            Map<String, String> headers = getAuthHeader(userTokenDTO);
-            GsonRequest<UserTokenDTO> request = new GsonRequest<UserTokenDTO>(Constants.API_TOKEN,
-                    Method.GET, UserTokenDTO.class, headers,
-                    new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+            // Si tiene conexión a internet renovamos el token
+            if (ConnectionUtils.isConnected(this.context)) {
+                ICommand<UserTokenDTO> myCommand = new MyCommand();
+                Map<String, String> headers = getAuthHeader(userTokenDTO);
+                GsonRequest<UserTokenDTO> request = new GsonRequest<UserTokenDTO>(Constants.API_TOKEN,
+                        Method.GET, UserTokenDTO.class, headers,
+                        new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
-            volleyManager.addToRequestQueue(request);
+                volleyManager.addToRequestQueue(request);
+            } else {
+                // En caso contrario le logueamos con los datos guardados en sharedPreferences
+                UserManager.getInstance().setUserTokenDTO(userTokenDTO);
+                loginView.hideProgress();
+                loginView.loginSuccess();
+            }
         }
     }
 
@@ -119,7 +128,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                 userManager.setUserTokenDTO(response);
                 PreferencesUtils.setMonitorizationHiker(context, UserManager.getInstance().getUserTokenDTO().getLogin(),
                         UserManager.getInstance().getUserTokenDTO().getToken());
-                loginView.loginSuccess(response);
+                loginView.loginSuccess();
             }
             loginView.hideProgress();
         }

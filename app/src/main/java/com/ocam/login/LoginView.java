@@ -11,5 +11,5 @@ public interface LoginView {
 
     void showErrorMessage(String message);
 
-    void loginSuccess(UserTokenDTO userTokenDTO);
+    void loginSuccess();
 }

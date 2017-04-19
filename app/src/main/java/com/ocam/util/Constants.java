@@ -33,6 +33,7 @@ public class Constants {
     public static final String SHARED_PREFS = "sharedocam";
     public static final String TOKEN_KEY = "USER-TOKEN";
     public static final String EMAIL_KEY = "USER-EMAIL";
+    public static final String LOGIN_KEY = "USER-LOGIN";
     public static final String REFRESH_TOKEN_KEY = "REFRESH-TOKEN";
     public static final String LOGIN_MONITORIZATION = "LOGIN-MONITORIZATION";
     public static final String TOKEN_MONITORIZATION = "TOKEN-MONITORIZATION";

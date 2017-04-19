@@ -115,7 +115,7 @@ public class LoginActivity extends Activity implements LoginView {
      * Método llamado cuando el login finaliza con éxito
      */
     @Override
-    public void loginSuccess(UserTokenDTO userTokenDTO) {
+    public void loginSuccess() {
         Intent i = new Intent(LoginActivity.this, ListActivity.class);
         startActivity(i);
     }

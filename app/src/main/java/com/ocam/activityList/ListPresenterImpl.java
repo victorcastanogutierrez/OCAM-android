@@ -5,6 +5,10 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
+import com.ocam.manager.App;
+import com.ocam.model.ActivityDao;
+import com.ocam.model.DaoSession;
+import com.ocam.util.ConnectionUtils;
 import com.ocam.volley.VolleyManager;
 import com.ocam.model.Activity;
 import com.ocam.util.Constants;
@@ -27,35 +31,51 @@ public class ListPresenterImpl implements ListPresenter {
     private ListActivityView listActivityView;
     private VolleyManager volleyManager;
     private Context context;
+    private ActivityDao activityDao;
 
     public ListPresenterImpl(ListActivityView listActivityView, Context context) {
         this.listActivityView = listActivityView;
         this.context = context;
         this.volleyManager = VolleyManager.getInstance(this.context);
+        DaoSession daoSession = ((App) context.getApplicationContext()).getDaoSession();
+        this.activityDao = daoSession.getActivityDao();
     }
 
     @Override
     public void loadActivities() {
-        this.listActivityView.showProgress();
+        //Si tiene conexión las obtenemos del servidor
+        if (ConnectionUtils.isConnected(this.context)) {
+            this.listActivityView.showProgress();
 
-        ICommand<Activity[]> myCommand = new MyCommand();
-        GsonRequest<Activity[]> request = new GsonRequest<Activity[]>(Constants.API_FIND_ALL_ACTIVITIES,
-                Request.Method.GET, Activity[].class, new HashMap<String, String>(),
-                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+            ICommand<Activity[]> myCommand = new MyCommand();
+            GsonRequest<Activity[]> request = new GsonRequest<Activity[]>(Constants.API_FIND_ALL_ACTIVITIES,
+                    Request.Method.GET, Activity[].class, new HashMap<String, String>(),
+                    new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
-        volleyManager.addToRequestQueue(request);
+            volleyManager.addToRequestQueue(request);
+        } else {
+            //Si no tiene conexión las busca en local
+            listActivityView.hideProgress();
+            listActivityView.setUpRecyclerView(this.activityDao.queryBuilder().list());
+            listActivityView.notifySnackbar("No tienes conexión a internet");
+        }
     }
 
     @Override
     public void reloadActivities() {
-        this.listActivityView.showProgress();
+        if (ConnectionUtils.isConnected(this.context)) {
+            this.listActivityView.showProgress();
 
-        ICommand<Activity[]> myCommand = new MyUpdateCommand();
-        GsonRequest<Activity[]> request = new GsonRequest<Activity[]>(Constants.API_FIND_ALL_ACTIVITIES,
-                Request.Method.GET, Activity[].class, new HashMap<String, String>(),
-                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+            ICommand<Activity[]> myCommand = new MyUpdateCommand();
+            GsonRequest<Activity[]> request = new GsonRequest<Activity[]>(Constants.API_FIND_ALL_ACTIVITIES,
+                    Request.Method.GET, Activity[].class, new HashMap<String, String>(),
+                    new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
-        volleyManager.addToRequestQueue(request);
+            volleyManager.addToRequestQueue(request);
+        } else {
+            listActivityView.notifyError("Opción no disponible sin conexión");
+            listActivityView.hideProgress();
+        }
     }
 
     /**
@@ -74,12 +94,22 @@ public class ListPresenterImpl implements ListPresenter {
         return result;
     }
 
+    /**
+     * Guarda en local los datos de las actividades
+     * @param activities
+     */
+    private void saveListData(List<Activity> activities) {
+        this.activityDao.deleteAll();
+        this.activityDao.insertInTx(activities);
+    }
+
     private class MyUpdateCommand implements ICommand<Activity[]> {
 
         @Override
         public void executeResponse(Activity[] response) {
             listActivityView.hideProgress();
             listActivityView.reloadRecyclerData(Arrays.asList(response));
+            saveListData(Arrays.asList(response));
         }
 
         @Override
@@ -95,6 +125,7 @@ public class ListPresenterImpl implements ListPresenter {
         public void executeResponse(Activity[] response) {
             listActivityView.hideProgress();
             listActivityView.setUpRecyclerView(Arrays.asList(response));
+            saveListData(Arrays.asList(response));
         }
 
         @Override

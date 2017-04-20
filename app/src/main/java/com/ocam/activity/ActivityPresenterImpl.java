@@ -8,12 +8,13 @@ import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.ocam.manager.UserManager;
+import com.ocam.model.Hiker;
+import com.ocam.model.HikerDTO;
 import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.util.NotificationUtils;
 import com.ocam.util.ViewUtils;
 import com.ocam.volley.VolleyManager;
 import com.ocam.model.Activity;
-import com.ocam.model.HikerDTO;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.util.Constants;
 import com.ocam.volley.GsonRequest;
@@ -44,7 +45,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     @Override
     public Boolean isUserGuide(Activity activity) {
         UserManager userManager = UserManager.getInstance();
-        for (HikerDTO h : activity.getGuides()){
+        for (Hiker h : activity.getGuides()){
             if (h.getEmail().equals(userManager.getUserTokenDTO().getEmail())) {
                 return Boolean.TRUE;
             }
@@ -175,8 +176,8 @@ public class ActivityPresenterImpl implements ActivityPresenter {
      */
     private void removeHikerFromList(Activity activity) {
         String loggedHiker = UserManager.getInstance().getUserTokenDTO().getLogin();
-        for (Iterator<HikerDTO> iterator = activity.getHikers().iterator(); iterator.hasNext();) {
-            HikerDTO hiker = iterator.next();
+        for (Iterator<Hiker> iterator = activity.getHikers().iterator(); iterator.hasNext();) {
+            Hiker hiker = iterator.next();
             if (hiker.getLogin().equals(loggedHiker)) {
                 iterator.remove();
                 break;
@@ -191,7 +192,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
      */
     private Boolean esParticipante(Activity activity) {
         String loggedHiker = UserManager.getInstance().getUserTokenDTO().getLogin();
-        for (HikerDTO h : activity.getHikers()) {
+        for (Hiker h : activity.getHikers()) {
             if (h.getLogin().equals(loggedHiker)) {
                 return Boolean.TRUE;
             }

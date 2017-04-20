@@ -46,6 +46,7 @@ public class FragmentList extends Fragment implements ListActivityView
     private SwipeRefreshLayout refreshLayout;
     private List<Activity> originalData;
     private Calendar myCal;
+    private View mView;
 
     public FragmentList() {
 
@@ -55,9 +56,11 @@ public class FragmentList extends Fragment implements ListActivityView
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_list, container, false);
+        this.mView = view;
         setHasOptionsMenu(true);
         setUpSwipeRefresh(view);
         this.listPresenter = new ListPresenterImpl(this, getContext());
+        this.recyclerView = (RecyclerView) view.findViewById(R.id.reciclerView);
         listPresenter.loadActivities();
         myCal = Calendar.getInstance();
         return view;
@@ -76,13 +79,14 @@ public class FragmentList extends Fragment implements ListActivityView
      */
     @Override
     public void hideProgress() {
-        this.refreshLayout.setRefreshing(false);
+        if (this.refreshLayout.isRefreshing()) {
+            this.refreshLayout.setRefreshing(false);
+        }
     }
 
     @Override
     public void setUpRecyclerView(List<Activity> datos) {
         this.originalData = datos;
-        this.recyclerView = (RecyclerView) getView().findViewById(R.id.reciclerView);
         this.recyclerView.setHasFixedSize(true);
         this.adapter = new ActivityAdapter();
         this.adapter.add(datos);
@@ -109,6 +113,11 @@ public class FragmentList extends Fragment implements ListActivityView
     @Override
     public void notifyError(String err) {
         ViewUtils.showToast(getContext(), Toast.LENGTH_SHORT, err);
+    }
+
+    @Override
+    public void notifySnackbar(String notification) {
+        Snackbar.make(mView, notification, Snackbar.LENGTH_LONG).show();
     }
 
     @Override

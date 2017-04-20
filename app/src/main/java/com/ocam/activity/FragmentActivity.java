@@ -9,7 +9,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +28,7 @@ import com.ocam.activity.monitorization.MonitorizationActivity;
 import com.ocam.activity.track.TrackActivity;
 import com.ocam.manager.UserManager;
 import com.ocam.model.Activity;
+import com.ocam.model.Hiker;
 import com.ocam.model.HikerDTO;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.periodicTasks.GPSLocation;
@@ -417,9 +417,9 @@ public class FragmentActivity extends Fragment implements ActivityView {
      */
     @Override
     public void onHikerJoinActivity() {
-        HikerDTO hikerDTO = new HikerDTO();
-        hikerDTO.setLogin(UserManager.getInstance().getUserTokenDTO().getLogin());
-        this.activity.getHikers().add(hikerDTO);
+        Hiker hiker = new Hiker();
+        hiker.setLogin(UserManager.getInstance().getUserTokenDTO().getLogin());
+        this.activity.getHikers().add(hiker);
         this.btUnirse.setVisibility(View.GONE);
         this.btMonitorizar.setVisibility(View.VISIBLE);
         this.btMonitorizar.setEnabled(Boolean.TRUE);

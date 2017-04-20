@@ -19,4 +19,6 @@ public interface ListActivityView {
     void reloadRecyclerData(List<Activity> datos);
 
     void notifyError(String err);
+
+    void notifySnackbar(String notification);
 }

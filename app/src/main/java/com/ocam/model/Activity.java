@@ -2,35 +2,103 @@ package com.ocam.model;
 
 import com.ocam.model.types.ActivityStatus;
 
+import org.greenrobot.greendao.annotation.Convert;
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.JoinEntity;
+import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.ToMany;
+import org.greenrobot.greendao.annotation.ToOne;
+import org.greenrobot.greendao.annotation.Transient;
+import org.greenrobot.greendao.converter.PropertyConverter;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.DaoException;
 
+@Entity
 public class Activity {
 
+	@Id
 	private Long id;
 
+	@NotNull
 	private String shortDescription;
 
 	private String longDescription;
 
 	private String mide;
 
+	@NotNull
 	private Date startDate;
 
 	private Long maxPlaces;
 
+	@Transient
 	private String password;
 
+	@NotNull
+    @Convert(converter = StatusConverter.class, columnType = String.class)
 	private ActivityStatus status;
 
-	private HikerDTO owner;
+    @ToOne(joinProperty = "ownerId")
+	private Hiker owner;
 
-	private List<HikerDTO> hikers = new ArrayList<HikerDTO>();
+    private Long ownerId;
 
-	private List<HikerDTO> guides = new ArrayList<HikerDTO>();
+	@ToMany
+    @JoinEntity(
+            entity = JoinActivityHikers.class,
+            sourceProperty = "activityId",
+            targetProperty = "hikerId"
+    )
+	private List<Hiker> hikers = new ArrayList<Hiker>();
 
+    @ToMany
+    @JoinEntity(
+            entity = JoinActivityGuides.class,
+            sourceProperty = "activityId",
+            targetProperty = "hikerId"
+    )
+	private List<Hiker> guides = new ArrayList<Hiker>();
+
+	@Transient
 	private List<ReportDTO> reportDTOs = new ArrayList<ReportDTO>();
+
+	/** Used to resolve relations */
+	@Generated(hash = 2040040024)
+	private transient DaoSession daoSession;
+
+	/** Used for active entity operations. */
+	@Generated(hash = 1662302404)
+	private transient ActivityDao myDao;
+
+
+
+	@Generated(hash = 592930359)
+	public Activity(Long id, @NotNull String shortDescription, String longDescription,
+			String mide, @NotNull Date startDate, Long maxPlaces, @NotNull ActivityStatus status,
+			Long ownerId) {
+		this.id = id;
+		this.shortDescription = shortDescription;
+		this.longDescription = longDescription;
+		this.mide = mide;
+		this.startDate = startDate;
+		this.maxPlaces = maxPlaces;
+		this.status = status;
+		this.ownerId = ownerId;
+	}
+
+	@Generated(hash = 126967852)
+	public Activity() {
+	}
+
+	@Generated(hash = 1847295403)
+	private transient Long owner__resolvedKey;
+
+
 
 	public String getShortDescription() {
 		return shortDescription;
@@ -88,30 +156,6 @@ public class Activity {
 		this.status = status;
 	}
 
-	public HikerDTO getOwner() {
-		return owner;
-	}
-
-	public void setOwner(HikerDTO owner) {
-		this.owner = owner;
-	}
-
-	public List<HikerDTO> getHikers() {
-		return hikers;
-	}
-
-	public void setHikers(List<HikerDTO> hikers) {
-		this.hikers = hikers;
-	}
-
-	public List<HikerDTO> getGuides() {
-		return guides;
-	}
-
-	public void setGuides(List<HikerDTO> guides) {
-		this.guides = guides;
-	}
-
 	public List<ReportDTO> getReportDTOs() {
 		return reportDTOs;
 	}
@@ -136,4 +180,163 @@ public class Activity {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
+    public static class StatusConverter implements PropertyConverter<ActivityStatus, String> {
+
+        @Override
+        public ActivityStatus convertToEntityProperty(String databaseValue) {
+            if (databaseValue == null) {
+                return null;
+            }
+            for (ActivityStatus status : ActivityStatus.values()) {
+                if (status.name().equals(databaseValue)) {
+                    return status;
+                }
+            }
+            return ActivityStatus.CLOSED;
+        }
+
+        @Override
+        public String convertToDatabaseValue(ActivityStatus entityProperty) {
+            return entityProperty == null ? null : entityProperty.name();
+        }
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+				/** To-one relationship, resolved on first access. */
+				@Generated(hash = 850704684)
+				public Hiker getOwner() {
+					Long __key = this.ownerId;
+					if (owner__resolvedKey == null || !owner__resolvedKey.equals(__key)) {
+						final DaoSession daoSession = this.daoSession;
+						if (daoSession == null) {
+							throw new DaoException("Entity is detached from DAO context");
+						}
+						HikerDao targetDao = daoSession.getHikerDao();
+						Hiker ownerNew = targetDao.load(__key);
+						synchronized (this) {
+							owner = ownerNew;
+							owner__resolvedKey = __key;
+						}
+					}
+					return owner;
+				}
+
+				/** called by internal mechanisms, do not call yourself. */
+				@Generated(hash = 53144329)
+				public void setOwner(Hiker owner) {
+					synchronized (this) {
+						this.owner = owner;
+						ownerId = owner == null ? null : owner.getId();
+						owner__resolvedKey = ownerId;
+					}
+				}
+
+				/**
+				 * To-many relationship, resolved on first access (and after reset).
+				 * Changes to to-many relations are not persisted, make changes to the target entity.
+				 */
+				@Generated(hash = 1210885595)
+				public List<Hiker> getHikers() {
+					if (hikers == null) {
+						final DaoSession daoSession = this.daoSession;
+						if (daoSession == null) {
+							throw new DaoException("Entity is detached from DAO context");
+						}
+						HikerDao targetDao = daoSession.getHikerDao();
+						List<Hiker> hikersNew = targetDao._queryActivity_Hikers(id);
+						synchronized (this) {
+							if (hikers == null) {
+								hikers = hikersNew;
+							}
+						}
+					}
+					return hikers;
+				}
+
+				/** Resets a to-many relationship, making the next get call to query for a fresh result. */
+				@Generated(hash = 1959915735)
+				public synchronized void resetHikers() {
+					hikers = null;
+				}
+
+				/**
+				 * To-many relationship, resolved on first access (and after reset).
+				 * Changes to to-many relations are not persisted, make changes to the target entity.
+				 */
+				@Generated(hash = 2092110586)
+				public List<Hiker> getGuides() {
+					if (guides == null) {
+						final DaoSession daoSession = this.daoSession;
+						if (daoSession == null) {
+							throw new DaoException("Entity is detached from DAO context");
+						}
+						HikerDao targetDao = daoSession.getHikerDao();
+						List<Hiker> guidesNew = targetDao._queryActivity_Guides(id);
+						synchronized (this) {
+							if (guides == null) {
+								guides = guidesNew;
+							}
+						}
+					}
+					return guides;
+				}
+
+				/** Resets a to-many relationship, making the next get call to query for a fresh result. */
+				@Generated(hash = 989145583)
+				public synchronized void resetGuides() {
+					guides = null;
+				}
+
+				/**
+				 * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
+				 * Entity must attached to an entity context.
+				 */
+				@Generated(hash = 128553479)
+				public void delete() {
+					if (myDao == null) {
+						throw new DaoException("Entity is detached from DAO context");
+					}
+					myDao.delete(this);
+				}
+
+				/**
+				 * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
+				 * Entity must attached to an entity context.
+				 */
+				@Generated(hash = 1942392019)
+				public void refresh() {
+					if (myDao == null) {
+						throw new DaoException("Entity is detached from DAO context");
+					}
+					myDao.refresh(this);
+				}
+
+				/**
+				 * Convenient call for {@link org.greenrobot.greendao.AbstractDao#update(Object)}.
+				 * Entity must attached to an entity context.
+				 */
+				@Generated(hash = 713229351)
+				public void update() {
+					if (myDao == null) {
+						throw new DaoException("Entity is detached from DAO context");
+					}
+					myDao.update(this);
+				}
+
+				/** called by internal mechanisms, do not call yourself. */
+				@Generated(hash = 1002377807)
+				public void __setDaoSession(DaoSession daoSession) {
+					this.daoSession = daoSession;
+					myDao = daoSession != null ? daoSession.getActivityDao() : null;
+				}
+
+
 }

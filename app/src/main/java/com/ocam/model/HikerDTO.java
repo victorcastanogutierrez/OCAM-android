@@ -1,5 +1,8 @@
 package com.ocam.model;
 
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 

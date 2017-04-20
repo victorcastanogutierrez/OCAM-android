@@ -1,6 +1,7 @@
 package com.ocam.manager;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.ocam.model.DaoMaster;
 import com.ocam.model.DaoMaster.DevOpenHelper;
@@ -17,7 +18,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        DevOpenHelper helper = new DevOpenHelper(this, "ocam-db");
+        DevOpenHelper helper = new DevOpenHelper(this, "ocam.db");
         Database db = helper.getWritableDb();
         daoSession = new DaoMaster(db).newSession();
     }

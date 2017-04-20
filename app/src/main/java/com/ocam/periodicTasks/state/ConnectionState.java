@@ -64,7 +64,6 @@ public class ConnectionState extends BaseReportState {
                     "Localización error", "No hemos podido obtener la localización del dispositivo!",
                     Boolean.FALSE);
         }
-        this.reportDao.deleteAll();
     }
 
     /**
@@ -156,13 +155,13 @@ public class ConnectionState extends BaseReportState {
             if (requests.size() > 0) {
                 volleyManager.addToRequestQueue(requests.remove(0));
             } else {
+                reportDao.deleteAll();
                 result.finish();
             }
         }
 
         @Override
         public void executeError(VolleyError error) {
-            Log.d("No exito", error.getMessage());
             if (error != null && error.getMessage() != null) {
                 Log.d("Error", error.getMessage());
                 JsonObject objError = new Gson().fromJson(error.getMessage(), JsonObject.class);

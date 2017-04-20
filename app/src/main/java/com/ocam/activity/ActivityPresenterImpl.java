@@ -14,6 +14,9 @@ import com.ocam.model.ActivityDao;
 import com.ocam.model.DaoSession;
 import com.ocam.model.Hiker;
 import com.ocam.model.HikerDTO;
+import com.ocam.model.HikerDao;
+import com.ocam.model.JoinActivityHikers;
+import com.ocam.model.JoinActivityHikersDao;
 import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.util.NotificationUtils;
 import com.ocam.util.ViewUtils;
@@ -41,12 +44,16 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     private ActivityView activityView;
     private Context context;
     private ActivityDao activityDao;
+    private HikerDao hikerDao;
+    private JoinActivityHikersDao joinActivityHikersDao;
 
     public ActivityPresenterImpl(ActivityView activityView, Context context) {
         this.activityView = activityView;
         this.context = context;
         DaoSession daoSession = ((App) context.getApplicationContext()).getDaoSession();
         this.activityDao = daoSession.getActivityDao();
+        this.hikerDao = daoSession.getHikerDao();
+        this.joinActivityHikersDao = daoSession.getJoinActivityHikersDao();
     }
 
     /**
@@ -198,6 +205,21 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     @Override
     public void saveActivity(Activity activity) {
         this.activityDao.save(activity);
+    }
+
+    @Override
+    public void incluirGuiaActividad(Activity activity) {
+        for (Hiker h : activity.getGuides()) {
+            if (h.getLogin().equals(UserManager.getInstance().getUserTokenDTO().getLogin())) {
+                Hiker hiker = hikerDao.queryBuilder().where(HikerDao.Properties.Login.eq(h.getLogin())).unique();
+                if (hiker != null) {
+                    JoinActivityHikers join = new JoinActivityHikers(null, activity.getId_local(), hiker.getId_local());
+                    joinActivityHikersDao.insert(join);
+                    activity.getHikers().add(hiker);
+                }
+                break;
+            }
+        }
     }
 
     /**

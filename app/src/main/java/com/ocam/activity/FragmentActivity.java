@@ -399,6 +399,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
     @Override
     public void onActivityOpen() {
         this.activity.setStatus(ActivityStatus.RUNNING);
+        this.activityPresenter.incluirGuiaActividad(this.activity);
         this.activityPresenter.saveActivity(this.activity);
         this.btComenzar.setVisibility(View.GONE);
         btMonitorizar.setEnabled(Boolean.TRUE);
@@ -424,7 +425,8 @@ public class FragmentActivity extends Fragment implements ActivityView {
     public void onHikerJoinActivity() {
         Hiker hiker = new Hiker();
         hiker.setLogin(UserManager.getInstance().getUserTokenDTO().getLogin());
-        this.activity.getHikers().add(hiker);
+        this.activityPresenter.incluirGuiaActividad(this.activity);
+        this.activityPresenter.saveActivity(this.activity);
         this.btUnirse.setVisibility(View.GONE);
         this.btMonitorizar.setVisibility(View.VISIBLE);
         this.btMonitorizar.setEnabled(Boolean.TRUE);
@@ -447,6 +449,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
                 .show();
 
         activity.setStatus(ActivityStatus.CLOSED);
+        activityPresenter.saveActivity(activity);
         btCerrar.setVisibility(View.GONE);
         btMonitorizar.setVisibility(View.GONE);
         btCambiarPassword.setVisibility(View.GONE);
@@ -458,10 +461,10 @@ public class FragmentActivity extends Fragment implements ActivityView {
      */
     @Override
     public void iniciarMonitorizacion() {
-        PeriodicTask.startBroadcast(getContext());
+        /*PeriodicTask.startBroadcast(getContext());
         NotificationUtils.sendNotification(getContext(), Constants.ONGOING_NOTIFICATION_ID,
                 "Participas en una actividad en curso", "Aún no se ha enviado ningún reporte",
-                Boolean.TRUE);
+                Boolean.TRUE);*/
     }
 
     /**

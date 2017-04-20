@@ -92,4 +92,10 @@ public interface ActivityPresenter {
      * @param activity
      */
     void saveActivity(Activity activity);
+
+    /**
+     * Incluye al usuario identificado como hiker de la actividad
+     * @param activity
+     */
+    void incluirGuiaActividad(Activity activity);
 }

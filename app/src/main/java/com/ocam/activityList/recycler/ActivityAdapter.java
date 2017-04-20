@@ -142,7 +142,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
         public void bindActivity(final Activity activity) {
             txDescripcion.setText(activity.getShortDescription());
             txFecha.setText(com.ocam.util.DateUtils.formatDate(activity.getStartDate()));
-            txEstado.setText(activity.getFormattedStatus());
+            txEstado.setText(ActivityStatus.getFormattedStatus(activity.getStatus()));
             txEstado.setTextColor(getStatusColor(activity.getStatus()));
             btDetalle.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -7,7 +7,6 @@ import android.util.Log;
 
 import com.ocam.model.Report;
 import com.ocam.model.types.GPSPoint;
-import com.ocam.periodicTasks.GPSLocation;
 import com.ocam.util.NotificationUtils;
 
 import java.util.Date;
@@ -36,7 +35,7 @@ public class DisconnectedState extends BaseReportState {
      * @return
      */
     private void saveReport(Location location) {
-        //Location location = GPSLocation.getLastKnownLocation(this.context);
+        //Location location = GPSLocationHelper.getLastKnownLocation(this.context);
         if (location != null) {
             Log.d("-", "Guarda reporte en local");
             GPSPoint gpsPoint = new GPSPoint(location);

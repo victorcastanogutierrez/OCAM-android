@@ -4,12 +4,16 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Unique;
 
 @Entity
 public class Hiker {
 
-    @Id
+    @Unique
     private Long id;
+
+    @Id
+    private Long id_local;
 
     @NotNull
     private String email;
@@ -21,12 +25,18 @@ public class Hiker {
 
     }
 
-    @Generated(hash = 414962445)
-    public Hiker(Long id, @NotNull String email, @NotNull String login) {
+
+
+    @Generated(hash = 257416339)
+    public Hiker(Long id, Long id_local, @NotNull String email,
+            @NotNull String login) {
         this.id = id;
+        this.id_local = id_local;
         this.email = email;
         this.login = login;
     }
+
+
 
     public Long getId() {
         return id;
@@ -50,5 +60,13 @@ public class Hiker {
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public Long getId_local() {
+        return this.id_local;
+    }
+
+    public void setId_local(Long id_local) {
+        this.id_local = id_local;
     }
 }

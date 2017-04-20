@@ -5,9 +5,17 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
 import com.ocam.manager.App;
+import com.ocam.model.ActivityDTO;
 import com.ocam.model.ActivityDao;
 import com.ocam.model.DaoSession;
+import com.ocam.model.Hiker;
+import com.ocam.model.HikerDao;
+import com.ocam.model.JoinActivityGuides;
+import com.ocam.model.JoinActivityGuidesDao;
+import com.ocam.model.JoinActivityHikers;
+import com.ocam.model.JoinActivityHikersDao;
 import com.ocam.util.ConnectionUtils;
 import com.ocam.volley.VolleyManager;
 import com.ocam.model.Activity;
@@ -32,6 +40,9 @@ public class ListPresenterImpl implements ListPresenter {
     private VolleyManager volleyManager;
     private Context context;
     private ActivityDao activityDao;
+    private HikerDao hikerDao;
+    private JoinActivityGuidesDao joinActivityGuidesDao;
+    private JoinActivityHikersDao joinActivityHikersDao;
 
     public ListPresenterImpl(ListActivityView listActivityView, Context context) {
         this.listActivityView = listActivityView;
@@ -39,6 +50,9 @@ public class ListPresenterImpl implements ListPresenter {
         this.volleyManager = VolleyManager.getInstance(this.context);
         DaoSession daoSession = ((App) context.getApplicationContext()).getDaoSession();
         this.activityDao = daoSession.getActivityDao();
+        this.hikerDao = daoSession.getHikerDao();
+        this.joinActivityGuidesDao = daoSession.getJoinActivityGuidesDao();
+        this.joinActivityHikersDao = daoSession.getJoinActivityHikersDao();
     }
 
     @Override
@@ -47,9 +61,9 @@ public class ListPresenterImpl implements ListPresenter {
         if (ConnectionUtils.isConnected(this.context)) {
             this.listActivityView.showProgress();
 
-            ICommand<Activity[]> myCommand = new MyCommand();
-            GsonRequest<Activity[]> request = new GsonRequest<Activity[]>(Constants.API_FIND_ALL_ACTIVITIES,
-                    Request.Method.GET, Activity[].class, new HashMap<String, String>(),
+            ICommand<ActivityDTO[]> myCommand = new MyCommand();
+            GsonRequest<ActivityDTO[]> request = new GsonRequest<ActivityDTO[]>(Constants.API_FIND_ALL_ACTIVITIES,
+                    Request.Method.GET, ActivityDTO[].class, new HashMap<String, String>(),
                     new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
             volleyManager.addToRequestQueue(request);
@@ -66,9 +80,9 @@ public class ListPresenterImpl implements ListPresenter {
         if (ConnectionUtils.isConnected(this.context)) {
             this.listActivityView.showProgress();
 
-            ICommand<Activity[]> myCommand = new MyUpdateCommand();
-            GsonRequest<Activity[]> request = new GsonRequest<Activity[]>(Constants.API_FIND_ALL_ACTIVITIES,
-                    Request.Method.GET, Activity[].class, new HashMap<String, String>(),
+            ICommand<ActivityDTO[]> myCommand = new MyUpdateCommand();
+            GsonRequest<ActivityDTO[]> request = new GsonRequest<ActivityDTO[]>(Constants.API_FIND_ALL_ACTIVITIES,
+                    Request.Method.GET, ActivityDTO[].class, new HashMap<String, String>(),
                     new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
             volleyManager.addToRequestQueue(request);
@@ -98,18 +112,76 @@ public class ListPresenterImpl implements ListPresenter {
      * Guarda en local los datos de las actividades
      * @param activities
      */
-    private void saveListData(List<Activity> activities) {
-        this.activityDao.deleteAll();
-        this.activityDao.insertInTx(activities);
+    private List<Activity> saveListData(List<ActivityDTO> activities) {
+        removeData();
+        List<Activity> result = new ArrayList<Activity>();
+        for (ActivityDTO act : activities) {
+            //Convierte ActivityDTO en activity pasandolo por JSON
+            Activity activity = new Gson().fromJson(new Gson().toJson(act), Activity.class);
+
+            //Persiste el dueño de la actividad
+            Hiker owner = new Hiker(act.getOwner().getId(), null, act.getOwner().getEmail(), act.getOwner().getLogin());
+            Long ownerId = hikerDao.insert(owner);
+            activity.setOwnerId(ownerId);
+            activity.setOwner(owner);
+
+            Long activityLocalId = activityDao.insert(activity);
+
+            //Persiste los guías de la actividad
+            persistActivityGuides(act, activity, activityLocalId);
+
+            //Persiste los participantes de la actividad
+            persistActivityHikers(act, activity, activityLocalId);
+
+            result.add(activity);
+        }
+        return result;
     }
 
-    private class MyUpdateCommand implements ICommand<Activity[]> {
+    private void persistActivityHikers(ActivityDTO act, Activity activity, Long activityLocalId) {
+        for (Hiker h : act.getHikers()) {
+            Hiker actHiker = hikerDao.queryBuilder().where(HikerDao.Properties.Id.eq(h.getId())).unique();
+            if (actHiker == null) {
+                actHiker = new Hiker(h.getId(), null, h.getEmail(), h.getLogin());
+                hikerDao.insert(actHiker);
+            }
+
+            JoinActivityHikers join = new JoinActivityHikers(null, activityLocalId, actHiker.getId_local());
+            joinActivityHikersDao.insert(join);
+
+            activity.getHikers().add(actHiker);
+        }
+    }
+
+    private void persistActivityGuides(ActivityDTO act, Activity activity, Long activityLocalId) {
+        for (Hiker h : act.getGuides()) {
+            Hiker guide = hikerDao.queryBuilder().where(HikerDao.Properties.Id.eq(h.getId())).unique();
+            if (guide == null) {
+                guide = new Hiker(h.getId(), null, h.getEmail(), h.getLogin());
+                hikerDao.insert(guide);
+            }
+
+            JoinActivityGuides join = new JoinActivityGuides(null, activityLocalId, guide.getId_local());
+            joinActivityGuidesDao.insert(join);
+
+            activity.getGuides().add(guide);
+        }
+    }
+
+    private void removeData() {
+        this.activityDao.deleteAll();
+        this.hikerDao.deleteAll();
+        this.joinActivityGuidesDao.deleteAll();
+        this.joinActivityHikersDao.deleteAll();
+    }
+
+    private class MyUpdateCommand implements ICommand<ActivityDTO[]> {
 
         @Override
-        public void executeResponse(Activity[] response) {
+        public void executeResponse(ActivityDTO[] response) {
             listActivityView.hideProgress();
-            listActivityView.reloadRecyclerData(Arrays.asList(response));
-            saveListData(Arrays.asList(response));
+            List<Activity> acts = saveListData(Arrays.asList(response));
+            listActivityView.reloadRecyclerData(acts);
         }
 
         @Override
@@ -119,13 +191,13 @@ public class ListPresenterImpl implements ListPresenter {
         }
     }
 
-    private class MyCommand implements ICommand<Activity[]> {
+    private class MyCommand implements ICommand<ActivityDTO[]> {
 
         @Override
-        public void executeResponse(Activity[] response) {
+        public void executeResponse(ActivityDTO[] response) {
             listActivityView.hideProgress();
-            listActivityView.setUpRecyclerView(Arrays.asList(response));
-            saveListData(Arrays.asList(response));
+            List<Activity> acts = saveListData(Arrays.asList(response));
+            listActivityView.setUpRecyclerView(acts);
         }
 
         @Override

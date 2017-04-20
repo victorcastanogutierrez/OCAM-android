@@ -6,9 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -16,8 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +28,6 @@ import com.ocam.activityList.ListActivityView;
 import com.ocam.activityList.ListPresenter;
 import com.ocam.activityList.ListPresenterImpl;
 import com.ocam.model.Activity;
-import com.ocam.periodicTasks.GPSLocation;
 import com.ocam.util.ViewUtils;
 
 import java.text.SimpleDateFormat;
@@ -41,11 +36,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
-
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.os.Build.VERSION_CODES.M;
 
 
 public class FragmentList extends Fragment implements ListActivityView, OnDetailClickListener
@@ -258,6 +248,10 @@ public class FragmentList extends Fragment implements ListActivityView, OnDetail
         alertDialog.show();
     }
 
+    /**
+     * Muestra un dialog de confirmación para acceder a un enlace
+     * @param mide
+     */
     private void showConfirmURLDialog(final String mide) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
         builder.setTitle(R.string.app_name);

@@ -10,7 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import java.util.List;
 
 
-public class GPSLocation {
+public class GPSLocationHelper {
 
     /**
      * Comprueba los permisos necesarios para obtener la posición del dispositivo

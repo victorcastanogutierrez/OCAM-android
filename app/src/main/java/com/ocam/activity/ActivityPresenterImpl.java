@@ -7,7 +7,11 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.ocam.manager.App;
 import com.ocam.manager.UserManager;
+import com.ocam.model.ActivityDTO;
+import com.ocam.model.ActivityDao;
+import com.ocam.model.DaoSession;
 import com.ocam.model.Hiker;
 import com.ocam.model.HikerDTO;
 import com.ocam.periodicTasks.PeriodicTask;
@@ -22,6 +26,9 @@ import com.ocam.volley.listeners.GenericErrorListener;
 import com.ocam.volley.listeners.GenericResponseListener;
 import com.ocam.volley.listeners.ICommand;
 
+import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -33,10 +40,13 @@ public class ActivityPresenterImpl implements ActivityPresenter {
 
     private ActivityView activityView;
     private Context context;
+    private ActivityDao activityDao;
 
     public ActivityPresenterImpl(ActivityView activityView, Context context) {
         this.activityView = activityView;
         this.context = context;
+        DaoSession daoSession = ((App) context.getApplicationContext()).getDaoSession();
+        this.activityDao = daoSession.getActivityDao();
     }
 
     /**
@@ -145,7 +155,6 @@ public class ActivityPresenterImpl implements ActivityPresenter {
 
     /**
      * {@inheritDoc}
-     * @param activity
      */
     @Override
     public void leaveActivity(Activity activity) {
@@ -165,9 +174,30 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         activityView.onLeaveActivity();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean puedeAbandonar(Activity activity) {
         return !isUserGuide(activity) && esParticipante(activity) && assertActivityRunning(activity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Activity findLocalActivity(Long activityLocalId) {
+        return activityDao.queryBuilder()
+                .where(ActivityDao.Properties.Id_local.eq(activityLocalId))
+                .unique();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveActivity(Activity activity) {
+        this.activityDao.save(activity);
     }
 
     /**

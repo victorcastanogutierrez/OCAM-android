@@ -29,9 +29,8 @@ import com.ocam.activity.track.TrackActivity;
 import com.ocam.manager.UserManager;
 import com.ocam.model.Activity;
 import com.ocam.model.Hiker;
-import com.ocam.model.HikerDTO;
 import com.ocam.model.types.ActivityStatus;
-import com.ocam.periodicTasks.GPSLocation;
+import com.ocam.periodicTasks.GPSLocationHelper;
 import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.util.Constants;
 import com.ocam.util.NotificationUtils;
@@ -132,7 +131,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
         btComenzar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!GPSLocation.checkGPSEnabled(getContext())) {
+                if (!GPSLocationHelper.checkGPSEnabled(getContext())) {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setMessage(AVISO_GPS)
                             .setCancelable(false)
@@ -144,7 +143,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
                             })
                             .setNegativeButton("No me interesa", new DialogInterface.OnClickListener() {
                                 public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                                    if (!GPSLocation.checkPermission(getContext())) {
+                                    if (!GPSLocationHelper.checkPermission(getContext())) {
                                         requestPermissions(
                                                 new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
                                                 02);
@@ -156,7 +155,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
                     final AlertDialog alert = builder.create();
                     alert.show();
                 } else {
-                    if (!GPSLocation.checkPermission(getContext())) {
+                    if (!GPSLocationHelper.checkPermission(getContext())) {
                         requestPermissions(
                                 new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
                                 02);
@@ -171,7 +170,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
             @Override
             public void onClick(View v) {
 
-                if (!GPSLocation.checkGPSEnabled(getContext())) {
+                if (!GPSLocationHelper.checkGPSEnabled(getContext())) {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setMessage(AVISO_GPS)
                         .setCancelable(false)
@@ -268,11 +267,16 @@ public class FragmentActivity extends Fragment implements ActivityView {
 
     /**
      * Expone los datos de la actividad en los label correspondientes
-     * @param activity
+     * @param act
      */
-    private void setUpActivityData(Activity activity) {
-        this.activity = activity;
-        this.txEstado.setText(activity.getFormattedStatus());
+    private void setUpActivityData(Activity act) {
+        this.activity = activityPresenter.findLocalActivity(act.getId_local());
+        if (this.activity == null) {
+            ViewUtils.showToast(getContext(), Toast.LENGTH_SHORT, "Error accediendo a la actividad");
+            hideProgress();
+            getActivity().onBackPressed();
+        }
+        this.txEstado.setText(ActivityStatus.getFormattedStatus(activity.getStatus()));
         this.txDescripcion.setText(activity.getShortDescription());
         this.txFecha.setText(formatDate(activity.getStartDate()));
         this.txOrganiza.setText(activity.getOwner().getEmail());
@@ -395,12 +399,13 @@ public class FragmentActivity extends Fragment implements ActivityView {
     @Override
     public void onActivityOpen() {
         this.activity.setStatus(ActivityStatus.RUNNING);
+        this.activityPresenter.saveActivity(this.activity);
         this.btComenzar.setVisibility(View.GONE);
         btMonitorizar.setEnabled(Boolean.TRUE);
         btMonitorizar.setVisibility(View.VISIBLE);
         btCambiarPassword.setVisibility(View.VISIBLE);
         btCerrar.setVisibility(View.VISIBLE);
-        this.txEstado.setText(this.activity.getFormattedStatus());
+        this.txEstado.setText(ActivityStatus.getFormattedStatus(this.activity.getStatus()));
         iniciarMonitorizationFragment();
         Snackbar.make(getView(), "Actividad abierta. Password: "+this.activity.getPassword(), Snackbar.LENGTH_LONG)
             .setAction("OK", new View.OnClickListener() {
@@ -445,7 +450,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
         btCerrar.setVisibility(View.GONE);
         btMonitorizar.setVisibility(View.GONE);
         btCambiarPassword.setVisibility(View.GONE);
-        txEstado.setText(activity.getFormattedStatus());
+        txEstado.setText(ActivityStatus.getFormattedStatus(activity.getStatus()));
     }
 
     /**
@@ -489,7 +494,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
                 " posición del resto del grupo");
         builder.setPositiveButton("Unirme", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                if (!GPSLocation.checkPermission(getContext())) {
+                if (!GPSLocationHelper.checkPermission(getContext())) {
                     requestPermissions(
                             new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
                             01);

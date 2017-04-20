@@ -1,7 +1,10 @@
 package com.ocam.activity;
 
 import com.ocam.model.Activity;
+import com.ocam.model.ActivityDTO;
 import com.ocam.model.types.GPSPoint;
+
+import org.greenrobot.greendao.DaoException;
 
 import java.util.List;
 
@@ -76,4 +79,17 @@ public interface ActivityPresenter {
      * @return
      */
     Boolean puedeAbandonar(Activity activity);
+
+    /**
+     * Busca una actividad en local por su ID
+     * @param activityLocalId
+     * @return
+     */
+    Activity findLocalActivity(Long activityLocalId);
+
+    /**
+     * Persiste los cambios en local de una actividad
+     * @param activity
+     */
+    void saveActivity(Activity activity);
 }

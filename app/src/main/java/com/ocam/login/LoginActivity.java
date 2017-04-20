@@ -17,6 +17,7 @@ import com.ocam.R;
 import com.ocam.activityList.ListActivity;
 import com.ocam.model.UserTokenDTO;
 import com.ocam.register.RegisterActivity;
+import com.ocam.util.ConnectionUtils;
 import com.ocam.util.PreferencesUtils;
 import com.ocam.util.ViewUtils;
 import com.ocam.volley.NukeSSLCerts;
@@ -66,13 +67,17 @@ public class LoginActivity extends Activity implements LoginView {
      * @param view
      */
     public void login(View view) {
-        String username = ilUsername.getEditText().getText().toString();
-        String password = ilPassword.getEditText().getText().toString();
-        if (assertEmailPassword(username, password)) {
-            ViewUtils.showToast(getApplicationContext(), Toast.LENGTH_SHORT, "Email y password requeridos");
+        if (ConnectionUtils.isConnected(LoginActivity.this)) {
+            String username = ilUsername.getEditText().getText().toString();
+            String password = ilPassword.getEditText().getText().toString();
+            if (assertEmailPassword(username, password)) {
+                ViewUtils.showToast(getApplicationContext(), Toast.LENGTH_SHORT, "Email y password requeridos");
+            } else {
+                this.displayProgress();
+                this.loginPresenter.login(username, password, cbRecuerda.isChecked());
+            }
         } else {
-            this.displayProgress();
-            this.loginPresenter.login(username, password, cbRecuerda.isChecked());
+            ViewUtils.showToast(LoginActivity.this, Toast.LENGTH_LONG, "No tienes conexión a internet");
         }
     }
 

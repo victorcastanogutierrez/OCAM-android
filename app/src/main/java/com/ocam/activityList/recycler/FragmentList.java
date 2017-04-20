@@ -1,6 +1,9 @@
 package com.ocam.activityList.recycler;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,11 +11,13 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +32,7 @@ import com.ocam.activityList.ListActivityView;
 import com.ocam.activityList.ListPresenter;
 import com.ocam.activityList.ListPresenterImpl;
 import com.ocam.model.Activity;
+import com.ocam.periodicTasks.GPSLocation;
 import com.ocam.util.ViewUtils;
 
 import java.text.SimpleDateFormat;
@@ -35,9 +41,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.os.Build.VERSION_CODES.M;
 
 
-public class FragmentList extends Fragment implements ListActivityView
+public class FragmentList extends Fragment implements ListActivityView, OnDetailClickListener
 {
 
     private ListPresenter listPresenter;
@@ -86,6 +97,7 @@ public class FragmentList extends Fragment implements ListActivityView
 
     @Override
     public void setUpRecyclerView(List<Activity> datos) {
+        ActivityAdapter.setOnDetailClick(this);
         this.originalData = datos;
         this.recyclerView.setHasFixedSize(true);
         this.adapter = new ActivityAdapter();
@@ -222,5 +234,84 @@ public class FragmentList extends Fragment implements ListActivityView
                 listPresenter.reloadActivities();
             }
         });
+    }
+
+    @Override
+    public void onDetailClick(final Activity activity) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+        alertDialog.setTitle("Detalle de actividad");
+        alertDialog.setMessage(getActivityDetail(activity));
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+        if (activity.getMide() != null) {
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "IR A ENLACE",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        showConfirmURLDialog(activity.getMide());
+                    }
+                });
+        }
+        alertDialog.show();
+    }
+
+    private void showConfirmURLDialog(final String mide) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+        builder.setTitle(R.string.app_name);
+        builder.setTitle("Ir a enlace");
+        builder.setMessage("Esta acción abrirá el siguiente enlace en el navegador del dispositivo: "+mide+".\n\n¿Estás seguro?");
+        builder.setPositiveButton("Abrir", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                openBrowser(mide);
+            }
+        });
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    /**
+     * Abre el navegador del dispositivo con la URL pasada por parámetro
+     * @param URL
+     */
+    private void openBrowser(String URL) {
+        String furl = URL;
+        if (!furl.startsWith("http://") && !furl.startsWith("https://")) {
+            furl = "http://" + URL;
+        }
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(furl));
+        startActivity(browserIntent);
+    }
+
+    /**
+     * Construye el string que da contenido al dialog con la información del detalle de la
+     * actividad
+     * @return
+     */
+    private String getActivityDetail(Activity activity) {
+        StringBuilder sb = new StringBuilder();
+        if (activity.getLongDescription() != null) {
+            sb.append(activity.getLongDescription());
+            sb.append(System.getProperty("line.separator"));
+            sb.append(System.getProperty("line.separator"));
+        }
+        if (activity.getMaxPlaces() != null && !activity.getMaxPlaces().equals(0L)) {
+            sb.append("Plazas estimadas para la actividad: ");
+            sb.append(activity.getMaxPlaces().toString());
+            sb.append(System.getProperty("line.separator"));
+            sb.append(System.getProperty("line.separator"));
+        }
+        if (activity.getMide() != null) {
+            sb.append("Más información en: ");
+            sb.append(activity.getMide());
+        }
+        return sb.toString();
     }
 }

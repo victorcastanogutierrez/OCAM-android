@@ -1,5 +1,7 @@
 package com.ocam.model;
 
+import android.util.Patterns;
+
 import com.ocam.model.types.ActivityStatus;
 
 import org.greenrobot.greendao.annotation.Convert;
@@ -117,7 +119,11 @@ public class Activity {
 	}
 
 	public String getMide() {
-		return mide;
+        if (this.mide != null && Patterns.WEB_URL.matcher(this.mide).matches()) {
+            return mide;
+        } else {
+            return null;
+        }
 	}
 
 	public void setMide(String mide) {

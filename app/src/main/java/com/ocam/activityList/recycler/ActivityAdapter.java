@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.gson.reflect.TypeToken;
@@ -64,6 +65,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
     });
 
     private View.OnClickListener listener;
+    private static OnDetailClickListener onDetailClick;
 
     @Override
     public ActivitiesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -91,6 +93,10 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
         if (this.listener != null) {
             this.listener.onClick(v);
         }
+    }
+
+    public static void setOnDetailClick(OnDetailClickListener onDetail) {
+        onDetailClick = onDetail;
     }
 
     public void add(Activity activity) {
@@ -122,6 +128,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
         private TextView txDescripcion;
         private TextView txFecha;
         private TextView txEstado;
+        private Button btDetalle;
 
         public ActivitiesViewHolder(View itemView) {
             super(itemView);
@@ -129,19 +136,38 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.Activi
             txDescripcion = (TextView)itemView.findViewById(R.id.lbDescripcion);
             txFecha = (TextView)itemView.findViewById(R.id.lbFecha);
             txEstado = (TextView)itemView.findViewById(R.id.lbEstado);
+            btDetalle = (Button)itemView.findViewById(R.id.btEnlaceDetalle);
         }
 
-        public void bindActivity(Activity activity) {
+        public void bindActivity(final Activity activity) {
             txDescripcion.setText(activity.getShortDescription());
             txFecha.setText(com.ocam.util.DateUtils.formatDate(activity.getStartDate()));
             txEstado.setText(activity.getFormattedStatus());
-            if (ActivityStatus.RUNNING.equals(activity.getStatus())) {
-                txEstado.setTextColor(Color.parseColor("#4CAF50"));
-            } else if (ActivityStatus.PENDING.equals(activity.getStatus())) {
-                txEstado.setTextColor(Color.parseColor("#EF5350"));
-            } else if (ActivityStatus.CLOSED.equals(activity.getStatus())) {
-                txEstado.setTextColor(Color.parseColor("#90A4AE"));
-            }
+            txEstado.setTextColor(getStatusColor(activity.getStatus()));
+            btDetalle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (onDetailClick != null) {
+                        onDetailClick.onDetailClick(activity);
+                    }
+                }
+            });
         }
+    }
+
+    /**
+     * Retorna el color asociado a cada status
+     * @param status
+     * @return
+     */
+    private static int getStatusColor(ActivityStatus status) {
+        if (ActivityStatus.RUNNING.equals(status)) {
+            return Color.parseColor("#4CAF50");
+        } else if (ActivityStatus.PENDING.equals(status)) {
+            return Color.parseColor("#EF5350");
+        } else if (ActivityStatus.CLOSED.equals(status)) {
+            return Color.parseColor("#90A4AE");
+        }
+        return Color.parseColor("#EF5350");
     }
 }

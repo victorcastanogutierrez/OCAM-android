@@ -14,6 +14,8 @@ import com.ocam.model.Hiker;
 import com.ocam.model.JoinActivityHikers;
 import com.ocam.model.JoinActivityHikersDao;
 import com.ocam.model.PendingAction;
+import com.ocam.model.Report;
+import com.ocam.model.ReportDao;
 import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.util.Constants;
 import com.ocam.util.NotificationUtils;
@@ -113,6 +115,9 @@ public class JoinActivityAction extends BaseAction {
 
     private void removeAllPendingReports() {
         DaoSession daoSession = ((App) context.getApplicationContext()).getDaoSession();
-        daoSession.getReportDao().deleteAll();
+        List<Report> reports = daoSession.getReportDao().queryBuilder().where(ReportDao.Properties.Pending.eq(Boolean.TRUE)).list();
+        if (reports != null && reports.size() > 0) {
+            daoSession.getReportDao().deleteInTx(reports);
+        }
     }
 }

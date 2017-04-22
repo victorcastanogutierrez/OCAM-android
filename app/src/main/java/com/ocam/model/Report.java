@@ -1,5 +1,6 @@
 package com.ocam.model;
 
+import com.google.gson.annotations.Expose;
 import com.ocam.model.types.GPSPoint;
 
 import org.greenrobot.greendao.DaoException;
@@ -28,6 +29,13 @@ public class Report {
     @ToOne(joinProperty = "gpsPointId")
     private GPSPoint point;
 
+    /**
+     * Indica si el report esta pendiente de envio o no
+     */
+    @NotNull
+    @Expose(deserialize = false, serialize =  false)
+    private Boolean pending = Boolean.FALSE;
+
     private Long gpsPointId;
 
     /** Used to resolve relations */
@@ -38,10 +46,11 @@ public class Report {
     @Generated(hash = 485466363)
     private transient ReportDao myDao;
 
-    @Generated(hash = 1455840538)
-    public Report(Long id, @NotNull Date date, Long gpsPointId) {
+    @Generated(hash = 1867517975)
+    public Report(Long id, @NotNull Date date, @NotNull Boolean pending, Long gpsPointId) {
         this.id = id;
         this.date = date;
+        this.pending = pending;
         this.gpsPointId = gpsPointId;
     }
 
@@ -51,6 +60,14 @@ public class Report {
 
     @Generated(hash = 1150438727)
     private transient Long point__resolvedKey;
+
+    public Boolean getPending() {
+        return pending;
+    }
+
+    public void setPending(Boolean pending) {
+        this.pending = pending;
+    }
 
     public Date getDate() {
         return date;

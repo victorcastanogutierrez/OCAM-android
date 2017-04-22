@@ -36,7 +36,6 @@ public class DisconnectedState extends BaseReportState {
      * @return
      */
     private void saveReport(Location location) {
-        //Location location = GPSLocationHelper.getLastKnownLocation(this.context);
         if (location != null) {
             Log.d("-", "Guarda reporte en local");
             GPSPoint gpsPoint = new GPSPoint(location);
@@ -45,6 +44,7 @@ public class DisconnectedState extends BaseReportState {
             Report report = new Report();
             report.setDate(new Date());
             report.setPoint(gpsPoint);
+            report.setPending(Boolean.TRUE);
             reportDao.insert(report);
             report.setGpsPointId(pointId);
         } else {

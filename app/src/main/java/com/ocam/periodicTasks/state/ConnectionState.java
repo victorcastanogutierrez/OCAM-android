@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.ocam.model.HikerDTO;
 import com.ocam.model.Report;
 import com.ocam.model.ReportDTO;
+import com.ocam.model.ReportDao;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.util.Constants;
@@ -108,6 +109,7 @@ public class ConnectionState extends BaseReportState {
 
         Report report = new Report();
         report.setPoint(point);
+        report.setPending(Boolean.TRUE);
         report.setDate(new Date());
         this.reportDao.insert(report);
 
@@ -154,7 +156,10 @@ public class ConnectionState extends BaseReportState {
             if (requests.size() > 0) {
                 volleyManager.addToRequestQueue(requests.remove(0));
             } else {
-                reportDao.deleteAll();
+                List<Report> reports = reportDao.queryBuilder().where(ReportDao.Properties.Pending.eq(Boolean.TRUE)).list();
+                if (reports != null && reports.size() > 0) {
+                    reportDao.deleteInTx(reports);
+                }
                 result.finish();
             }
         }

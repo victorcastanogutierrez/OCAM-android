@@ -31,6 +31,7 @@ import com.ocam.model.Activity;
 import com.ocam.model.Hiker;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.periodicTasks.GPSLocationHelper;
+import com.ocam.util.ConnectionUtils;
 import com.ocam.util.ViewUtils;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -166,7 +167,6 @@ public class FragmentActivity extends Fragment implements ActivityView {
         btUnirse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if (!GPSLocationHelper.checkGPSEnabled(getContext())) {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setMessage(AVISO_GPS)

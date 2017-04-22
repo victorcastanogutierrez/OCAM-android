@@ -10,29 +10,25 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.ocam.manager.App;
 import com.ocam.manager.UserManager;
-import com.ocam.model.ActivityDTO;
+import com.ocam.model.Activity;
 import com.ocam.model.ActivityDao;
 import com.ocam.model.DaoSession;
 import com.ocam.model.Hiker;
-import com.ocam.model.HikerDTO;
 import com.ocam.model.HikerDao;
 import com.ocam.model.JoinActivityHikers;
 import com.ocam.model.JoinActivityHikersDao;
 import com.ocam.model.UserTokenDTO;
+import com.ocam.model.types.ActivityStatus;
 import com.ocam.periodicTasks.PeriodicTask;
+import com.ocam.util.ConnectionUtils;
+import com.ocam.util.Constants;
 import com.ocam.util.NotificationUtils;
 import com.ocam.util.ViewUtils;
-import com.ocam.volley.VolleyManager;
-import com.ocam.model.Activity;
-import com.ocam.model.types.ActivityStatus;
-import com.ocam.util.Constants;
 import com.ocam.volley.GsonRequest;
+import com.ocam.volley.VolleyManager;
 import com.ocam.volley.listeners.GenericErrorListener;
 import com.ocam.volley.listeners.GenericResponseListener;
 import com.ocam.volley.listeners.ICommand;
-
-import org.greenrobot.greendao.DaoException;
-import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -137,15 +133,20 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     @Override
     public void joinActivity(Activity activity, String password) {
         this.activityView.displayProgress();
-        UserManager userManager = UserManager.getInstance();
-        ICommand<Void> myCommand = new MyJoinActivityCommand();
-        GsonRequest<Void> request = new GsonRequest<Void>(
-                Constants.API_UNIRSE_ACTIVIDAD + '/' + activity.getId() +
-                        '/' + userManager.getUserTokenDTO().getLogin() + '/' + password,
-                Request.Method.POST, Void.class, null,
-                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+        if (ConnectionUtils.isConnected(this.context)) {
+            UserManager userManager = UserManager.getInstance();
+            ICommand<Void> myCommand = new MyJoinActivityCommand();
+            GsonRequest<Void> request = new GsonRequest<Void>(
+                    Constants.API_UNIRSE_ACTIVIDAD + '/' + activity.getId() +
+                            '/' + userManager.getUserTokenDTO().getLogin() + '/' + password,
+                    Request.Method.POST, Void.class, null,
+                    new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
-        VolleyManager.getInstance(this.context).addToRequestQueue(request);
+            VolleyManager.getInstance(this.context).addToRequestQueue(request);
+        } else {
+            //Si no tiene conexion persistimos el intento de unirse
+            persistJoinPendingAction(activity, password);
+        }
     }
 
     /**
@@ -280,6 +281,15 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     }
 
     /**
+     * Persiste de manera local el intento de unirse a una actividad
+     * @param activity
+     * @param password
+     */
+    private void persistJoinPendingAction(Activity activity, String password) {
+
+    }
+
+    /**
      * Command genérico para manejar la respuesta HTTP a la llamada a la API del servidor
      * para dar por iniciada una actividad
      */
@@ -361,10 +371,15 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         @Override
         public void executeError(VolleyError error) {
             activityView.hideProgress();
-            JsonObject objError = new Gson().fromJson(error.getMessage(), JsonObject.class);
-            if (Constants.HTTP_422.equals(objError.get("status").getAsString())) {
-                activityView.notifyUser(objError.get("message").getAsString());
+            if (error  != null && error.getMessage() != null) {
+                JsonObject objError = new Gson().fromJson(error.getMessage(), JsonObject.class);
+                if (Constants.HTTP_422.equals(objError.get("status").getAsString())) {
+                    activityView.notifyUser(objError.get("message").getAsString());
+                } else {
+                    activityView.notifyUser("No te has podido unir. Prueba de nuevo más tarde");
+                }
             } else {
+                // No debería darse
                 activityView.notifyUser("No te has podido unir. Prueba de nuevo más tarde");
             }
         }

@@ -46,6 +46,8 @@ public class LoginActivity extends Activity implements LoginView {
         setContentView(R.layout.activity_login);
         Picasso.with(LoginActivity.this)
                 .load(R.drawable.testing1)
+                .fit()
+                .centerInside()
                 .into((ImageView) findViewById(R.id.ivLogo));
 
 

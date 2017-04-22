@@ -91,7 +91,6 @@ public class FragmentActivity extends Fragment implements ActivityView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("Viene", "que viene");
         View v = inflater.inflate(R.layout.activity_detail, container, false);
         this.activityPresenter = new ActivityPresenterImpl(this, v.getContext());
         this.txDescripcion = (TextView) v.findViewById(R.id.lbDescripcion);
@@ -137,24 +136,24 @@ public class FragmentActivity extends Fragment implements ActivityView {
                 if (!GPSLocationHelper.checkGPSEnabled(getContext())) {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setMessage(AVISO_GPS)
-                            .setCancelable(false)
-                            .setPositiveButton("Activar", new DialogInterface.OnClickListener() {
-                                public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                                    dialog.dismiss();
-                                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        .setCancelable(false)
+                        .setPositiveButton("Activar", new DialogInterface.OnClickListener() {
+                            public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                dialog.dismiss();
+                                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            }
+                        })
+                        .setNegativeButton("No me interesa", new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                if (!GPSLocationHelper.checkPermission(getContext())) {
+                                    requestPermissions(
+                                            new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
+                                            02);
+                                } else {
+                                    mostrarPasswordDialog();
                                 }
-                            })
-                            .setNegativeButton("No me interesa", new DialogInterface.OnClickListener() {
-                                public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                                    if (!GPSLocationHelper.checkPermission(getContext())) {
-                                        requestPermissions(
-                                                new String[]{ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION},
-                                                02);
-                                    } else {
-                                        mostrarPasswordDialog();
-                                    }
-                                }
-                            });
+                            }
+                        });
                     final AlertDialog alert = builder.create();
                     alert.show();
                 } else {

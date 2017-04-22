@@ -2,10 +2,22 @@ package com.ocam.activity.monitorization;
 
 
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
+import com.ocam.manager.App;
+import com.ocam.model.Activity;
+import com.ocam.model.ActivityDao;
+import com.ocam.model.DaoSession;
+import com.ocam.model.Hiker;
+import com.ocam.model.HikerDao;
+import com.ocam.model.Report;
+import com.ocam.model.ReportDao;
+import com.ocam.model.types.GPSPointDao;
+import com.ocam.util.ConnectionUtils;
 import com.ocam.volley.VolleyManager;
 import com.ocam.model.ReportDTO;
 import com.ocam.model.types.GPSPoint;
@@ -25,6 +37,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
@@ -32,10 +45,19 @@ public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
     private Context context;
     private MonitorizacionView monitorizacionView;
     private List<ReportDTO> reportDTOs;
+    private ActivityDao activityDao;
+    private ReportDao reportDao;
+    private GPSPointDao gpsPointDao;
+    private HikerDao hikerDao;
 
     public MonitorizacionPresenterImpl(Context context, MonitorizacionView monitorizacionView) {
         this.context = context;
         this.monitorizacionView = monitorizacionView;
+        DaoSession daoSession = ((App) context.getApplicationContext()).getDaoSession();
+        this.activityDao = daoSession.getActivityDao();
+        this.reportDao = daoSession.getReportDao();
+        this.gpsPointDao = daoSession.getGPSPointDao();
+        this.hikerDao = daoSession.getHikerDao();
     }
 
     /**
@@ -57,13 +79,76 @@ public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
      */
     @Override
     public void loadReportsData(Long activityId) {
-        monitorizacionView.displayProgress();
-        ICommand<ReportDTO[]> reportsCommand = new reportsCommand();
-        GsonRequest<ReportDTO[]> hikersRequest = new GsonRequest<ReportDTO[]>(Constants.API_FIND_ACTIVITY_REPORTS + "/" + activityId,
-                Request.Method.GET, ReportDTO[].class, null,
-                new GenericResponseListener<>(reportsCommand), new GenericErrorListener(reportsCommand));
+        if (ConnectionUtils.isConnected(this.context)) {
+            monitorizacionView.displayProgress();
+            ICommand<ReportDTO[]> reportsCommand = new reportsCommand();
+            GsonRequest<ReportDTO[]> hikersRequest = new GsonRequest<ReportDTO[]>(Constants.API_FIND_ACTIVITY_REPORTS + "/" + activityId,
+                    Request.Method.GET, ReportDTO[].class, null,
+                    new GenericResponseListener<>(reportsCommand), new GenericErrorListener(reportsCommand));
 
-        VolleyManager.getInstance(this.context).addToRequestQueue(hikersRequest);
+            VolleyManager.getInstance(this.context).addToRequestQueue(hikersRequest);
+        } else {
+            Activity act = activityDao.queryBuilder()
+                    .where(ActivityDao.Properties.Id.eq(activityId)).unique();
+            if (act != null) {
+                List<Report> reports = reportDao.queryBuilder()
+                        .where(ReportDao.Properties.Pending.eq(Boolean.FALSE),
+                                ReportDao.Properties.ActivityId.eq(act.getId_local()))
+                        .list();
+
+                //Fuerzo a descargar tambien la relaccion con los hiker
+                for (Report r : reports) {
+                    r.getHiker();
+                    r.getPoint();
+                }
+
+                this.reportDTOs = Arrays.asList(new Gson().fromJson(new Gson().toJson(reports), ReportDTO[].class));
+                monitorizacionView.refreshHikersData(this.reportDTOs);
+            }
+            monitorizacionView.hideProgress();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveLocalData(Long activityId, List<ReportDTO> datos) {
+        Activity act = activityDao.queryBuilder().where(ActivityDao.Properties.Id.eq(activityId)).unique();
+        if (act != null) {
+
+            List<Report> originalReports = reportDao.queryBuilder()
+                    .where(ReportDao.Properties.Pending.eq(Boolean.FALSE),
+                            ReportDao.Properties.ActivityId.eq(act.getId_local()))
+                    .list();
+
+            reportDao.deleteInTx(originalReports);
+            act.resetReports();
+
+            for (ReportDTO reportDTO : datos) {
+                Hiker hiker = hikerDao.queryBuilder().where(HikerDao.Properties.Login.eq(reportDTO.getHikerDTO().getLogin())).unique();
+                if (hiker == null) {
+                    hiker = new Hiker(null,
+                            reportDTO.getHikerDTO().getEmail(), reportDTO.getHikerDTO().getLogin());
+                    hikerDao.insertOrReplace(hiker);
+                }
+
+                Long gpsPointId = gpsPointDao.insertOrReplace(
+                        new GPSPoint(null,
+                                reportDTO.getPoint().getLatitude(),
+                                reportDTO.getPoint().getLongitude()));
+
+                Report r = new Report();
+                r.setDate(reportDTO.getDate());
+                r.setPending(Boolean.FALSE);
+                r.setGpsPointId(gpsPointId);
+                r.setActivityId(act.getId_local());
+                r.setHiker(hiker);
+                reportDao.insertOrReplace(r);
+                act.getReports().add(r);
+                act.update();
+            }
+        }
     }
 
     private List<GPSPoint> parseTrack(String track) {

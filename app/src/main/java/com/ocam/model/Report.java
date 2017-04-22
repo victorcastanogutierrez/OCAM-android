@@ -21,10 +21,17 @@ public class Report {
     private Long id;
 
     @NotNull
-    private Date date;
+    private Long date;
 
     @Transient
     private Activity activity;
+
+    @ToOne(joinProperty = "hikerId")
+    private Hiker hiker;
+
+    private Long hikerId;
+
+    private Long activityId;
 
     @ToOne(joinProperty = "gpsPointId")
     private GPSPoint point;
@@ -46,10 +53,15 @@ public class Report {
     @Generated(hash = 485466363)
     private transient ReportDao myDao;
 
-    @Generated(hash = 1867517975)
-    public Report(Long id, @NotNull Date date, @NotNull Boolean pending, Long gpsPointId) {
+
+
+    @Generated(hash = 416159130)
+    public Report(Long id, @NotNull Long date, Long hikerId, Long activityId,
+            @NotNull Boolean pending, Long gpsPointId) {
         this.id = id;
         this.date = date;
+        this.hikerId = hikerId;
+        this.activityId = activityId;
         this.pending = pending;
         this.gpsPointId = gpsPointId;
     }
@@ -58,8 +70,13 @@ public class Report {
     public Report() {
     }
 
+    @Generated(hash = 99060812)
+    private transient Long hiker__resolvedKey;
+
     @Generated(hash = 1150438727)
     private transient Long point__resolvedKey;
+
+
 
     public Boolean getPending() {
         return pending;
@@ -69,11 +86,11 @@ public class Report {
         this.pending = pending;
     }
 
-    public Date getDate() {
+    public Long getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Long date) {
         this.date = date;
     }
 
@@ -99,6 +116,51 @@ public class Report {
 
     public void setGpsPointId(Long gpsPointId) {
         this.gpsPointId = gpsPointId;
+    }
+
+    public Long getActivityId() {
+        return this.activityId;
+    }
+
+    public void setActivityId(Long activityId) {
+        this.activityId = activityId;
+    }
+
+    public Long getHikerId() {
+        return this.hikerId;
+    }
+
+    public void setHikerId(Long hikerId) {
+        this.hikerId = hikerId;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    @Generated(hash = 2085977116)
+    public Hiker getHiker() {
+        Long __key = this.hikerId;
+        if (hiker__resolvedKey == null || !hiker__resolvedKey.equals(__key)) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            HikerDao targetDao = daoSession.getHikerDao();
+            Hiker hikerNew = targetDao.load(__key);
+            synchronized (this) {
+                hiker = hikerNew;
+                hiker__resolvedKey = __key;
+            }
+        }
+        return hiker;
+    }
+
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 1937889363)
+    public void setHiker(Hiker hiker) {
+        synchronized (this) {
+            this.hiker = hiker;
+            hikerId = hiker == null ? null : hiker.getId_local();
+            hiker__resolvedKey = hikerId;
+        }
     }
 
     /** To-one relationship, resolved on first access. */
@@ -172,8 +234,4 @@ public class Report {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getReportDao() : null;
     }
-
-
-
-
 }

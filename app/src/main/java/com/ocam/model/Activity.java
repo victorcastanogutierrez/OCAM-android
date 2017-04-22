@@ -42,6 +42,9 @@ public class Activity {
 
 	private String longDescription;
 
+	@ToMany (referencedJoinProperty = "activityId")
+	private List<Report> reports;
+
 	private String mide;
 
 	@NotNull
@@ -350,6 +353,34 @@ public class Activity {
 						throw new DaoException("Entity is detached from DAO context");
 					}
 					myDao.update(this);
+				}
+
+				/**
+				 * To-many relationship, resolved on first access (and after reset).
+				 * Changes to to-many relations are not persisted, make changes to the target entity.
+				 */
+				@Generated(hash = 1130036934)
+				public List<Report> getReports() {
+					if (reports == null) {
+						final DaoSession daoSession = this.daoSession;
+						if (daoSession == null) {
+							throw new DaoException("Entity is detached from DAO context");
+						}
+						ReportDao targetDao = daoSession.getReportDao();
+						List<Report> reportsNew = targetDao._queryActivity_Reports(id_local);
+						synchronized (this) {
+							if (reports == null) {
+								reports = reportsNew;
+							}
+						}
+					}
+					return reports;
+				}
+
+				/** Resets a to-many relationship, making the next get call to query for a fresh result. */
+				@Generated(hash = 1539079726)
+				public synchronized void resetReports() {
+					reports = null;
 				}
 
 				/** called by internal mechanisms, do not call yourself. */

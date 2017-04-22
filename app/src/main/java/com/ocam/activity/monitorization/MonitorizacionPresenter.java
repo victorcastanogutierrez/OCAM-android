@@ -1,6 +1,10 @@
 package com.ocam.activity.monitorization;
 
 
+import com.ocam.model.ReportDTO;
+
+import java.util.List;
+
 public interface MonitorizacionPresenter {
 
     /**
@@ -13,4 +17,11 @@ public interface MonitorizacionPresenter {
      * @param activityId
      */
     void loadReportsData(Long activityId);
+
+    /**
+     * Guarda la lista de reportes en local
+     * @param activityId
+     * @param datos
+     */
+    void saveLocalData(Long activityId, List<ReportDTO> datos);
 }

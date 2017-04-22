@@ -42,7 +42,7 @@ public class DisconnectedState extends BaseReportState {
             Long pointId = this.gpsPointDao.insert(gpsPoint);
 
             Report report = new Report();
-            report.setDate(new Date());
+            report.setDate(new Date().getTime());
             report.setPoint(gpsPoint);
             report.setPending(Boolean.TRUE);
             reportDao.insert(report);

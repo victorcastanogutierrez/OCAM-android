@@ -74,7 +74,10 @@ public class ConnectionState extends BaseReportState {
      */
     private void sendServerLocation(Location location, Context context) {
         List<Report> reports = new ArrayList<>();
-        reports.addAll(getPendingReports());
+        List<Report> pendingReports = getPendingReports();
+        if (pendingReports != null) {
+            reports.addAll(getPendingReports());
+        }
         reports.add(getReport(location));
 
         ICommand<Void> myCommand = new ReportCommand();
@@ -96,7 +99,9 @@ public class ConnectionState extends BaseReportState {
      * @return
      */
     private List<Report> getPendingReports() {
-        return this.reportDao.queryBuilder().list();
+        return this.reportDao.queryBuilder()
+                .where(ReportDao.Properties.Pending.eq(Boolean.TRUE))
+                .list();
     }
 
     /**
@@ -110,7 +115,7 @@ public class ConnectionState extends BaseReportState {
         Report report = new Report();
         report.setPoint(point);
         report.setPending(Boolean.TRUE);
-        report.setDate(new Date());
+        report.setDate(new Date().getTime());
         this.reportDao.insert(report);
 
         report.setGpsPointId(pid);
@@ -126,7 +131,7 @@ public class ConnectionState extends BaseReportState {
         ReportDTO reportDTO = new ReportDTO();
         reportDTO.setPoint(new GPSPoint(
                 report.getPoint().getLatitude(), report.getPoint().getLongitude()));
-        reportDTO.setDate(report.getDate().getTime());
+        reportDTO.setDate(report.getDate());
         HikerDTO hikerDTO = new HikerDTO();
         hikerDTO.setLogin(PreferencesUtils.getMonitorizationHiker(this.context));
         reportDTO.setHikerDTO(hikerDTO);

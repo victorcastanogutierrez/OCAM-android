@@ -16,6 +16,8 @@ import com.ocam.model.JoinActivityGuides;
 import com.ocam.model.JoinActivityGuidesDao;
 import com.ocam.model.JoinActivityHikers;
 import com.ocam.model.JoinActivityHikersDao;
+import com.ocam.model.Report;
+import com.ocam.model.ReportDao;
 import com.ocam.util.ConnectionUtils;
 import com.ocam.volley.VolleyManager;
 import com.ocam.model.Activity;
@@ -43,6 +45,7 @@ public class ListPresenterImpl implements ListPresenter {
     private HikerDao hikerDao;
     private JoinActivityGuidesDao joinActivityGuidesDao;
     private JoinActivityHikersDao joinActivityHikersDao;
+    private ReportDao reportDao;
 
     public ListPresenterImpl(ListActivityView listActivityView, Context context) {
         this.listActivityView = listActivityView;
@@ -53,6 +56,7 @@ public class ListPresenterImpl implements ListPresenter {
         this.hikerDao = daoSession.getHikerDao();
         this.joinActivityGuidesDao = daoSession.getJoinActivityGuidesDao();
         this.joinActivityHikersDao = daoSession.getJoinActivityHikersDao();
+        this.reportDao = daoSession.getReportDao();
     }
 
     @Override
@@ -174,6 +178,10 @@ public class ListPresenterImpl implements ListPresenter {
         this.hikerDao.deleteAll();
         this.joinActivityGuidesDao.deleteAll();
         this.joinActivityHikersDao.deleteAll();
+        List<Report> reports = reportDao.queryBuilder().where(ReportDao.Properties.Pending.eq(Boolean.FALSE)).list();
+        if (reports != null && reports.size() > 0){
+            reportDao.deleteInTx(reports);
+        }
     }
 
     private class MyUpdateCommand implements ICommand<ActivityDTO[]> {

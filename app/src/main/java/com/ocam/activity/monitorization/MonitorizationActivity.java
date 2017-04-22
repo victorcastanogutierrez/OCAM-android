@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.ocam.R;
 import com.ocam.model.ReportDTO;
 import com.ocam.model.types.GPSPoint;
+import com.ocam.util.ConnectionUtils;
 import com.ocam.util.ViewUtils;
 
 import java.util.ArrayList;
@@ -66,7 +67,13 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
         this.monitorizationPresenter = new MonitorizacionPresenterImpl(MonitorizationActivity.this, this);
 
         setUpToolbar();
-        this.monitorizationPresenter.loadActivityData(activityId);
+        if (ConnectionUtils.isConnected(MonitorizationActivity.this)) {
+            this.monitorizationPresenter.loadActivityData(activityId);
+        } else {
+            this.monitorizationPresenter.loadReportsData(this.activityId);
+            ViewUtils.showToast(MonitorizationActivity.this, Toast.LENGTH_LONG,
+                    MonitorizationActivity.this.getResources().getString(R.string.noConnectionWarning));
+        }
     }
 
     /**
@@ -225,6 +232,9 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
             entry.getValue().remove();
         }
         this.markers.clear();
+        if (ConnectionUtils.isConnected(MonitorizationActivity.this)) {
+            this.monitorizationPresenter.saveLocalData(activityId, datos);
+        }
     }
 
     /**
@@ -232,6 +242,12 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
      */
     @Override
     public void onClick(ReportDTO reportDTO) {
+        if (!ConnectionUtils.isConnected(MonitorizationActivity.this)) {
+            ViewUtils.showToast(MonitorizationActivity.this, Toast.LENGTH_SHORT,
+                    MonitorizationActivity.this.getResources()
+                            .getString(R.string.noConnectionOption));
+            return ;
+        }
         String login = reportDTO.getHikerDTO().getLogin();
         if (!this.markers.containsKey(login)) {
             LatLng markerPos = new LatLng(

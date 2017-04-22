@@ -45,4 +45,9 @@ public interface ActivityView {
      * Ejecutado al dejar con éxito una actividad
      */
     void onLeaveActivity();
+
+    /**
+     * Abre un dialog informativo al usuario
+     */
+    void notifyUserDialog(String text);
 }

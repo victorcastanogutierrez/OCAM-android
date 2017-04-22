@@ -1,13 +1,14 @@
 package com.ocam.activity;
 
 import android.content.Context;
-import android.util.Log;
+import android.database.sqlite.SQLiteConstraintException;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.ocam.R;
 import com.ocam.manager.App;
 import com.ocam.manager.UserManager;
 import com.ocam.model.Activity;
@@ -17,7 +18,10 @@ import com.ocam.model.Hiker;
 import com.ocam.model.HikerDao;
 import com.ocam.model.JoinActivityHikers;
 import com.ocam.model.JoinActivityHikersDao;
+import com.ocam.model.PendingAction;
+import com.ocam.model.PendingActionDao;
 import com.ocam.model.UserTokenDTO;
+import com.ocam.model.types.ActionType;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.util.ConnectionUtils;
@@ -44,6 +48,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     private ActivityDao activityDao;
     private HikerDao hikerDao;
     private JoinActivityHikersDao joinActivityHikersDao;
+    private PendingActionDao pendingActionDao;
 
     public ActivityPresenterImpl(ActivityView activityView, Context context) {
         this.activityView = activityView;
@@ -52,6 +57,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         this.activityDao = daoSession.getActivityDao();
         this.hikerDao = daoSession.getHikerDao();
         this.joinActivityHikersDao = daoSession.getJoinActivityHikersDao();
+        this.pendingActionDao = daoSession.getPendingActionDao();
     }
 
     /**
@@ -146,6 +152,12 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         } else {
             //Si no tiene conexion persistimos el intento de unirse
             persistJoinPendingAction(activity, password);
+            joinHikerActivity(activity);
+            this.activityView.hideProgress();
+            this.activityView.onHikerJoinActivity();
+            activityView.notifyUserDialog(this.context.getResources()
+                    .getString(R.string.joinActivityDisconnected));
+            activityView.iniciarMonitorizacion();
         }
     }
 
@@ -224,8 +236,6 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         joinActivityHikersDao.insert(join);
         activity.getHikers().add(hiker);
         activityDao.insertOrReplace(activity);
-
-        Log.d("-", activity.getHikers().size()+"");
     }
 
     /**
@@ -286,7 +296,10 @@ public class ActivityPresenterImpl implements ActivityPresenter {
      * @param password
      */
     private void persistJoinPendingAction(Activity activity, String password) {
-
+        PendingAction pendingAction = new PendingAction(ActionType.JOIN_ACTIVITY);
+        pendingAction.getParametros().add(activity.getId().toString());
+        pendingAction.getParametros().add(password);
+        pendingActionDao.insertOrReplace(pendingAction);
     }
 
     /**

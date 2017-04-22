@@ -6,8 +6,10 @@ import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.Unique;
 import org.greenrobot.greendao.converter.PropertyConverter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.greenrobot.greendao.annotation.Generated;
@@ -29,6 +31,7 @@ public class PendingAction {
      * Accion que va a ser realizada
      */
     @NotNull
+    @Unique
     @Convert(converter = ActionTypeConverter.class, columnType = Integer.class)
     private ActionType actionType;
 
@@ -47,6 +50,11 @@ public class PendingAction {
 
     @Generated(hash = 1012560780)
     public PendingAction() {
+    }
+
+    public PendingAction(@NotNull ActionType actionType) {
+        this.actionType = actionType;
+        this.parametros = new ArrayList<>();
     }
 
     public Long getId() {

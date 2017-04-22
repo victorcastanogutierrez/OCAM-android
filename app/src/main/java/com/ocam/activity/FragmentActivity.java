@@ -31,7 +31,10 @@ import com.ocam.model.Activity;
 import com.ocam.model.Hiker;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.periodicTasks.GPSLocationHelper;
+import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.util.ConnectionUtils;
+import com.ocam.util.Constants;
+import com.ocam.util.NotificationUtils;
 import com.ocam.util.ViewUtils;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -420,17 +423,16 @@ public class FragmentActivity extends Fragment implements ActivityView {
      */
     @Override
     public void onHikerJoinActivity() {
-        Hiker hiker = new Hiker();
-        hiker.setLogin(UserManager.getInstance().getUserTokenDTO().getLogin());
         this.activityPresenter.joinHikerActivity(this.activity);
-        this.activityPresenter.saveActivity(this.activity);
         this.btUnirse.setVisibility(View.GONE);
         this.btMonitorizar.setVisibility(View.VISIBLE);
         this.btMonitorizar.setEnabled(Boolean.TRUE);
         if (!activityPresenter.isUserGuide(this.activity)) {
             this.btAbandonar.setVisibility(View.VISIBLE);
         }
-        iniciarMonitorizationFragment();
+        if (ConnectionUtils.isConnected(getContext())) {
+            iniciarMonitorizationFragment();
+        }
     }
 
     /**
@@ -460,10 +462,10 @@ public class FragmentActivity extends Fragment implements ActivityView {
      */
     @Override
     public void iniciarMonitorizacion() {
-        /*PeriodicTask.startBroadcast(getContext());
+        PeriodicTask.startBroadcast(getContext());
         NotificationUtils.sendNotification(getContext(), Constants.ONGOING_NOTIFICATION_ID,
                 "Participas en una actividad en curso", "Aún no se ha enviado ningún reporte",
-                Boolean.TRUE);*/
+                Boolean.TRUE);
     }
 
     /**
@@ -479,6 +481,24 @@ public class FragmentActivity extends Fragment implements ActivityView {
      * {@inheritDoc}
      */
     @Override
+    public void notifyUserDialog(String text) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+        builder.setTitle(R.string.app_name);
+        builder.setTitle("OCAM");
+        builder.setMessage(text);
+        builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void notifyUser(String notificationText) {
         ViewUtils.showToast(getView().getContext(), Toast.LENGTH_SHORT, notificationText);
     }
@@ -487,13 +507,10 @@ public class FragmentActivity extends Fragment implements ActivityView {
      * Confirmación visual de unirse a una actividad
      */
     private void showConfirmJoinDialog() {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
         builder.setTitle(R.string.app_name);
         builder.setTitle("Unirte a la actividad");
-        builder.setMessage("Al unirte a la actividad y mientras esté en curso, enviaremos tu " +
-                "posición cada cierto tiempo para mantenerte monitorizado. También podrás ver la" +
-                " posición del resto del grupo");
+        builder.setMessage(R.string.condicionUnirseActividad);
         builder.setPositiveButton("Unirme", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 if (!GPSLocationHelper.checkPermission(getContext())) {

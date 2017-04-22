@@ -27,19 +27,20 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key"
-            />
+            android:value="@string/google_maps_key" />
 
         <activity
             android:name=".activity.track.TrackActivity"
             android:label="@string/title_activity_track" />
         <activity android:name=".activity.monitorization.MonitorizationActivity" />
-        <activity
-            android:name=".register.RegisterActivity">
-        </activity>
+        <activity android:name=".register.RegisterActivity"></activity>
 
-        <receiver android:name="com.ocam.periodicTasks.ReportSender" ></receiver>
+        <receiver android:name=".periodicTasks.ReportSender" />
 
+        <service
+            android:name=".periodicTasks.pendingActions.ActionService"
+            android:enabled="true"
+            android:exported="false"></service>
     </application>
 
 </manifest>

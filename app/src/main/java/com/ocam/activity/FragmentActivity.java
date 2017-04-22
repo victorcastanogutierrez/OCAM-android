@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -90,6 +91,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("Viene", "que viene");
         View v = inflater.inflate(R.layout.activity_detail, container, false);
         this.activityPresenter = new ActivityPresenterImpl(this, v.getContext());
         this.txDescripcion = (TextView) v.findViewById(R.id.lbDescripcion);

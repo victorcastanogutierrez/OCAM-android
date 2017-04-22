@@ -44,7 +44,9 @@ public class LoginActivity extends Activity implements LoginView {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_login);
-        Picasso.with(LoginActivity.this).load(R.drawable.ocam_logo).into((ImageView) findViewById(R.id.ivLogo));
+        Picasso.with(LoginActivity.this)
+                .load(R.drawable.testing1)
+                .into((ImageView) findViewById(R.id.ivLogo));
 
 
         //Confiar en todos los certificados: solo para desarrollo

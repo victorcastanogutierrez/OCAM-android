@@ -36,6 +36,7 @@ import com.ocam.volley.listeners.ICommand;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -232,8 +233,15 @@ public class ActivityPresenterImpl implements ActivityPresenter {
             hikerDao.insert(hiker);
         }
 
+        List<JoinActivityHikers> joinList = joinActivityHikersDao.queryBuilder()
+                .where(JoinActivityHikersDao.Properties.ActivityId.eq(activity.getId_local()),
+                        JoinActivityHikersDao.Properties.HikerId.eq(hiker.getId_local())).list();
+        if (joinList != null && joinList.size() > 0) {
+            joinActivityHikersDao.deleteInTx(joinList);
+        }
+
         JoinActivityHikers join = new JoinActivityHikers(null, activity.getId_local(), hiker.getId_local());
-        joinActivityHikersDao.insert(join);
+        joinActivityHikersDao.insertOrReplace(join);
         activity.getHikers().add(hiker);
         activityDao.insertOrReplace(activity);
     }
@@ -298,6 +306,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     private void persistJoinPendingAction(Activity activity, String password) {
         PendingAction pendingAction = new PendingAction(ActionType.JOIN_ACTIVITY);
         pendingAction.getParametros().add(activity.getId().toString());
+        pendingAction.getParametros().add(UserManager.getInstance().getUserTokenDTO().getLogin());
         pendingAction.getParametros().add(password);
         pendingActionDao.insertOrReplace(pendingAction);
     }

@@ -89,12 +89,21 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     @Override
     public void startActivity(Long activityId, String password) {
         this.activityView.displayProgress();
-        ICommand<Void> myCommand = new MyCommand();
-        GsonRequest<Void> request = new GsonRequest<Void>(Constants.API_START_ACTIVITY,
-                Request.Method.POST, Void.class, getHeaders(), getBody(activityId, password),
-                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+        if (ConnectionUtils.isConnected(this.context)) {
+            ICommand<Void> myCommand = new MyCommand();
+            GsonRequest<Void> request = new GsonRequest<Void>(Constants.API_START_ACTIVITY,
+                    Request.Method.POST, Void.class, getHeaders(), getBody(activityId, password),
+                    new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
-        VolleyManager.getInstance(this.context).addToRequestQueue(request);
+            VolleyManager.getInstance(this.context).addToRequestQueue(request);
+        } else {
+            persistStartPendingAction(activityId, password);
+            this.activityView.notifyUserDialog(context.getResources()
+                    .getString(R.string.startActivityDisconnected));
+            activityView.onActivityOpen();
+            activityView.iniciarMonitorizacion();
+            this.activityView.hideProgress();
+        }
     }
 
     /**
@@ -308,6 +317,19 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         pendingAction.getParametros().add(activity.getId().toString());
         pendingAction.getParametros().add(UserManager.getInstance().getUserTokenDTO().getLogin());
         pendingAction.getParametros().add(password);
+        pendingActionDao.insertOrReplace(pendingAction);
+    }
+
+    /**
+     * Persiste de manera local el intento de unirse a una actividad
+     * @param activityId
+     * @param password
+     */
+    private void persistStartPendingAction(Long activityId, String password) {
+        PendingAction pendingAction = new PendingAction(ActionType.START_ACTIVITY);
+        pendingAction.getParametros().add(activityId.toString());
+        pendingAction.getParametros().add(password);
+        pendingAction.getParametros().add(UserManager.getInstance().getUserTokenDTO().getLogin());
         pendingActionDao.insertOrReplace(pendingAction);
     }
 

@@ -1,6 +1,7 @@
 package com.ocam.periodicTasks.state;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 
 import com.ocam.manager.App;
@@ -10,15 +11,17 @@ import com.ocam.model.types.GPSPointDao;
 
 public abstract class BaseReportState implements ReportState{
 
-    protected Context context;
-    protected ReportDao reportDao;
-    protected GPSPointDao gpsPointDao;
+    Context context;
+    ReportDao reportDao;
+    GPSPointDao gpsPointDao;
+    BroadcastReceiver.PendingResult result;
 
-    public BaseReportState (Context context) {
+    public BaseReportState (Context context, BroadcastReceiver.PendingResult result) {
         this.context = context;
         DaoSession daoSession = ((App) context.getApplicationContext()).getDaoSession();
         this.reportDao = daoSession.getReportDao();
         this.gpsPointDao = daoSession.getGPSPointDao();
+        this.result = result;
     }
 
     public Context getContext() {

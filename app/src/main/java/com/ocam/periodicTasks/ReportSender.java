@@ -22,7 +22,6 @@ public class ReportSender extends BroadcastReceiver implements UpdateLocationLis
 
     private PendingResult result;
     private Context context;
-    private List<PendingAction> actions;
 
     /**
      * Solicita actualización de la localización
@@ -34,27 +33,18 @@ public class ReportSender extends BroadcastReceiver implements UpdateLocationLis
         Log.d("-", "Solicita actualizacion de localizacion");
         this.result = goAsync();
         this.context = context;
-        DaoSession daoSession = ((App) context.getApplicationContext()).getDaoSession();
-        this.actions = daoSession.getPendingActionDao().queryBuilder().list();
         new LocationUtils(context, this); // Inicia la solicitud de localizacion
     }
 
     /**
      * Obtiene el objeto correspondiente al estado del dispositivo
-     *
-     * Si tiene acciones por completar el estado será el de desconectado hasta que las complete
-     * para así guardar los reportes de posición de manera local
-     *
      * @param context
      * @return
      */
     public ReportState getConnection(Context context) {
 
-        if (this.actions.size() > 0) {
-            return new DisconnectedState(context);
-        }
         return ConnectionUtils.isConnected(context) ? new ConnectionState(context, this.result) :
-            new DisconnectedState(context);
+            new DisconnectedState(context, this.result);
     }
 
     /**
@@ -65,12 +55,19 @@ public class ReportSender extends BroadcastReceiver implements UpdateLocationLis
      */
     @Override
     public void onLocationUpdate(Location location) {
-        ReportState state = getConnection(context);
-        state.doReport(location);
-        if (ConnectionUtils.isConnected(this.context) && this.actions.size() > 0) {
+        DaoSession daoSession = ((App) context.getApplicationContext()).getDaoSession();
+        List<PendingAction> actions = daoSession.getPendingActionDao().queryBuilder().list();
+        ReportState state;
+        if (actions.size() > 0) {
+            state = new DisconnectedState(context, result);
+        }  else {
+            state = getConnection(context);
+        }
+        if (ConnectionUtils.isConnected(this.context) && actions.size() > 0) {
             Log.d("-", "Completa acciones pendientes");
             Intent i = new Intent(context, ActionService.class);
             this.context.startService(i);
         }
+        state.doReport(location);
     }
 }

@@ -42,11 +42,10 @@ public class ConnectionState extends BaseReportState {
    // private PendingResult result;
     private List<Request<Void>> requests = new ArrayList<>();
     private VolleyManager volleyManager;
-    private BroadcastReceiver.PendingResult result;
+
 
     public ConnectionState(Context context, PendingResult result) {
-        super(context);
-        this.result = result;
+        super(context, result);
         this.volleyManager = VolleyManager.getInstance(context);
     }
 

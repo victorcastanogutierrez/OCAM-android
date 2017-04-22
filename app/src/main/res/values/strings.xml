@@ -31,4 +31,5 @@
     <string name="prompt_login">Nombre de usuario</string>
     <string name="joinActivityDisconnected">Te has unido a la actividad sin conexión. Recogeremos tus datos de posición con normalidad y cuando recuperes la conexion, si la password es correcta, te unirás a la actividad.</string>
     <string name="condicionUnirseActividad">Al unirte a la actividad y mientras esté en curso, enviaremos tu posición cada cierto tiempo para mantenerte monitorizado. También podrás ver la posición del resto del grupo.</string>
+    <string name="startActivityDisconnected">Iniciaste la actividad sin conexión. Cuando la recuperes se enviarán los datos. Recogeremos hasta entonces tus reportes de posición con normalidad</string>
 </resources>

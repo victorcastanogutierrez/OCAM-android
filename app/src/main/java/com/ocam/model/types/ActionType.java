@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum ActionType {
-    JOIN_ACTIVITY (1);
+    JOIN_ACTIVITY (1),
+    START_ACTIVITY (2);
 
     private Integer actionId;
 

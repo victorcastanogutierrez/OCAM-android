@@ -1,6 +1,7 @@
 package com.ocam.periodicTasks.state;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
@@ -17,8 +18,8 @@ import java.util.Date;
  */
 public class DisconnectedState extends BaseReportState {
 
-    public DisconnectedState(Context context) {
-        super(context);
+    public DisconnectedState(Context context, BroadcastReceiver.PendingResult result) {
+        super(context, result);
     }
 
     /**
@@ -51,5 +52,6 @@ public class DisconnectedState extends BaseReportState {
                     "Localización error", "No hemos podido obtener la localización del dispositivo!",
                     Boolean.FALSE);
         }
+        result.finish();
     }
 }

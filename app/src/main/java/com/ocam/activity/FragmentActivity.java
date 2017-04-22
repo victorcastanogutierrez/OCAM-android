@@ -408,7 +408,9 @@ public class FragmentActivity extends Fragment implements ActivityView {
         btCambiarPassword.setVisibility(View.VISIBLE);
         btCerrar.setVisibility(View.VISIBLE);
         this.txEstado.setText(ActivityStatus.getFormattedStatus(this.activity.getStatus()));
-        iniciarMonitorizationFragment();
+        if (ConnectionUtils.isConnected(getContext())) {
+            iniciarMonitorizationFragment();
+        }
         Snackbar.make(getView(), "Actividad abierta. Password: "+this.activity.getPassword(), Snackbar.LENGTH_LONG)
             .setAction("OK", new View.OnClickListener() {
                 @Override

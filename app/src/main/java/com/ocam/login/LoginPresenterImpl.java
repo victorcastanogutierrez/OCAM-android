@@ -6,7 +6,10 @@ import android.util.Log;
 
 import com.android.volley.Request.Method;
 import com.android.volley.VolleyError;
+import com.ocam.manager.App;
 import com.ocam.manager.UserManager;
+import com.ocam.model.Activity;
+import com.ocam.model.DaoSession;
 import com.ocam.util.ConnectionUtils;
 import com.ocam.volley.VolleyManager;
 import com.ocam.model.UserTokenDTO;
@@ -18,6 +21,7 @@ import com.ocam.volley.listeners.GenericResponseListener;
 import com.ocam.volley.listeners.ICommand;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**

@@ -1,6 +1,7 @@
 package com.ocam.activity;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -17,6 +18,7 @@ import com.ocam.model.HikerDTO;
 import com.ocam.model.HikerDao;
 import com.ocam.model.JoinActivityHikers;
 import com.ocam.model.JoinActivityHikersDao;
+import com.ocam.model.UserTokenDTO;
 import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.util.NotificationUtils;
 import com.ocam.util.ViewUtils;
@@ -126,7 +128,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
      */
     @Override
     public Boolean puedeUnirse(Activity activity) {
-        return !isUserGuide(activity) && !esParticipante(activity) && assertActivityRunning(activity);
+        return !esParticipante(activity) && assertActivityRunning(activity);
     }
 
     /**
@@ -208,18 +210,21 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     }
 
     @Override
-    public void incluirGuiaActividad(Activity activity) {
-        for (Hiker h : activity.getGuides()) {
-            if (h.getLogin().equals(UserManager.getInstance().getUserTokenDTO().getLogin())) {
-                Hiker hiker = hikerDao.queryBuilder().where(HikerDao.Properties.Login.eq(h.getLogin())).unique();
-                if (hiker != null) {
-                    JoinActivityHikers join = new JoinActivityHikers(null, activity.getId_local(), hiker.getId_local());
-                    joinActivityHikersDao.insert(join);
-                    activity.getHikers().add(hiker);
-                }
-                break;
-            }
+    public void joinHikerActivity(Activity activity) {
+        UserTokenDTO hdto = UserManager.getInstance().getUserTokenDTO();
+        Hiker hiker = hikerDao.queryBuilder().where(
+                HikerDao.Properties.Login.eq(hdto.getLogin())).unique();
+        if (hiker == null) {
+            hiker = new Hiker(null, hdto.getEmail(), hdto.getLogin());
+            hikerDao.insert(hiker);
         }
+
+        JoinActivityHikers join = new JoinActivityHikers(null, activity.getId_local(), hiker.getId_local());
+        joinActivityHikersDao.insert(join);
+        activity.getHikers().add(hiker);
+        activityDao.insertOrReplace(activity);
+
+        Log.d("-", activity.getHikers().size()+"");
     }
 
     /**

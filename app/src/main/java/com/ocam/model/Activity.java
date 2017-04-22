@@ -68,7 +68,7 @@ public class Activity {
             targetProperty = "hikerId"
     )
     @Expose(deserialize = false)
-	private List<Hiker> hikers = new ArrayList<Hiker>();
+	private List<Hiker> hikers;
 
     @ToMany
     @JoinEntity(

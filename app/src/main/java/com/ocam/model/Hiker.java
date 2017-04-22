@@ -9,9 +9,6 @@ import org.greenrobot.greendao.annotation.Unique;
 @Entity
 public class Hiker {
 
-    @Unique
-    private Long id;
-
     @Id
     private Long id_local;
 
@@ -19,6 +16,7 @@ public class Hiker {
     private String email;
 
     @NotNull
+    @Unique
     private String login;
 
     public Hiker() {
@@ -27,24 +25,14 @@ public class Hiker {
 
 
 
-    @Generated(hash = 257416339)
-    public Hiker(Long id, Long id_local, @NotNull String email,
-            @NotNull String login) {
-        this.id = id;
+    @Generated(hash = 1146096760)
+    public Hiker(Long id_local, @NotNull String email, @NotNull String login) {
         this.id_local = id_local;
         this.email = email;
         this.login = login;
     }
 
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getEmail() {
         return email;

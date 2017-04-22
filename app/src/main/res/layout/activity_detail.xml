@@ -129,13 +129,14 @@
 
         <Button
             android:id="@+id/btUnirse"
-            style="@style/Widget.AppCompat.Button.Colored"
+            android:background="@color/colorPrimary"
+            android:textColor="@android:color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
+            android:layout_marginTop="15sp"
             android:paddingLeft="10sp"
             android:paddingRight="10sp"
-            android:paddingTop="15sp"
             android:text="Participar en la actividad" />
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -203,6 +204,7 @@
             android:layout_height="match_parent"
             android:background="@color/colorPrimary"
             android:textColor="@android:color/white"
+            android:layout_marginTop="15sp"
             android:enabled="false"
             android:text="Monitorizar actividad" />
 

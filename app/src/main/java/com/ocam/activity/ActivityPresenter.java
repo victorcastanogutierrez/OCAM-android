@@ -97,5 +97,5 @@ public interface ActivityPresenter {
      * Incluye al usuario identificado como hiker de la actividad
      * @param activity
      */
-    void incluirGuiaActividad(Activity activity);
+    void joinHikerActivity(Activity activity);
 }

@@ -31,9 +31,6 @@ import com.ocam.model.Activity;
 import com.ocam.model.Hiker;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.periodicTasks.GPSLocationHelper;
-import com.ocam.periodicTasks.PeriodicTask;
-import com.ocam.util.Constants;
-import com.ocam.util.NotificationUtils;
 import com.ocam.util.ViewUtils;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -399,7 +396,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
     @Override
     public void onActivityOpen() {
         this.activity.setStatus(ActivityStatus.RUNNING);
-        this.activityPresenter.incluirGuiaActividad(this.activity);
+        this.activityPresenter.joinHikerActivity(this.activity);
         this.activityPresenter.saveActivity(this.activity);
         this.btComenzar.setVisibility(View.GONE);
         btMonitorizar.setEnabled(Boolean.TRUE);
@@ -425,12 +422,14 @@ public class FragmentActivity extends Fragment implements ActivityView {
     public void onHikerJoinActivity() {
         Hiker hiker = new Hiker();
         hiker.setLogin(UserManager.getInstance().getUserTokenDTO().getLogin());
-        this.activityPresenter.incluirGuiaActividad(this.activity);
+        this.activityPresenter.joinHikerActivity(this.activity);
         this.activityPresenter.saveActivity(this.activity);
         this.btUnirse.setVisibility(View.GONE);
         this.btMonitorizar.setVisibility(View.VISIBLE);
         this.btMonitorizar.setEnabled(Boolean.TRUE);
-        this.btAbandonar.setVisibility(View.VISIBLE);
+        if (!activityPresenter.isUserGuide(this.activity)) {
+            this.btAbandonar.setVisibility(View.VISIBLE);
+        }
         iniciarMonitorizationFragment();
     }
 

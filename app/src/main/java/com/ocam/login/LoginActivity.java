@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import com.ocam.util.ConnectionUtils;
 import com.ocam.util.PreferencesUtils;
 import com.ocam.util.ViewUtils;
 import com.ocam.volley.NukeSSLCerts;
+import com.squareup.picasso.Picasso;
 
 public class LoginActivity extends Activity implements LoginView {
 
@@ -41,10 +43,12 @@ public class LoginActivity extends Activity implements LoginView {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        setContentView(R.layout.activity_login);
+        Picasso.with(LoginActivity.this).load(R.drawable.ocam_logo).into((ImageView) findViewById(R.id.ivLogo));
+
+
         //Confiar en todos los certificados: solo para desarrollo
         this.loginPresenter = new LoginPresenterImpl(this, LoginActivity.this);
-
-        setContentView(R.layout.activity_login);
 
         this.ilUsername = (TextInputLayout) findViewById(R.id.ilUsername);
         this.ilPassword = (TextInputLayout) findViewById(R.id.ilPassword);
@@ -59,6 +63,7 @@ public class LoginActivity extends Activity implements LoginView {
         } else {
             PreferencesUtils.removeSavedCredentials(LoginActivity.this);
         }
+
     }
 
     /**

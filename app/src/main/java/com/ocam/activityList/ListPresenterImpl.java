@@ -70,7 +70,8 @@ public class ListPresenterImpl implements ListPresenter {
         } else {
             //Si no tiene conexión las busca en local
             listActivityView.hideProgress();
-            listActivityView.setUpRecyclerView(this.activityDao.queryBuilder().list());
+            List<Activity> acts = this.activityDao.queryBuilder().list();
+            listActivityView.setUpRecyclerView(acts);
             listActivityView.notifySnackbar("No tienes conexión a internet");
         }
     }
@@ -120,7 +121,7 @@ public class ListPresenterImpl implements ListPresenter {
             Activity activity = new Gson().fromJson(new Gson().toJson(act), Activity.class);
 
             //Persiste el dueño de la actividad
-            Hiker owner = new Hiker(act.getOwner().getId(), null, act.getOwner().getEmail(), act.getOwner().getLogin());
+            Hiker owner = new Hiker(null, act.getOwner().getEmail(), act.getOwner().getLogin());
             Long ownerId = hikerDao.insert(owner);
             activity.setOwnerId(ownerId);
             activity.setOwner(owner);
@@ -140,9 +141,9 @@ public class ListPresenterImpl implements ListPresenter {
 
     private void persistActivityHikers(ActivityDTO act, Activity activity, Long activityLocalId) {
         for (Hiker h : act.getHikers()) {
-            Hiker actHiker = hikerDao.queryBuilder().where(HikerDao.Properties.Id.eq(h.getId())).unique();
+            Hiker actHiker = hikerDao.queryBuilder().where(HikerDao.Properties.Login.eq(h.getLogin())).unique();
             if (actHiker == null) {
-                actHiker = new Hiker(h.getId(), null, h.getEmail(), h.getLogin());
+                actHiker = new Hiker(null, h.getEmail(), h.getLogin());
                 hikerDao.insert(actHiker);
             }
 
@@ -155,9 +156,9 @@ public class ListPresenterImpl implements ListPresenter {
 
     private void persistActivityGuides(ActivityDTO act, Activity activity, Long activityLocalId) {
         for (Hiker h : act.getGuides()) {
-            Hiker guide = hikerDao.queryBuilder().where(HikerDao.Properties.Id.eq(h.getId())).unique();
+            Hiker guide = hikerDao.queryBuilder().where(HikerDao.Properties.Login.eq(h.getLogin())).unique();
             if (guide == null) {
-                guide = new Hiker(h.getId(), null, h.getEmail(), h.getLogin());
+                guide = new Hiker(null, h.getEmail(), h.getLogin());
                 hikerDao.insert(guide);
             }
 

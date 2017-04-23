@@ -126,7 +126,7 @@ public class ListPresenterImpl implements ListPresenter {
 
             //Persiste el dueño de la actividad
             Hiker owner = new Hiker(null, act.getOwner().getEmail(), act.getOwner().getLogin());
-            Long ownerId = hikerDao.insert(owner);
+            Long ownerId = hikerDao.insertOrReplace(owner);
             activity.setOwnerId(ownerId);
             activity.setOwner(owner);
 

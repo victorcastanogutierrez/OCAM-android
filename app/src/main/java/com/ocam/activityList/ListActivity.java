@@ -1,6 +1,7 @@
 package com.ocam.activityList;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -13,10 +14,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.ocam.R;
 import com.ocam.activityList.recycler.FragmentList;
 import com.ocam.login.LoginActivity;
+import com.ocam.manager.UserManager;
 
 public class ListActivity extends AppCompatActivity {
 
@@ -45,6 +48,12 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void setUpToolbar() {
+        View header = this.navView.getHeaderView(0);
+        TextView txDatos = (TextView) header.findViewById(R.id.txDatos);
+        txDatos.setTypeface(null, Typeface.BOLD_ITALIC);
+        UserManager userManager = UserManager.getInstance();
+        txDatos.setText(userManager.getUserTokenDTO().getLogin()+"\n"+userManager.getUserTokenDTO().getEmail());
+
         final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, this.drawerLayout, this.appbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         this.drawerLayout.addDrawerListener(toggle);

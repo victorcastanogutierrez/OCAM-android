@@ -2,16 +2,12 @@ package com.ocam.periodicTasks.pendingActions;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.ocam.manager.App;
 import com.ocam.model.DaoSession;
 import com.ocam.model.PendingAction;
-import com.ocam.periodicTasks.ConnectivityReceiver;
-import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.periodicTasks.pendingActions.actions.Action;
 import com.ocam.periodicTasks.pendingActions.actions.ActionFinishListener;
 
@@ -59,6 +55,7 @@ public class ActionService extends Service implements ActionFinishListener {
         Log.d("Accion", "Accion resuelta");
         DaoSession daoSession = ((App) this.getApplicationContext()).getDaoSession();
         daoSession.getPendingActionDao().delete(pendingAction);
+        solveNextAction();
     }
 
     private void solveNextAction() {

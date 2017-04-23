@@ -63,6 +63,8 @@ public class JoinActivityAction extends BaseAction {
         public void executeResponse(Void response) {
             NotificationUtils.sendNotification(
                     context, 01, "Actividad", "Te uniste con éxito a la actividad", false);
+            PeriodicTask.stopBroadcast(context);
+            PeriodicTask.startBroadcast(context);
             onActionFinish();
         }
 

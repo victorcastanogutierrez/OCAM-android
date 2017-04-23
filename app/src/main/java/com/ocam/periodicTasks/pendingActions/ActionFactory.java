@@ -8,6 +8,7 @@ import com.ocam.model.types.ActionType;
 import com.ocam.periodicTasks.pendingActions.actions.Action;
 import com.ocam.periodicTasks.pendingActions.actions.CloseActivityAction;
 import com.ocam.periodicTasks.pendingActions.actions.JoinActivityAction;
+import com.ocam.periodicTasks.pendingActions.actions.LeaveActivityAction;
 import com.ocam.periodicTasks.pendingActions.actions.StartActivityAction;
 
 public class ActionFactory {
@@ -19,6 +20,8 @@ public class ActionFactory {
             return new StartActivityAction(context, pendingAction);
         } else if (pendingAction.getActionType().equals(ActionType.CLOSE_ACTIVITY)) {
             return new CloseActivityAction(context, pendingAction);
+        } else if (pendingAction.getActionType().equals(ActionType.LEAVE_ACTIVITY)) {
+            return new LeaveActivityAction(context, pendingAction);
         }
         return null;
     }

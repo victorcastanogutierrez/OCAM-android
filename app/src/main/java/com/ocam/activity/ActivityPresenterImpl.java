@@ -20,6 +20,8 @@ import com.ocam.model.JoinActivityHikers;
 import com.ocam.model.JoinActivityHikersDao;
 import com.ocam.model.PendingAction;
 import com.ocam.model.PendingActionDao;
+import com.ocam.model.Report;
+import com.ocam.model.ReportDao;
 import com.ocam.model.UserTokenDTO;
 import com.ocam.model.types.ActionType;
 import com.ocam.model.types.ActivityStatus;
@@ -50,6 +52,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     private HikerDao hikerDao;
     private JoinActivityHikersDao joinActivityHikersDao;
     private PendingActionDao pendingActionDao;
+    private ReportDao reportDao;
 
     public ActivityPresenterImpl(ActivityView activityView, Context context) {
         this.activityView = activityView;
@@ -59,6 +62,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         this.hikerDao = daoSession.getHikerDao();
         this.joinActivityHikersDao = daoSession.getJoinActivityHikersDao();
         this.pendingActionDao = daoSession.getPendingActionDao();
+        this.reportDao = daoSession.getReportDao();
     }
 
     /**
@@ -149,6 +153,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     @Override
     public void joinActivity(Activity activity, String password) {
         this.activityView.displayProgress();
+        discardReports();
         if (ConnectionUtils.isConnected(this.context)) {
             UserManager userManager = UserManager.getInstance();
             ICommand<Void> myCommand = new MyJoinActivityCommand();
@@ -168,6 +173,16 @@ public class ActivityPresenterImpl implements ActivityPresenter {
             activityView.notifyUserDialog(this.context.getResources()
                     .getString(R.string.joinActivityDisconnected));
             activityView.iniciarMonitorizacion();
+        }
+    }
+
+    /**
+     * Elimina todos los reportes pendientes de enviar en local
+     */
+    private void discardReports() {
+        List<Report> pending = reportDao.queryBuilder().where(ReportDao.Properties.Pending.eq(Boolean.TRUE)).list();
+        if (pending != null && pending.size() > 0) {
+            reportDao.deleteInTx(pending);
         }
     }
 
@@ -198,6 +213,13 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         pendingActionDao.insertOrReplace(pendingAction);
     }
 
+    private void persistsAbandonActivityAction(Activity activity) {
+        PendingAction pendingAction = new PendingAction(ActionType.LEAVE_ACTIVITY);
+        pendingAction.getParametros().add(activity.getId().toString());
+        pendingAction.getParametros().add(UserManager.getInstance().getUserTokenDTO().getLogin());
+        pendingActionDao.insertOrReplace(pendingAction);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -206,16 +228,20 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         String loggedHiker = UserManager.getInstance().getUserTokenDTO().getLogin();
         this.activityView.displayProgress();
         removeHikerFromList(activity);
-        PeriodicTask.stopBroadcast(this.context);
         NotificationUtils.sendNotification(this.context, Constants.ONGOING_NOTIFICATION_ID, "Abandonaste la actividad", "Se ha interrumpido la monitorización.", Boolean.FALSE);
 
-        ICommand<Void> myCommand = new MyLeaveCommand();
-        GsonRequest<Void> request = new GsonRequest<Void>(Constants.API_LEAVE_ACTIVITY + '/' +
-                activity.getId() + '/' + loggedHiker,
-                Request.Method.POST, Void.class, null,
-                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
-
-        VolleyManager.getInstance(this.context).addToRequestQueue(request);
+        if (ConnectionUtils.isConnected(this.context)) {
+            PeriodicTask.stopBroadcast(this.context);
+            GsonRequest<Void> request = new GsonRequest<Void>(Constants.API_LEAVE_ACTIVITY + '/' +
+                    activity.getId() + '/' + loggedHiker,
+                    Request.Method.POST, Void.class, null,
+                    null, null);
+            VolleyManager.getInstance(this.context).addToRequestQueue(request);
+        } else {
+            persistsAbandonActivityAction(activity);
+            this.activityView.hideProgress();
+            this.activityView.notifyUserDialog(context.getResources().getString(R.string.disconnectedLeaveWarning));
+        }
         activityView.onLeaveActivity();
     }
 
@@ -281,6 +307,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
                 break;
             }
         }
+        activity.update();
     }
 
     /**
@@ -466,31 +493,6 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         public void executeError(VolleyError error) {
             activityView.hideProgress();
             activityView.notifyUser("La actividad no pudo ser cerrada debido a un error.");
-        }
-    }
-
-    /**
-     * Command genérico para manejar la respuesta HTTP a la llamada a la API del servidor
-     * para eliminar a un hiker de la actividad
-     */
-    private class MyLeaveCommand implements ICommand<Void> {
-
-        /**
-         * Notifica al usuario
-         * @param response
-         */
-        @Override
-        public void executeResponse(Void response) {
-            ViewUtils.showToast(context, Toast.LENGTH_SHORT, "Abandonaste la actividad.");
-        }
-
-        /**
-         * Muestra el error retornado por el servidor al usuario
-         * @param error
-         */
-        @Override
-        public void executeError(VolleyError error) {
-            ViewUtils.showToast(context, Toast.LENGTH_SHORT, "No has podido abandonar pero se interrumpe la monitorización.");
         }
     }
 }

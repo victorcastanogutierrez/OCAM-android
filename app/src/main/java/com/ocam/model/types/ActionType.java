@@ -7,7 +7,8 @@ import java.util.Map;
 public enum ActionType {
     JOIN_ACTIVITY (1),
     START_ACTIVITY (2),
-    CLOSE_ACTIVITY (3);
+    CLOSE_ACTIVITY (3),
+    LEAVE_ACTIVITY (4);
 
     private Integer actionId;
 

@@ -122,7 +122,9 @@ public class GsonRequest<T> extends Request<T> {
 
     @Override
     protected void deliverResponse(T response) {
-        listener.onResponse(response);
+        if (listener != null) {
+            listener.onResponse(response);
+        }
     }
 
     @Override

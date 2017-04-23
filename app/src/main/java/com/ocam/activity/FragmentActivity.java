@@ -554,7 +554,6 @@ public class FragmentActivity extends Fragment implements ActivityView {
      */
     private void showConfirmAbandonDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-        builder.setTitle(R.string.app_name);
         builder.setTitle("Abandonar actividad");
         builder.setMessage("Al abandonar la actividad dejarás de ser monitorizado. ¿Estás seguro?");
         builder.setPositiveButton("Abandonar", new DialogInterface.OnClickListener() {

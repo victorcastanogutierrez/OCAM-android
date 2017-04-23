@@ -1,42 +1,26 @@
 package com.ocam.login;
 
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.Dialog;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.TextInputLayout;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ocam.R;
 import com.ocam.activityList.ListActivity;
-import com.ocam.model.UserTokenDTO;
-import com.ocam.periodicTasks.ConnectivityReceiver;
-import com.ocam.periodicTasks.ReportSender;
 import com.ocam.register.RegisterActivity;
 import com.ocam.util.ConnectionUtils;
-import com.ocam.util.Constants;
 import com.ocam.util.PreferencesUtils;
 import com.ocam.util.ViewUtils;
 import com.ocam.volley.NukeSSLCerts;
 import com.squareup.picasso.Picasso;
-
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.Manifest.permission.ACCESS_NETWORK_STATE;
-import static android.Manifest.permission.CHANGE_NETWORK_STATE;
 
 public class LoginActivity extends Activity implements LoginView {
 

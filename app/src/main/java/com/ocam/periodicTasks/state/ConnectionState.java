@@ -75,10 +75,10 @@ public class ConnectionState extends BaseReportState {
     private void sendServerLocation(Location location, Context context) {
         List<Report> reports = new ArrayList<>();
         List<Report> pendingReports = getPendingReports();
+        reports.add(getReport(location));
         if (pendingReports != null) {
             reports.addAll(getPendingReports());
         }
-        reports.add(getReport(location));
 
         ICommand<Void> myCommand = new ReportCommand();
 

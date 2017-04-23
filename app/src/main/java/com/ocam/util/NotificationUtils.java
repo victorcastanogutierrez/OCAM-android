@@ -24,7 +24,7 @@ public class NotificationUtils {
                 .setContentTitle(title)
                 .setContentText(content)
                 .setOngoing(onGoing)
-                .setSmallIcon(R.drawable.mountain_home)
+                .setSmallIcon(R.drawable.testing1)
                 .build();
         notificationManager.notify(code, notification);
     }

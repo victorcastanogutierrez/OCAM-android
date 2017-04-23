@@ -98,4 +98,11 @@ public interface ActivityPresenter {
      * @param activity
      */
     void joinHikerActivity(Activity activity);
+
+    /**
+     * Comprueba si el usuario logueado es participante de la actividad
+     * @param activity
+     * @return
+     */
+    Boolean esParticipante(Activity activity);
 }

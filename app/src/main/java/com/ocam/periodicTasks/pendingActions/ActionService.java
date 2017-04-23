@@ -2,6 +2,7 @@ package com.ocam.periodicTasks.pendingActions;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -9,6 +10,8 @@ import android.widget.Toast;
 import com.ocam.manager.App;
 import com.ocam.model.DaoSession;
 import com.ocam.model.PendingAction;
+import com.ocam.periodicTasks.ConnectivityReceiver;
+import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.periodicTasks.pendingActions.actions.Action;
 import com.ocam.periodicTasks.pendingActions.actions.ActionFinishListener;
 
@@ -19,14 +22,14 @@ import java.util.List;
  */
 public class ActionService extends Service implements ActionFinishListener {
 
+    private List<PendingAction> actions;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         DaoSession daoSession = ((App) this.getApplicationContext()).getDaoSession();
-        List<PendingAction> actions = daoSession.getPendingActionDao().queryBuilder().list();
+        this.actions = daoSession.getPendingActionDao().queryBuilder().list();
         Log.d("Servicio", "Ejecuta servicio acciones pendientes con "+actions.size()+" pendientes");
-        for (PendingAction action : actions) {
-            solveAction(action);
-        }
+        solveNextAction();
         return START_STICKY;
     }
 
@@ -56,5 +59,21 @@ public class ActionService extends Service implements ActionFinishListener {
         Log.d("Accion", "Accion resuelta");
         DaoSession daoSession = ((App) this.getApplicationContext()).getDaoSession();
         daoSession.getPendingActionDao().delete(pendingAction);
+    }
+
+    private void solveNextAction() {
+        PendingAction action = safeGetAction();
+        if (action != null) {
+            solveAction(action);
+        } else {
+            stopSelf();
+        }
+    }
+
+    private PendingAction safeGetAction() {
+        if (this.actions.size() > 0) {
+            return actions.remove(0);
+        }
+        return null;
     }
 }

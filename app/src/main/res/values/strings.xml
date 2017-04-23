@@ -14,8 +14,6 @@
     <string name="action_settings">Settings</string>
     <string name="register">Registro</string>
     <string name="title_activity_register">Sign in</string>
-
-    <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_repassword">Repite password</string>
@@ -25,13 +23,12 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
     <string name="prompt_login">Nombre de usuario</string>
     <string name="joinActivityDisconnected">Te has unido a la actividad sin conexión. Recogeremos tus datos de posición con normalidad y cuando recuperes la conexion, si la password es correcta, te unirás a la actividad.</string>
     <string name="condicionUnirseActividad">Al unirte a la actividad y mientras esté en curso, enviaremos tu posición cada cierto tiempo para mantenerte monitorizado. También podrás ver la posición del resto del grupo.</string>
     <string name="startActivityDisconnected">Iniciaste la actividad sin conexión. Cuando la recuperes se enviarán los datos. Recogeremos hasta entonces tus reportes de posición con normalidad</string>
     <string name="noConnectionWarning">No tienes conexión. Los datos podrían no ser los actuales.</string>
     <string name="noConnectionOption">Opción no disponible sin conexión</string>
+    <string name="gpsWarning">Con el fin de mejorar la experiencia y que los datos de posición sean más precisos y sin conexión a internet, es necesario que actives la localización GPS de tu móvil, y el modo sea el adecuado.</string>
+    <string name="closeActivityDisconnectedWarn">Cierras la actividad sin conexión. Cuando la recuperes se cerrará oficialmente. Dejamos de obtener posiciones en tu dispositivo.</string>
 </resources>

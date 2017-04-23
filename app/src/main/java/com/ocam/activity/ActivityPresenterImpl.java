@@ -177,12 +177,25 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     @Override
     public void closeActivity(Activity activity) {
         this.activityView.displayProgress();
-        ICommand<Void> myCommand = new CloseActivityCommand();
-        GsonRequest<Void> request = new GsonRequest<Void>(Constants.API_CLOSE_ACTIVITY + '/' + activity.getId(),
-                Request.Method.POST, Void.class, null,
-                new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
+        if (ConnectionUtils.isConnected(this.context)) {
+            ICommand<Void> myCommand = new CloseActivityCommand();
+            GsonRequest<Void> request = new GsonRequest<Void>(Constants.API_CLOSE_ACTIVITY + '/' + activity.getId(),
+                    Request.Method.POST, Void.class, null,
+                    new GenericResponseListener<>(myCommand), new GenericErrorListener(myCommand));
 
-        VolleyManager.getInstance(this.context).addToRequestQueue(request);
+            VolleyManager.getInstance(this.context).addToRequestQueue(request);
+        } else {
+            persistsCloseActivityAction(activity);
+            this.activityView.hideProgress();
+            this.activityView.onActivityClosed();
+            this.activityView.notifyUserDialog(this.context.getResources().getString(R.string.closeActivityDisconnectedWarn));
+        }
+    }
+
+    private void persistsCloseActivityAction(Activity activity) {
+        PendingAction pendingAction = new PendingAction(ActionType.CLOSE_ACTIVITY);
+        pendingAction.getParametros().add(activity.getId().toString());
+        pendingActionDao.insertOrReplace(pendingAction);
     }
 
     /**
@@ -271,11 +284,10 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     }
 
     /**
-     * Comprueba si el usuario logueado es participante de la actividad
-     * @param activity
-     * @return
+     * {@inheritDoc}
      */
-    private Boolean esParticipante(Activity activity) {
+    @Override
+    public Boolean esParticipante(Activity activity) {
         String loggedHiker = UserManager.getInstance().getUserTokenDTO().getLogin();
         for (Hiker h : activity.getHikers()) {
             if (h.getLogin().equals(loggedHiker)) {

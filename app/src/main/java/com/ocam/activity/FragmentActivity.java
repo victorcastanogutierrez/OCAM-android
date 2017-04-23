@@ -9,7 +9,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,9 +26,7 @@ import com.google.gson.Gson;
 import com.ocam.R;
 import com.ocam.activity.monitorization.MonitorizationActivity;
 import com.ocam.activity.track.TrackActivity;
-import com.ocam.manager.UserManager;
 import com.ocam.model.Activity;
-import com.ocam.model.Hiker;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.periodicTasks.GPSLocationHelper;
 import com.ocam.periodicTasks.PeriodicTask;
@@ -66,10 +63,6 @@ public class FragmentActivity extends Fragment implements ActivityView {
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
     private EditText input; // Dialog de password
-    private static final String AVISO_GPS =
-            "Con el fin de mejorar la experiencia " +
-            "y que los datos de posición sean más precisos y sin conexión a internet, " +
-            "es necesario que actives la localización GPS de tu móvil, y el modo sea el adecuado.";
 
     public FragmentActivity() {
 
@@ -135,7 +128,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
             public void onClick(View v) {
                 if (!GPSLocationHelper.checkGPSEnabled(getContext())) {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage(AVISO_GPS)
+                    builder.setMessage(getContext().getResources().getString(R.string.gpsWarning))
                         .setCancelable(false)
                         .setPositiveButton("Activar", new DialogInterface.OnClickListener() {
                             public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
@@ -173,7 +166,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
             public void onClick(View v) {
                 if (!GPSLocationHelper.checkGPSEnabled(getContext())) {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage(AVISO_GPS)
+                    builder.setMessage(getContext().getResources().getString(R.string.gpsWarning))
                         .setCancelable(false)
                         .setPositiveButton("Activar", new DialogInterface.OnClickListener() {
                             public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
@@ -299,12 +292,14 @@ public class FragmentActivity extends Fragment implements ActivityView {
         //Si es guía
         if (this.activityPresenter.isUserGuide(this.activity)) {
             this.guiasLayout.setVisibility(View.VISIBLE);
-            if (!this.activityPresenter.assertActivityRunning(activity)) {
+            if (ActivityStatus.PENDING.equals(activity.getStatus())) {
                 this.btComenzar.setVisibility(View.VISIBLE);
-            } else {
+            } else if(this.activityPresenter.assertActivityRunning(activity)){
                 //Siendo guía y estando activa, la puede cerrar o cambiar la password
                 this.btCambiarPassword.setVisibility(View.VISIBLE);
-                this.btCerrar.setVisibility(View.VISIBLE);
+                if (this.activityPresenter.esParticipante(activity)) {
+                    this.btCerrar.setVisibility(View.VISIBLE);
+                }
             }
         } else {
             //Si no es guía y ya está unido
@@ -432,6 +427,8 @@ public class FragmentActivity extends Fragment implements ActivityView {
         this.btMonitorizar.setEnabled(Boolean.TRUE);
         if (!activityPresenter.isUserGuide(this.activity)) {
             this.btAbandonar.setVisibility(View.VISIBLE);
+        } else {
+            this.btCerrar.setVisibility(View.VISIBLE);
         }
         if (ConnectionUtils.isConnected(getContext())) {
             iniciarMonitorizationFragment();

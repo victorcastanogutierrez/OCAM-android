@@ -13,8 +13,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.ocam.R;
 import com.ocam.activityList.ListActivity;
+import com.ocam.manager.UserManager;
+import com.ocam.model.UserTokenDTO;
 import com.ocam.register.RegisterActivity;
 import com.ocam.util.ConnectionUtils;
 import com.ocam.util.PreferencesUtils;
@@ -127,7 +130,19 @@ public class LoginActivity extends Activity implements LoginView {
      */
     @Override
     public void loginSuccess() {
+        logUser();
         Intent i = new Intent(LoginActivity.this, ListActivity.class);
         startActivity(i);
+    }
+
+    /**
+     * Fabric: método que establece la información del usuario
+     * cara a obtener mayor información de posibles crashes
+     */
+    private void logUser() {
+        UserTokenDTO userManager = UserManager.getInstance().getUserTokenDTO();
+        Crashlytics.setUserIdentifier(userManager.getToken());
+        Crashlytics.setUserEmail(userManager.getEmail());
+        Crashlytics.setUserName(userManager.getLogin());
     }
 }

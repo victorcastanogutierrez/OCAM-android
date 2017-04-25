@@ -218,6 +218,5 @@
             android:layout_marginBottom="15sp"
             android:visibility="gone"
             android:text="Cerrar actividad" />
-
     </LinearLayout>
 </ScrollView>

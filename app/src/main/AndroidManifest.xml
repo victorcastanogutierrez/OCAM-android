@@ -10,7 +10,7 @@
     <application
         android:name=".manager.App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_ocam_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -42,6 +42,9 @@
             android:name=".periodicTasks.pendingActions.ActionService"
             android:enabled="true"
             android:exported="false" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="2bee8b4e2a935fac1d74a762f9cbc93270416e08" />
     </application>
 
 </manifest>

@@ -66,6 +66,14 @@ public class ConnectionState extends BaseReportState {
         }
     }
 
+    private void testing(String step) {
+
+        List reports2 = this.reportDao.queryBuilder()
+                .where(ReportDao.Properties.Pending.eq(Boolean.TRUE))
+                .list();
+        Log.d(step, "Hay " + reports2.size()+" pendientes");
+    }
+
     /**
      * Envía la POST al servidor con los reportes de posición. El que le toca enviar más todos los
      * que tenga almacenados de manera local
@@ -73,12 +81,8 @@ public class ConnectionState extends BaseReportState {
      * @param location
      */
     private void sendServerLocation(Location location, Context context) {
-        List<Report> reports = new ArrayList<>();
-        List<Report> pendingReports = getPendingReports();
-        reports.add(getReport(location));
-        if (pendingReports != null) {
-            reports.addAll(getPendingReports());
-        }
+        getReport(location);
+        List<Report> reports = getPendingReports();
 
         ICommand<Void> myCommand = new ReportCommand();
 
@@ -105,7 +109,7 @@ public class ConnectionState extends BaseReportState {
     }
 
     /**
-     * Obtiene el report actual
+     * Obtiene el report actual, lo guarda para que se reenvie en caso de haber timeout en el svr
      * @return
      */
     private Report getReport(Location location) {
@@ -155,14 +159,16 @@ public class ConnectionState extends BaseReportState {
         @Override
         public void executeResponse(Void response) {
             Log.d("Exito", "Reporte enviado con exito");
-            NotificationUtils.sendNotification(context, Constants.ONGOING_NOTIFICATION_ID,
-                    "Participas en una actividad en curso", "Último reporte enviado a las " +
-                            DateUtils.formatDate(new Date(), "HH:mm"), Boolean.TRUE);
             if (requests.size() > 0) {
                 volleyManager.addToRequestQueue(requests.remove(0));
             } else {
+                NotificationUtils.sendNotification(context, Constants.ONGOING_NOTIFICATION_ID,
+                        "Participas en una actividad en curso", "Último reporte enviado a las " +
+                                DateUtils.formatDate(new Date(), "HH:mm"), Boolean.TRUE);
+
                 List<Report> reports = reportDao.queryBuilder().where(ReportDao.Properties.Pending.eq(Boolean.TRUE)).list();
                 if (reports != null && reports.size() > 0) {
+                    Log.d("-", "Elimina "+reports.size()+" reportes pendientes");
                     reportDao.deleteInTx(reports);
                 }
                 result.finish();

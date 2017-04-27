@@ -66,14 +66,6 @@ public class ConnectionState extends BaseReportState {
         }
     }
 
-    private void testing(String step) {
-
-        List reports2 = this.reportDao.queryBuilder()
-                .where(ReportDao.Properties.Pending.eq(Boolean.TRUE))
-                .list();
-        Log.d(step, "Hay " + reports2.size()+" pendientes");
-    }
-
     /**
      * Envía la POST al servidor con los reportes de posición. El que le toca enviar más todos los
      * que tenga almacenados de manera local

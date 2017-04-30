@@ -64,6 +64,7 @@ public class HikerAdapter extends RecyclerView.Adapter<HikerAdapter.HikersViewHo
 
         public void bindActivity(final ReportDTO reportDTO) {
             hikerLogin.setText(reportDTO.getHikerDTO().getLogin());
+            hikerLogin.setTextColor(reportDTO.getColor());
             hikerLogin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {

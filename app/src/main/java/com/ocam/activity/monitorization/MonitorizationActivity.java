@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static com.ocam.R.id.map;
 
@@ -51,9 +52,9 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
     private Map<String, Marker> markers;
     private LatLngBounds bounds;
     private SwipeRefreshLayout refreshLayout;
+    private Map<Integer, Float> colorMap;
 
     public MonitorizationActivity() {
-
     }
 
     @Override
@@ -65,6 +66,7 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
         this.markers = new HashMap<>();
         this.activityId = getActivityParameter();
         this.monitorizationPresenter = new MonitorizacionPresenterImpl(MonitorizationActivity.this, this);
+        setUpColorMap();
 
         setUpToolbar();
         if (ConnectionUtils.isConnected(MonitorizationActivity.this)) {
@@ -226,6 +228,7 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
      */
     @Override
     public void refreshHikersData(List<ReportDTO> datos) {
+        setRandomColors(datos);
         this.hikerAdapter.setData(new ArrayList<>(datos));
         this.hikerAdapter.notifyDataSetChanged();
         for (Map.Entry<String, Marker> entry : this.markers.entrySet()) {
@@ -256,7 +259,7 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
             this.markers.put(login, this.mMap.addMarker(new MarkerOptions()
                     .position(markerPos)
                     .icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                            .defaultMarker(colorMap.get(reportDTO.getColor())))
                     .title(login)));
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -298,5 +301,33 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
                 monitorizationPresenter.loadReportsData(activityId);
             }
         });
+    }
+
+    private void setUpColorMap() {
+        this.colorMap = new HashMap<>();
+        this.colorMap.put(Color.parseColor("#FF0000"), BitmapDescriptorFactory.HUE_RED);
+        this.colorMap.put(Color.parseColor("#FFA500"), BitmapDescriptorFactory.HUE_ORANGE);
+        this.colorMap.put(Color.parseColor("#FFFF00"), BitmapDescriptorFactory.HUE_YELLOW);
+        this.colorMap.put(Color.parseColor("#00FF00"), BitmapDescriptorFactory.HUE_GREEN);
+        this.colorMap.put(Color.parseColor("#00FFFF"), BitmapDescriptorFactory.HUE_CYAN);
+        this.colorMap.put(Color.parseColor("#F0FFFF"), BitmapDescriptorFactory.HUE_AZURE);
+        this.colorMap.put(Color.parseColor("#0000FF"), BitmapDescriptorFactory.HUE_BLUE);
+        this.colorMap.put(Color.parseColor("#EE82EE"), BitmapDescriptorFactory.HUE_VIOLET);
+        this.colorMap.put(Color.parseColor("#FF00FF"), BitmapDescriptorFactory.HUE_MAGENTA);
+        this.colorMap.put(Color.parseColor("#FFC0CB"), BitmapDescriptorFactory.HUE_ROSE);
+    }
+
+    private void setRandomColors(List<ReportDTO> datos) {
+        Random rand = new Random();
+        Map<Integer, Float> copy = new HashMap<>(this.colorMap);
+        for (ReportDTO report : datos) {
+            if (copy.size() == 0) {
+                copy = new HashMap<>(this.colorMap);
+            }
+            Integer random = rand.nextInt(copy.size());
+            Integer color = new ArrayList<>(copy.keySet()).get(random);
+            copy.remove(color);
+            report.setColor(color);
+        }
     }
 }

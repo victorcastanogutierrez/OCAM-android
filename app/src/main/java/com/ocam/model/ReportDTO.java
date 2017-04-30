@@ -13,6 +13,8 @@ public class ReportDTO {
 
 	private GPSPoint point;
 
+	private Integer color;
+
 	public Long getDate() {
 		return date;
 	}
@@ -45,4 +47,11 @@ public class ReportDTO {
 		this.point = point;
 	}
 
+	public Integer getColor() {
+		return color;
+	}
+
+	public void setColor(Integer color) {
+		this.color = color;
+	}
 }

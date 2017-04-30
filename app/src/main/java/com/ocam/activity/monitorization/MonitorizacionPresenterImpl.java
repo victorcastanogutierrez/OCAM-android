@@ -2,12 +2,14 @@ package com.ocam.activity.monitorization;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
+import com.ocam.R;
 import com.ocam.manager.App;
 import com.ocam.model.Activity;
 import com.ocam.model.ActivityDao;
@@ -34,11 +36,13 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
 

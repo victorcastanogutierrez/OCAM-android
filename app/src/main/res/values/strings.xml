@@ -32,4 +32,8 @@
     <string name="gpsWarning">Con el fin de mejorar la experiencia y que los datos de posición sean más precisos y sin conexión a internet, es necesario que actives la localización GPS de tu móvil, y el modo sea el adecuado.</string>
     <string name="closeActivityDisconnectedWarn">Cierras la actividad sin conexión. Cuando la recuperes se cerrará oficialmente. Dejamos de obtener posiciones en tu dispositivo.</string>
     <string name="disconnectedLeaveWarning">Abandonas la actividad sin conexión. En cuanto la recuperes saldrás de ella y se deshecharán los últimos reportes de posición recogidos.</string>
+    <string name="hint_passwordAct">Password actual</string>
+    <string name="hint_newPassword">Nueva password</string>
+    <string name="hint_repassword">Repite nueva password</string>
+    <string name="actualizarDatos">Actualizar datos</string>
 </resources>

@@ -20,6 +20,7 @@ import com.ocam.R;
 import com.ocam.activityList.recycler.FragmentList;
 import com.ocam.login.LoginActivity;
 import com.ocam.manager.UserManager;
+import com.ocam.proffile.FragmentProffile;
 
 public class ListActivity extends AppCompatActivity {
 
@@ -125,6 +126,11 @@ public class ListActivity extends AppCompatActivity {
                             fragmentTransaction = Boolean.TRUE;
                             fragment = new FragmentList();
                             break;
+                        case R.id.menu_item2:
+                            fragmentTransaction = Boolean.TRUE;
+                            fragment = new FragmentProffile();
+                            setSelectedMenuItem(navView.getMenu().getItem(1));
+                            break;
                     }
 
                     if(fragmentTransaction) {
@@ -143,6 +149,9 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void setSelectedMenuItem(MenuItem menuItem) {
+        for (int i = 0; i < navView.getMenu().size(); i++) {
+            navView.getMenu().getItem(i).setChecked(false);
+        }
         menuItem.setChecked(true);
         getSupportActionBar().setTitle(menuItem.getTitle());
     }

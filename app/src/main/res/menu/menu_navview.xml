@@ -4,29 +4,15 @@
         <item
             android:id="@+id/menu_item_1"
             android:title="Actividades"/>
-            <!--android:icon="@drawable/ic_menu"-->
-        <!--<item
-            android:id="@+id/menu_seccion_2"
-            android:title="Cambiame 2"/>
-            android:icon="@drawable/ic_menu"
-        <item
-            android:id="@+id/menu_seccion_3"
-            android:title="Cambiame 3"/>
-        android:icon="@drawable/ic_menu"-->
     </group>
 
     <item
-        android:id="@+id/navigation_subheader"
+        android:id="@+id/menu_item2"
         android:title="@string/cuenta">
     </item>
     <item
         android:id="@+id/menu_cerrar_sesion"
         android:title="@string/cerrar_sesion"/>
-    <!--android:icon="@drawable/ic_menu"-->
-    <!--<item
-        android:id="@+id/menu_opcion_2"
-        android:title="Cambiame 2.2"/>
-        ndroid:icon="@drawable/ic_menu"-->
 
 
 </menu>

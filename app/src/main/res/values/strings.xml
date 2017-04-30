@@ -36,4 +36,5 @@
     <string name="hint_newPassword">Nueva password</string>
     <string name="hint_repassword">Repite nueva password</string>
     <string name="actualizarDatos">Actualizar datos</string>
+    <string name="aviso_unido">¡Participas en la actividad!</string>
 </resources>

@@ -63,6 +63,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
     private EditText input; // Dialog de password
+    private TextView lbAvisoUnido;
 
     public FragmentActivity() {
 
@@ -102,6 +103,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
         this.mProgress = (ProgressBar) v.findViewById(R.id.progressBar);
         this.mOverlayDialog = new Dialog(v.getContext(), android.R.style.Theme_Panel);
         this.btAbandonar = (Button) v.findViewById(R.id.btAbandonar);
+        this.lbAvisoUnido = (TextView) v.findViewById(R.id.lbAvisoUnido);
         Bundle args = getArguments();
         setUpActivityData(new Gson().fromJson(args.getString("activity"), Activity.class));
 
@@ -320,6 +322,11 @@ public class FragmentActivity extends Fragment implements ActivityView {
         } else {
             this.btUnirse.setVisibility(View.GONE);
         }
+        if (this.activityPresenter.esParticipante(this.activity) && this.activityPresenter.assertActivityRunning(this.activity)) {
+            this.lbAvisoUnido.setVisibility(View.VISIBLE);
+        } else {
+            this.lbAvisoUnido.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -433,6 +440,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
         if (ConnectionUtils.isConnected(getContext())) {
             iniciarMonitorizationFragment();
         }
+        this.lbAvisoUnido.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -454,6 +462,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
         btCerrar.setVisibility(View.GONE);
         btMonitorizar.setVisibility(View.GONE);
         btCambiarPassword.setVisibility(View.GONE);
+        lbAvisoUnido.setVisibility(View.GONE);
         txEstado.setText(ActivityStatus.getFormattedStatus(activity.getStatus()));
     }
 

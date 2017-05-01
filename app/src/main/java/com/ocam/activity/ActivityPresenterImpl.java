@@ -94,6 +94,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
     public void startActivity(Long activityId, String password) {
         this.activityView.displayProgress();
         if (ConnectionUtils.isConnected(this.context)) {
+            removeAllPendingReports();
             ICommand<Void> myCommand = new MyCommand();
             GsonRequest<Void> request = new GsonRequest<Void>(Constants.API_START_ACTIVITY,
                     Request.Method.POST, Void.class, getHeaders(), getBody(activityId, password),
@@ -155,6 +156,7 @@ public class ActivityPresenterImpl implements ActivityPresenter {
         this.activityView.displayProgress();
         discardReports();
         if (ConnectionUtils.isConnected(this.context)) {
+            removeAllPendingReports();
             UserManager userManager = UserManager.getInstance();
             ICommand<Void> myCommand = new MyJoinActivityCommand();
             GsonRequest<Void> request = new GsonRequest<Void>(
@@ -173,6 +175,14 @@ public class ActivityPresenterImpl implements ActivityPresenter {
             activityView.notifyUserDialog(this.context.getResources()
                     .getString(R.string.joinActivityDisconnected));
             activityView.iniciarMonitorizacion();
+        }
+    }
+
+    private void removeAllPendingReports() {
+        DaoSession daoSession = ((App) context.getApplicationContext()).getDaoSession();
+        List<Report> reports = daoSession.getReportDao().queryBuilder().where(ReportDao.Properties.Pending.eq(Boolean.TRUE)).list();
+        if (reports != null && reports.size() > 0) {
+            daoSession.getReportDao().deleteInTx(reports);
         }
     }
 

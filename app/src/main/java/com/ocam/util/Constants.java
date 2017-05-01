@@ -39,7 +39,6 @@ public class Constants {
     public static final String REFRESH_TOKEN_KEY = "REFRESH-TOKEN";
     public static final String LOGIN_MONITORIZATION = "LOGIN-MONITORIZATION";
     public static final String TOKEN_MONITORIZATION = "TOKEN-MONITORIZATION";
-    public static final String EMAIL_MONITORIZATION = "EMAIL-MONITORIZATION";
 
     //Errors
     public static final String ERROR_LOADING_ACTIVITIES = "Error cargando las actividades";
@@ -47,6 +46,7 @@ public class Constants {
 
     //Notifications
     public static final Integer ONGOING_NOTIFICATION_ID = 687326891;
+    public static final Integer NOTIFICATION_NOTCONNECTED = 687326892;
     public static final Integer BROADCAST_INTENT = 234324243;
 
     public static final long REPORTS_PERIODICITY = 60 * 1000;

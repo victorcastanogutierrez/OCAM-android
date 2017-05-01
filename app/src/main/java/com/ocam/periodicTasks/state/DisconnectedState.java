@@ -7,7 +7,10 @@ import android.location.Location;
 import android.util.Log;
 
 import com.ocam.model.Report;
+import com.ocam.model.ReportDao;
 import com.ocam.model.types.GPSPoint;
+import com.ocam.util.Constants;
+import com.ocam.util.DateUtils;
 import com.ocam.util.NotificationUtils;
 
 import java.util.Date;
@@ -47,6 +50,11 @@ public class DisconnectedState extends BaseReportState {
             report.setPending(Boolean.TRUE);
             reportDao.insert(report);
             report.setGpsPointId(pointId);
+
+            Integer encolados = reportDao.queryBuilder().where(ReportDao.Properties.Pending.eq(Boolean.TRUE)).list().size();
+
+            NotificationUtils.sendNotification(context, Constants.NOTIFICATION_NOTCONNECTED,
+                    "No tienes conexión a internet", "Reportes encolados " + encolados, Boolean.FALSE);
         } else {
             NotificationUtils.sendNotification(context, 01,
                     "Localización error", "No hemos podido obtener la localización del dispositivo!",

@@ -11,10 +11,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -25,12 +27,17 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.ocam.R;
+import com.ocam.manager.UserManager;
+import com.ocam.model.Report;
 import com.ocam.model.ReportDTO;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.util.ConnectionUtils;
 import com.ocam.util.ViewUtils;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +60,8 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
     private LatLngBounds bounds;
     private SwipeRefreshLayout refreshLayout;
     private Map<Integer, Float> colorMap;
+    private TextView lbReportesEnviados;
+    private TextView lbReportesEncolados;
 
     public MonitorizationActivity() {
     }
@@ -65,9 +74,10 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
         setUpRecyclerData();
         this.markers = new HashMap<>();
         this.activityId = getActivityParameter();
+        this.lbReportesEnviados = (TextView) findViewById(R.id.lbReportesEnviados);
+        this.lbReportesEncolados = (TextView) findViewById(R.id.lbReportesEncolados);
         this.monitorizationPresenter = new MonitorizacionPresenterImpl(MonitorizationActivity.this, this);
         setUpColorMap();
-
         setUpToolbar();
         if (ConnectionUtils.isConnected(MonitorizationActivity.this)) {
             this.monitorizationPresenter.loadActivityData(activityId);
@@ -229,7 +239,7 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
     @Override
     public void refreshHikersData(List<ReportDTO> datos) {
         setRandomColors(datos);
-        this.hikerAdapter.setData(new ArrayList<>(datos));
+        this.hikerAdapter.setData(getLastReportHiker(datos));
         this.hikerAdapter.notifyDataSetChanged();
         for (Map.Entry<String, Marker> entry : this.markers.entrySet()) {
             entry.getValue().remove();
@@ -238,6 +248,27 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
         if (ConnectionUtils.isConnected(MonitorizationActivity.this)) {
             this.monitorizationPresenter.saveLocalData(activityId, datos);
         }
+        setUpResumen(datos);
+    }
+
+    /**
+     * Obtiene una lista con el ultiumo report de cada hiker, es decir,
+     * agrupa los reports por hiker quedandose siempre con el de fecha mas actual
+     * @param datos
+     * @return
+     */
+    private List<ReportDTO> getLastReportHiker(List<ReportDTO> datos) {
+        Map<String, ReportDTO> reports = new HashMap<>();
+        for (ReportDTO reportDTO : datos) {
+            if (!reports.containsKey(reportDTO.getHikerDTO().getLogin())) {
+                reports.put(reportDTO.getHikerDTO().getLogin(), reportDTO);
+            } else {
+                if (reports.get(reportDTO.getHikerDTO().getLogin()).getDate() < reportDTO.getDate()) {
+                    reports.put(reportDTO.getHikerDTO().getLogin(), reportDTO);
+                }
+            }
+        }
+        return new ArrayList<>(reports.values());
     }
 
     /**
@@ -245,12 +276,12 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
      */
     @Override
     public void onClick(ReportDTO reportDTO) {
-        if (!ConnectionUtils.isConnected(MonitorizationActivity.this)) {
+        /*if (!ConnectionUtils.isConnected(MonitorizationActivity.this)) {
             ViewUtils.showToast(MonitorizationActivity.this, Toast.LENGTH_SHORT,
                     MonitorizationActivity.this.getResources()
                             .getString(R.string.noConnectionOption));
             return ;
-        }
+        }*/
         String login = reportDTO.getHikerDTO().getLogin();
         if (!this.markers.containsKey(login)) {
             LatLng markerPos = new LatLng(
@@ -260,7 +291,8 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
                     .position(markerPos)
                     .icon(BitmapDescriptorFactory
                             .defaultMarker(colorMap.get(reportDTO.getColor())))
-                    .title(login)));
+                    .title(login + ": " + reportDTO.getPoint().getLatitude() + "," +
+                            reportDTO.getPoint().getLongitude())));
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(markerPos)
@@ -329,5 +361,20 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
             copy.remove(color);
             report.setColor(color);
         }
+    }
+
+    /**
+     * Muestra los datos de reportes enviados y encolados
+     */
+    private void setUpResumen(List<ReportDTO> datos) {
+        int reportesEnviados = 0;
+        String ulogged = UserManager.getInstance().getUserTokenDTO().getLogin();
+        for (ReportDTO report : datos) {
+            if (report.getHikerDTO().getLogin().equals(ulogged)) {
+                reportesEnviados++;
+            }
+        }
+        this.lbReportesEnviados.setText("Reportes enviados: "+reportesEnviados);
+        this.lbReportesEncolados.setText("Reportes encolados: "+this.monitorizationPresenter.getReportesEncolados()+"");
     }
 }

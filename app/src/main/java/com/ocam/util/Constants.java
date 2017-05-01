@@ -21,6 +21,7 @@ public class Constants {
     public static final String API_SAVE_REPORT = "/api/report/save";
     public static final String API_LEAVE_ACTIVITY = "/api/activity/leaveActivity";
     public static final String API_CHANGE_PASSWORD = "/api/hiker/changePassword";
+    public static final String API_ALL_ACTIVITY_REPORTS = "/api/findAllByActivity";
 
     //Header auth
     public static final String HEADER_AUTH_NAME = "authorization";
@@ -38,6 +39,7 @@ public class Constants {
     public static final String REFRESH_TOKEN_KEY = "REFRESH-TOKEN";
     public static final String LOGIN_MONITORIZATION = "LOGIN-MONITORIZATION";
     public static final String TOKEN_MONITORIZATION = "TOKEN-MONITORIZATION";
+    public static final String EMAIL_MONITORIZATION = "EMAIL-MONITORIZATION";
 
     //Errors
     public static final String ERROR_LOADING_ACTIVITIES = "Error cargando las actividades";

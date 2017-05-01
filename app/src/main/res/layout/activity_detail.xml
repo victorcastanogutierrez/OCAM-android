@@ -17,7 +17,8 @@
             android:layout_height="wrap_content"
             android:visibility="gone"/>
 
-        <TextView android:id="@+id/lbAvisoUnido"
+        <TextView
+            android:id="@+id/lbParticipa"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textStyle="bold"

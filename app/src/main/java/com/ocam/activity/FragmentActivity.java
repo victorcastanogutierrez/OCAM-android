@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,7 +27,11 @@ import com.google.gson.Gson;
 import com.ocam.R;
 import com.ocam.activity.monitorization.MonitorizationActivity;
 import com.ocam.activity.track.TrackActivity;
+import com.ocam.manager.App;
 import com.ocam.model.Activity;
+import com.ocam.model.DaoSession;
+import com.ocam.model.Hiker;
+import com.ocam.model.HikerDao;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.periodicTasks.GPSLocationHelper;
 import com.ocam.periodicTasks.PeriodicTask;
@@ -63,7 +68,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
     private EditText input; // Dialog de password
-    private TextView lbAvisoUnido;
+    private TextView lbParticipa;
 
     public FragmentActivity() {
 
@@ -103,7 +108,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
         this.mProgress = (ProgressBar) v.findViewById(R.id.progressBar);
         this.mOverlayDialog = new Dialog(v.getContext(), android.R.style.Theme_Panel);
         this.btAbandonar = (Button) v.findViewById(R.id.btAbandonar);
-        this.lbAvisoUnido = (TextView) v.findViewById(R.id.lbAvisoUnido);
+        this.lbParticipa = (TextView) v.findViewById(R.id.lbParticipa);
         Bundle args = getArguments();
         setUpActivityData(new Gson().fromJson(args.getString("activity"), Activity.class));
 
@@ -261,6 +266,12 @@ public class FragmentActivity extends Fragment implements ActivityView {
         startActivity(i);
     }
 
+    private void loadError() {
+        ViewUtils.showToast(getContext(), Toast.LENGTH_SHORT, "Error accediendo a la actividad");
+        hideProgress();
+        getActivity().onBackPressed();
+    }
+
     /**
      * Expone los datos de la actividad en los label correspondientes
      * @param act
@@ -268,9 +279,16 @@ public class FragmentActivity extends Fragment implements ActivityView {
     private void setUpActivityData(Activity act) {
         this.activity = activityPresenter.findLocalActivity(act.getId_local());
         if (this.activity == null) {
-            ViewUtils.showToast(getContext(), Toast.LENGTH_SHORT, "Error accediendo a la actividad");
-            hideProgress();
-            getActivity().onBackPressed();
+            loadError();
+        }
+        if (this.activity.getOwner() == null) { // Borrar
+            if (this.activity.getOwnerId() == null) {
+                loadError();
+            }
+            DaoSession daoSession = ((App) getContext().getApplicationContext()).getDaoSession();
+            HikerDao hikerDao = daoSession.getHikerDao();
+            Hiker h = hikerDao.load(this.activity.getOwnerId());
+            this.activity.setOwner(h);
         }
         this.txEstado.setText(ActivityStatus.getFormattedStatus(activity.getStatus()));
         this.txDescripcion.setText(activity.getShortDescription());
@@ -323,9 +341,9 @@ public class FragmentActivity extends Fragment implements ActivityView {
             this.btUnirse.setVisibility(View.GONE);
         }
         if (this.activityPresenter.esParticipante(this.activity) && this.activityPresenter.assertActivityRunning(this.activity)) {
-            this.lbAvisoUnido.setVisibility(View.VISIBLE);
+            this.lbParticipa.setVisibility(View.VISIBLE);
         } else {
-            this.lbAvisoUnido.setVisibility(View.GONE);
+            this.lbParticipa.setVisibility(View.GONE);
         }
     }
 
@@ -440,7 +458,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
         if (ConnectionUtils.isConnected(getContext())) {
             iniciarMonitorizationFragment();
         }
-        this.lbAvisoUnido.setVisibility(View.VISIBLE);
+        this.lbParticipa.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -462,7 +480,7 @@ public class FragmentActivity extends Fragment implements ActivityView {
         btCerrar.setVisibility(View.GONE);
         btMonitorizar.setVisibility(View.GONE);
         btCambiarPassword.setVisibility(View.GONE);
-        lbAvisoUnido.setVisibility(View.GONE);
+        lbParticipa.setVisibility(View.GONE);
         txEstado.setText(ActivityStatus.getFormattedStatus(activity.getStatus()));
     }
 

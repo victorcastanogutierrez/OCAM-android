@@ -72,7 +72,6 @@ public class ListPresenterImpl implements ListPresenter {
 
             volleyManager.addToRequestQueue(request);
         } else {
-            //Si no tiene conexión las busca en local
             listActivityView.hideProgress();
             List<Activity> acts = this.activityDao.queryBuilder().list();
             listActivityView.setUpRecyclerView(acts);
@@ -124,12 +123,6 @@ public class ListPresenterImpl implements ListPresenter {
             //Convierte ActivityDTO en activity pasandolo por JSON
             Activity activity = new Gson().fromJson(new Gson().toJson(act), Activity.class);
 
-            //Persiste el dueño de la actividad
-            Hiker owner = new Hiker(null, act.getOwner().getEmail(), act.getOwner().getLogin());
-            Long ownerId = hikerDao.insertOrReplace(owner);
-            activity.setOwnerId(ownerId);
-            activity.setOwner(owner);
-
             Long activityLocalId = activityDao.insert(activity);
 
             //Persiste los guías de la actividad
@@ -137,6 +130,16 @@ public class ListPresenterImpl implements ListPresenter {
 
             //Persiste los participantes de la actividad
             persistActivityHikers(act, activity, activityLocalId);
+
+            //Persiste el dueño de la actividad
+            Hiker owner = hikerDao.queryBuilder().where(HikerDao.Properties.Login.eq(act.getOwner().getLogin())).unique();
+            if (owner == null) {
+                owner = new Hiker(null, act.getOwner().getEmail(), act.getOwner().getLogin());
+                hikerDao.insert(owner);
+            }
+            activity.setOwnerId(owner.getId_local());
+
+            activity.update();
 
             result.add(activity);
         }

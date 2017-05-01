@@ -24,4 +24,10 @@ public interface MonitorizacionPresenter {
      * @param datos
      */
     void saveLocalData(Long activityId, List<ReportDTO> datos);
+
+    /**
+     * Devuelve el número de reportes encolados
+     * @return
+     */
+    int getReportesEncolados();
 }

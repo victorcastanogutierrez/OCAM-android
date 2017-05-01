@@ -9,6 +9,7 @@ import com.android.volley.VolleyError;
 import com.ocam.manager.App;
 import com.ocam.manager.UserManager;
 import com.ocam.model.Activity;
+import com.ocam.model.ActivityDao;
 import com.ocam.model.DaoSession;
 import com.ocam.util.ConnectionUtils;
 import com.ocam.volley.VolleyManager;
@@ -82,6 +83,13 @@ public class LoginPresenterImpl implements LoginPresenter {
 
                 volleyManager.addToRequestQueue(request);
             } else {
+                DaoSession daoSession = ((App) context.getApplicationContext()).getDaoSession();
+                ActivityDao activityDao = daoSession.getActivityDao();
+                List<Activity> prueba = activityDao.queryBuilder().list();
+                for (Activity act : prueba) {
+                    Log.d("---" , "-"+(act.getOwner()!=null));
+                }
+
                 // En caso contrario le logueamos con los datos guardados en sharedPreferences
                 UserManager.getInstance().setUserTokenDTO(userTokenDTO);
                 loginView.hideProgress();

@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
@@ -86,7 +87,7 @@ public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
         if (ConnectionUtils.isConnected(this.context)) {
             monitorizacionView.displayProgress();
             ICommand<ReportDTO[]> reportsCommand = new reportsCommand();
-            GsonRequest<ReportDTO[]> hikersRequest = new GsonRequest<ReportDTO[]>(Constants.API_FIND_ACTIVITY_REPORTS + "/" + activityId,
+            GsonRequest<ReportDTO[]> hikersRequest = new GsonRequest<ReportDTO[]>(Constants.API_ALL_ACTIVITY_REPORTS + "/" + activityId,
                     Request.Method.GET, ReportDTO[].class, null,
                     new GenericResponseListener<>(reportsCommand), new GenericErrorListener(reportsCommand));
 
@@ -153,6 +154,11 @@ public class MonitorizacionPresenterImpl implements MonitorizacionPresenter {
                 act.update();
             }
         }
+    }
+
+    @Override
+    public int getReportesEncolados() {
+        return reportDao.queryBuilder().where(ReportDao.Properties.Pending.eq(Boolean.TRUE)).list().size();
     }
 
     private List<GPSPoint> parseTrack(String track) {

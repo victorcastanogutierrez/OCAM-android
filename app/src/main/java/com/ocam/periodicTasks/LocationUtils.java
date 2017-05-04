@@ -33,7 +33,7 @@ public class LocationUtils implements LocationListener,
         //show error dialog if GoolglePlayServices not available
         if (isGooglePlayServicesAvailable()) {
             mLocationRequest = new LocationRequest();
-            mLocationRequest.setInterval(0);
+            mLocationRequest.setInterval(5);
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             //mLocationRequest.setSmallestDisplacement(10.0f);  /* min dist for location change, here it is 10 meter */
             mGoogleApiClient = new GoogleApiClient.Builder(context)

@@ -16,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:screenOrientation="portrait"
             android:name=".login.LoginActivity"
             android:noHistory="true">
             <intent-filter>
@@ -24,17 +25,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activityList.ListActivity" />
+        <activity
+            android:screenOrientation="portrait"
+            android:name=".activityList.ListActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
         <activity
+            android:screenOrientation="portrait"
             android:name=".activity.track.TrackActivity"
             android:label="@string/title_activity_track" />
-        <activity android:name=".activity.monitorization.MonitorizationActivity" />
-        <activity android:name=".register.RegisterActivity" />
+        <activity
+            android:screenOrientation="portrait"
+            android:name=".activity.monitorization.MonitorizationActivity" />
+        <activity
+            android:screenOrientation="portrait"
+            android:name=".register.RegisterActivity" />
 
         <receiver android:name=".periodicTasks.ReportSender" />
 

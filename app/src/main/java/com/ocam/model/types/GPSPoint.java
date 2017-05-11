@@ -13,34 +13,34 @@ public class GPSPoint {
 	@Id
 	private Long id;
 
-	public GPSPoint(float latitude, float longitude) {
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
-
-	@Generated(hash = 1190344889)
-	public GPSPoint(Long id, float latitude, float longitude) {
-		this.id = id;
+	public GPSPoint(double latitude, double longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
 
 	public GPSPoint(Location location) {
-		this.latitude = (float) location.getLatitude();
-		this.longitude = (float) location.getLongitude();
+		this.latitude = location.getLatitude();
+		this.longitude = location.getLongitude();
 	}
 
 	@Generated(hash = 332693450)
 	public GPSPoint() {
 	}
 
-	@NotNull
-	private float latitude;
+	@Generated(hash = 94632405)
+	public GPSPoint(Long id, double latitude, double longitude) {
+		this.id = id;
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
 
 	@NotNull
-	private float longitude;
+	private double latitude;
 
-	public float getLatitude() {
+	@NotNull
+	private double longitude;
+
+	public double getLatitude() {
 		return latitude;
 	}
 
@@ -48,7 +48,7 @@ public class GPSPoint {
 		this.latitude = latitude;
 	}
 
-	public float getLongitude() {
+	public double getLongitude() {
 		return longitude;
 	}
 
@@ -62,5 +62,13 @@ public class GPSPoint {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
 	}
 }

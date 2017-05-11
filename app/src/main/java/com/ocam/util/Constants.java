@@ -47,6 +47,7 @@ public class Constants {
     //Notifications
     public static final Integer ONGOING_NOTIFICATION_ID = 687326891;
     public static final Integer NOTIFICATION_NOTCONNECTED = 687326892;
+    public static final Integer GPS_ERROR = 687326839;
     public static final Integer BROADCAST_INTENT = 234324243;
 
     public static final long REPORTS_PERIODICITY = 60 * 1000;

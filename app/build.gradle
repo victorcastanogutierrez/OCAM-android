@@ -52,6 +52,7 @@ dependencies {
     compile 'org.greenrobot:greendao:3.2.2'
     compile 'com.google.android.gms:play-services-location:10.+'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'org.osmdroid:osmdroid-android:5.6.4'
     testCompile 'junit:junit:4.12'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.7@aar') {
         transitive = true;

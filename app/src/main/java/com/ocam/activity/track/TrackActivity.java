@@ -1,8 +1,11 @@
 package com.ocam.activity.track;
 
+import android.Manifest;
 import android.app.Dialog;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -12,31 +15,38 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.ocam.R;
 import com.ocam.model.types.GPSPoint;
+import com.ocam.osm.MapTypeSelector;
+import com.ocam.osm.MarkerOverlay;
 import com.ocam.util.ViewUtils;
 
+import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
+import org.osmdroid.util.BoundingBoxE6;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.compass.CompassOverlay;
+import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.ocam.R.id.map;
+public class TrackActivity extends AppCompatActivity implements TrackView {
 
-public class TrackActivity extends AppCompatActivity implements OnMapReadyCallback, TrackView {
-
-    private GoogleMap mMap;
     private TrackPresenter trackPresenter;
     private List<GPSPoint> puntos;
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
     private static final Integer PERMISSIONS_CODE = 123;
+    private MapView mMapView;
+    private String[] permissionsNeeded = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,21 +79,6 @@ public class TrackActivity extends AppCompatActivity implements OnMapReadyCallba
         return true;
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        this.mMap = googleMap;
-
-        LatLngBounds.Builder b = new LatLngBounds.Builder();
-        PolylineOptions polylineOptions = getPolylineOptions(b);
-        LatLngBounds bounds = b.build();
-        this.mMap.addPolyline(polylineOptions);
-        this.addStartFinishMarkers();
-        int width = getResources().getDisplayMetrics().widthPixels;
-        int height = getResources().getDisplayMetrics().heightPixels;
-        int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
-        this.mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding));
-    }
-
     /**
      * Muestra la barra de progreso e impide la interacción con cualquier elemento de la vista
      */
@@ -114,55 +109,80 @@ public class TrackActivity extends AppCompatActivity implements OnMapReadyCallba
     @Override
     public void showTrack(List<GPSPoint> puntos) {
         this.puntos = puntos;
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(map);
-        mapFragment.getMapAsync(this);
-
+        ActivityCompat.requestPermissions(TrackActivity.this, permissionsNeeded, PERMISSIONS_CODE);
     }
 
     /**
-     * Genera un objeto PolyLineOptions para construir la polylinea en el mapa
+     * Genera un objeto Polyline para construir la polylinea en el mapa
      * con el track de la ruta
      * @return
      */
-    private PolylineOptions getPolylineOptions(LatLngBounds.Builder bounds) {
-        PolylineOptions polylineOptions = new PolylineOptions()
-                .width(6)
-                .color(Color.RED);
-
-        LatLng latlng = null;
+    private Polyline getPolylineOptions() {
+        Polyline line = new Polyline();
+        line.setWidth(6f);
+        List<GeoPoint> pts = new ArrayList<>();
         for (GPSPoint gps: this.puntos) {
-            latlng = new LatLng(gps.getLatitude(), gps.getLongitude());
-            polylineOptions.add(latlng);
-            bounds.include(latlng);
+            pts.add(new GeoPoint(gps.getLatitude(), gps.getLongitude()));
+
         }
-        return polylineOptions;
+        line.setPoints(pts);
+        line.setGeodesic(true);
+        line.setColor(Color.RED);
+        return line;
     }
 
     /**
      * Añade dos markers al mapa, uno al principio y otro al final del track
      */
     private void addStartFinishMarkers() {
-        this.mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(
-                        this.puntos.get(0).getLatitude(),
-                        this.puntos.get(0).getLongitude()))
-                .title("Inicio"));
+        ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
+        OverlayItem pto = new OverlayItem("Track", "Inicio", new GeoPoint(this.puntos.get(0).getLatitude(),
+                this.puntos.get(0).getLongitude()));
+        overlayItemArray.add(pto);
+        pto = new OverlayItem("Track", "Fin", new GeoPoint(this.puntos.get(this.puntos.size()-1).getLatitude(),
+                this.puntos.get(this.puntos.size()-1).getLongitude()));
+        overlayItemArray.add(pto);
 
-        this.mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(
-                        this.puntos.get(this.puntos.size()-1).getLatitude(),
-                        this.puntos.get(this.puntos.size()-1).getLongitude()))
-                .icon(BitmapDescriptorFactory
-                        .defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                .title("Fin"));
+        MarkerOverlay overlay = new MarkerOverlay(this, overlayItemArray);
+        mMapView.getOverlays().add(overlay);
+        mMapView.getController().setCenter(new GeoPoint(this.puntos.get(0).getLatitude(),
+                this.puntos.get(0).getLongitude()));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        if (isGrantedPermissions(permissions, grantResults) && requestCode == PERMISSIONS_CODE) {
+            mMapView = (MapView) findViewById(R.id.map);
+            mMapView.setTileSource(TileSourceFactory.MAPNIK);
+            mMapView.setBuiltInZoomControls(true);
+            mMapView.setMultiTouchControls(true);
+            IMapController mMapController = mMapView.getController();
+            mMapController.setZoom(16);
+            GeoPoint gPt = new GeoPoint(51500000, -150000);
+            mMapController.setCenter(gPt);
+
+            MyLocationNewOverlay mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(TrackActivity.this), mMapView);
+            mLocationOverlay.enableMyLocation();
+            mMapView.getOverlays().add(mLocationOverlay);
+            CompassOverlay mCompassOverlay = new CompassOverlay(TrackActivity.this, new InternalCompassOrientationProvider(TrackActivity.this), mMapView);
+            mCompassOverlay.enableCompass();
+            mMapView.getOverlays().add(mCompassOverlay);
+            mMapView.invalidate();
+
+            addStartFinishMarkers();
+            mMapView.getOverlayManager().add(getPolylineOptions());
+        } else {
+            finish();
+            ViewUtils.showToast(TrackActivity.this, Toast.LENGTH_LONG, "Necesitamos los permisos necesarios para mostrar el mapa");
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.trackMapType:
-                ViewUtils.showMapTypeSelectorDialog(TrackActivity.this, mMap);
+                MapTypeSelector.show(TrackActivity.this, this.mMapView);
                 return true;
             case android.R.id.home:
                 //Click en back button de la toolbar (cerramos la actividad)
@@ -171,5 +191,22 @@ public class TrackActivity extends AppCompatActivity implements OnMapReadyCallba
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    /**
+     * Comprueba que se hayan dado los permisos necesarios para mostrar el mapa
+     * @param permissions
+     * @param grantResults
+     * @return
+     */
+    private Boolean isGrantedPermissions(String permissions[], int[] grantResults) {
+        Boolean result = Boolean.TRUE;
+        for (int i : grantResults) {
+            if (i != PackageManager.PERMISSION_GRANTED) {
+                result = Boolean.FALSE;
+                break;
+            }
+        }
+        return result && permissionsNeeded.length == permissions.length;
     }
 }

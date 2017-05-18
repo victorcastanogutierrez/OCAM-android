@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.android.volley.Request.Method;
 import com.android.volley.VolleyError;
-import com.ocam.manager.App;
+import com.ocam.App;
 import com.ocam.manager.UserManager;
 import com.ocam.model.Activity;
 import com.ocam.model.ActivityDao;

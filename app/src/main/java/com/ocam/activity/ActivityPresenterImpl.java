@@ -1,15 +1,13 @@
 package com.ocam.activity;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteConstraintException;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.ocam.R;
-import com.ocam.manager.App;
+import com.ocam.App;
 import com.ocam.manager.UserManager;
 import com.ocam.model.Activity;
 import com.ocam.model.ActivityDao;
@@ -29,7 +27,6 @@ import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.util.ConnectionUtils;
 import com.ocam.util.Constants;
 import com.ocam.util.NotificationUtils;
-import com.ocam.util.ViewUtils;
 import com.ocam.volley.GsonRequest;
 import com.ocam.volley.VolleyManager;
 import com.ocam.volley.listeners.GenericErrorListener;

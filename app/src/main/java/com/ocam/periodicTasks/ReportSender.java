@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.util.Log;
 
-import com.ocam.manager.App;
+import com.ocam.App;
 import com.ocam.model.DaoSession;
 import com.ocam.model.PendingAction;
 import com.ocam.periodicTasks.pendingActions.ActionService;

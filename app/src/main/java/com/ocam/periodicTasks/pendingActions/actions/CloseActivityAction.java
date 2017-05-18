@@ -5,17 +5,11 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
-import com.google.gson.Gson;
-import com.ocam.manager.App;
+import com.ocam.App;
 import com.ocam.model.Activity;
 import com.ocam.model.ActivityDao;
 import com.ocam.model.DaoSession;
-import com.ocam.model.Hiker;
-import com.ocam.model.JoinActivityHikers;
-import com.ocam.model.JoinActivityHikersDao;
 import com.ocam.model.PendingAction;
-import com.ocam.model.Report;
-import com.ocam.model.ReportDao;
 import com.ocam.model.types.ActivityStatus;
 import com.ocam.periodicTasks.PeriodicTask;
 import com.ocam.util.Constants;
@@ -26,7 +20,6 @@ import com.ocam.volley.listeners.GenericErrorListener;
 import com.ocam.volley.listeners.GenericResponseListener;
 import com.ocam.volley.listeners.ICommand;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class CloseActivityAction extends BaseAction {

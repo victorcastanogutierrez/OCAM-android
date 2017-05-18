@@ -4,7 +4,7 @@ package com.ocam.periodicTasks.state;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 
-import com.ocam.manager.App;
+import com.ocam.App;
 import com.ocam.model.DaoSession;
 import com.ocam.model.HikerDao;
 import com.ocam.model.ReportDao;

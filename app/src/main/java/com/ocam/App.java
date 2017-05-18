@@ -1,4 +1,4 @@
-package com.ocam.manager;
+package com.ocam;
 
 import android.app.Application;
 import android.util.Log;

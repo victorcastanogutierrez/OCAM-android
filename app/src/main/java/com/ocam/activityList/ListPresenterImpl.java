@@ -1,12 +1,11 @@
 package com.ocam.activityList;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
-import com.ocam.manager.App;
+import com.ocam.App;
 import com.ocam.model.ActivityDTO;
 import com.ocam.model.ActivityDao;
 import com.ocam.model.DaoSession;

@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -281,7 +282,7 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
         setRandomColors(datos);
         this.hikerAdapter.setData(getLastReportHiker(datos));
         this.hikerAdapter.notifyDataSetChanged();
-        if (mMapView.getOverlays() != null) {
+        if (mMapView != null && mMapView.getOverlays() != null) {
             for (MarkerOverlay ov : this.markers.values()) {
                 mMapView.getOverlays().remove(ov);
             }
@@ -363,7 +364,12 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
         this.refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                monitorizationPresenter.loadReportsData(activityId);
+                if (ConnectionUtils.isConnected(MonitorizationActivity.this)) {
+                    monitorizationPresenter.loadReportsData(activityId);
+                } else {
+                    ViewUtils.showToast(MonitorizationActivity.this, Toast.LENGTH_LONG, "Opción no disponible sin conexión");
+                    refreshLayout.setRefreshing(false);
+                }
             }
         });
     }

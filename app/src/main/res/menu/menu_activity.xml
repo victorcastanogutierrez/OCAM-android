@@ -4,16 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
 
     <item
-        android:id="@+id/refreshButton2"
-        android:icon="@drawable/ic_expand_more_white_24dp"
+        android:id="@+id/action_track"
+        android:icon="@drawable/track"
         android:title="Title"
         android:tint="@color/colorPrimary"
         app:showAsAction="ifRoom">
-        <menu>
-            <item
-                android:id="@+id/action_track"
-                android:title="Ver track"
-                android:icon="@drawable/ic_terrain_black_24dp"/>
-        </menu>
     </item>
 </menu>

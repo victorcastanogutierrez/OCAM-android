@@ -1,5 +1,6 @@
 package com.ocam.activity.monitorization;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +65,7 @@ public class HikerAdapter extends RecyclerView.Adapter<HikerAdapter.HikersViewHo
 
         public void bindActivity(final ReportDTO reportDTO) {
             hikerLogin.setText(reportDTO.getHikerDTO().getLogin());
-            hikerLogin.setTextColor(reportDTO.getColor());
+            hikerLogin.setTextColor(Color.parseColor(reportDTO.getColor()));
             hikerLogin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {

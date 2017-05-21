@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/tiposMapa"
-        android:icon="@drawable/ic_layers_white_24dp"
+        android:icon="@drawable/osmtypes"
         android:title="Title"
         android:tint="@color/colorPrimary"
         app:showAsAction="ifRoom">

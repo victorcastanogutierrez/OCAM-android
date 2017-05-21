@@ -1,6 +1,12 @@
 package com.ocam.model;
 
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+
 import com.ocam.model.types.GPSPoint;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class ReportDTO {
@@ -13,7 +19,7 @@ public class ReportDTO {
 
 	private GPSPoint point;
 
-	private Integer color;
+	private String color;
 
 	public Long getDate() {
 		return date;
@@ -47,11 +53,15 @@ public class ReportDTO {
 		this.point = point;
 	}
 
-	public Integer getColor() {
+	public String getColor() {
 		return color;
 	}
 
-	public void setColor(Integer color) {
+	public void setColor(String color) {
 		this.color = color;
+	}
+
+	public String getFormattedDate() {
+		return new SimpleDateFormat("HH:mm dd/MM/yyyy").format(new Date(this.date));
 	}
 }

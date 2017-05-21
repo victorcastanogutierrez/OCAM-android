@@ -3,8 +3,10 @@ package com.ocam.activity.monitorization;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -36,6 +38,7 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
@@ -43,11 +46,15 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import static com.ocam.R.drawable.hiker_rosa;
 
 /**
  * Activity para la vista de la monitorización de una actividad
@@ -59,9 +66,9 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
     private MonitorizacionPresenter monitorizationPresenter;
     private List<GPSPoint> puntos;
     private HikerAdapter hikerAdapter;
-    private Map<String, Marker> markers;
+    private Map<String, MarkerOverlay> markers;
     private SwipeRefreshLayout refreshLayout;
-    private Map<Integer, Float> colorMap;
+    private Map<String, Integer> colorMap;
     private TextView lbReportesEnviados;
     private TextView lbReportesEncolados;
     private static final Integer PERMISSIONS_CODE = 123;
@@ -237,9 +244,11 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
         ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
         OverlayItem pto = new OverlayItem("Track", "Inicio", new GeoPoint(this.puntos.get(0).getLatitude(),
                 this.puntos.get(0).getLongitude()));
+        pto.setMarker(this.getResources().getDrawable(R.drawable.inicio));
         overlayItemArray.add(pto);
         pto = new OverlayItem("Track", "Fin", new GeoPoint(this.puntos.get(this.puntos.size()-1).getLatitude(),
                 this.puntos.get(this.puntos.size()-1).getLongitude()));
+        pto.setMarker(this.getResources().getDrawable(R.drawable.fin));
         overlayItemArray.add(pto);
 
         MarkerOverlay overlay = new MarkerOverlay(this, overlayItemArray);
@@ -272,8 +281,10 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
         setRandomColors(datos);
         this.hikerAdapter.setData(getLastReportHiker(datos));
         this.hikerAdapter.notifyDataSetChanged();
-        for (Map.Entry<String, Marker> entry : this.markers.entrySet()) {
-            entry.getValue().remove();
+        if (mMapView.getOverlays() != null) {
+            for (MarkerOverlay ov : this.markers.values()) {
+                mMapView.getOverlays().remove(ov);
+            }
         }
         this.markers.clear();
         if (ConnectionUtils.isConnected(MonitorizationActivity.this) && this.cached.equals(Boolean.FALSE)) {
@@ -308,28 +319,23 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
      */
     @Override
     public void onClick(ReportDTO reportDTO) {
-        String login = reportDTO.getHikerDTO().getLogin();
+        String login = reportDTO.getHikerDTO() != null ? reportDTO.getHikerDTO().getLogin() : "Participante";
         if (!this.markers.containsKey(login)) {
-            //TODO
-            /*LatLng markerPos = new LatLng(
+            GeoPoint loc = new GeoPoint(
                     reportDTO.getPoint().getLatitude(),
                     reportDTO.getPoint().getLongitude());
-            this.markers.put(login, this.mMap.addMarker(new MarkerOptions()
-                    .position(markerPos)
-                    .icon(BitmapDescriptorFactory
-                            .defaultMarker(colorMap.get(reportDTO.getColor())))
-                    .title(login + ": " + reportDTO.getPoint().getLatitude() + "," +
-                            reportDTO.getPoint().getLongitude())));
-
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(markerPos)
-                    .zoom(18)
-                    .build();
-            this.mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));*/
-
+            ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
+            OverlayItem pto = new OverlayItem(
+                    login, "Posición a las "+reportDTO.getFormattedDate(), loc);
+            pto.setMarker(ResourcesCompat.getDrawable(getResources(), colorMap.get(reportDTO.getColor()), null));
+            overlayItemArray.add(pto);
+            this.mMapView.getController().setCenter(loc);
+            MarkerOverlay overlay = new MarkerOverlay(this, overlayItemArray);
+            mMapView.getOverlays().add(overlay);
+            this.markers.put(login, overlay);
         } else {
-            /*this.markers.get(login).remove();
-            this.markers.remove(login);*/
+            mMapView.getOverlays().remove(this.markers.get(login));
+            this.markers.remove(login);
         }
     }
 
@@ -364,27 +370,27 @@ public class MonitorizationActivity extends AppCompatActivity implements Monitor
 
     private void setUpColorMap() {
         this.colorMap = new HashMap<>();
-        this.colorMap.put(Color.parseColor("#FF0000"), BitmapDescriptorFactory.HUE_RED);
-        this.colorMap.put(Color.parseColor("#FFA500"), BitmapDescriptorFactory.HUE_ORANGE);
-        this.colorMap.put(Color.parseColor("#FFFF00"), BitmapDescriptorFactory.HUE_YELLOW);
-        this.colorMap.put(Color.parseColor("#00FF00"), BitmapDescriptorFactory.HUE_GREEN);
-        this.colorMap.put(Color.parseColor("#00FFFF"), BitmapDescriptorFactory.HUE_CYAN);
-        this.colorMap.put(Color.parseColor("#F0FFFF"), BitmapDescriptorFactory.HUE_AZURE);
-        this.colorMap.put(Color.parseColor("#0000FF"), BitmapDescriptorFactory.HUE_BLUE);
-        this.colorMap.put(Color.parseColor("#EE82EE"), BitmapDescriptorFactory.HUE_VIOLET);
-        this.colorMap.put(Color.parseColor("#FF00FF"), BitmapDescriptorFactory.HUE_MAGENTA);
-        this.colorMap.put(Color.parseColor("#FFC0CB"), BitmapDescriptorFactory.HUE_ROSE);
+        this.colorMap.put("#FF0000", R.drawable.hiker_rojo);
+        this.colorMap.put("#FFA500", R.drawable.hiker_naranja);
+        this.colorMap.put("#FFFF00", R.drawable.hiker_amarillo);
+        this.colorMap.put("#00FF00", R.drawable.hiker_verde);
+        this.colorMap.put("#00FFFF", R.drawable.hiker_cyan);
+        this.colorMap.put("#F0FFFF", R.drawable.hiker_azure);
+        this.colorMap.put("#0000FF", R.drawable.hiker_azul);
+        this.colorMap.put("#EE82EE", R.drawable.hiker_violeta);
+        this.colorMap.put("#FF00FF", R.drawable.hiker_magenta);
+        this.colorMap.put("#FFC0CB", hiker_rosa);
     }
 
     private void setRandomColors(List<ReportDTO> datos) {
         Random rand = new Random();
-        Map<Integer, Float> copy = new HashMap<>(this.colorMap);
+        Map<String, Integer> copy = new HashMap<>(this.colorMap);
         for (ReportDTO report : datos) {
             if (copy.size() == 0) {
                 copy = new HashMap<>(this.colorMap);
             }
             Integer random = rand.nextInt(copy.size());
-            Integer color = new ArrayList<>(copy.keySet()).get(random);
+            String color = new ArrayList<>(copy.keySet()).get(random);
             copy.remove(color);
             report.setColor(color);
         }

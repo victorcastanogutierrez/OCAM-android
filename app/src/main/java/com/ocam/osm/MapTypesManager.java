@@ -6,7 +6,9 @@ import com.ocam.osm.maptypes.MapBoxSatelite;
 import com.ocam.osm.maptypes.MapBoxTerrain;
 import com.ocam.osm.maptypes.MapType;
 import com.ocam.osm.maptypes.OSMType;
-import com.ocam.osm.maptypes.ThunderForestType;
+import com.ocam.osm.maptypes.ThunderForestCycle;
+import com.ocam.osm.maptypes.ThunderForestLandscape;
+import com.ocam.osm.maptypes.ThunderForestOutdoors;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,8 +30,10 @@ public class MapTypesManager {
 
     private void initMapTypes() {
         this.mapTypes = new HashMap<>();
+        this.mapTypes.put("ThunderForest Landscape", new ThunderForestLandscape("ThunderForest Landscape"));
+        this.mapTypes.put("ThunderForest Cycle", new ThunderForestCycle("ThunderForest Cycle"));
+        this.mapTypes.put("ThunderForest Outdoors", new ThunderForestOutdoors("ThunderForest Outdoors"));
         this.mapTypes.put("OSM", new OSMType("OSM"));
-        this.mapTypes.put("ThunderForestType", new ThunderForestType("ThunderForestType"));
         this.mapTypes.put("HikerMap", new HikerMap("hikerMap"));
         this.mapTypes.put("MapBoxSatellite", new MapBoxSatelite("MapBox Satelite"));
         this.mapTypes.put("MapBoxTerrain", new MapBoxTerrain("MapBox Terrain"));

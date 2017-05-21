@@ -138,9 +138,11 @@ public class TrackActivity extends AppCompatActivity implements TrackView {
         ArrayList<OverlayItem> overlayItemArray = new ArrayList<OverlayItem>();
         OverlayItem pto = new OverlayItem("Track", "Inicio", new GeoPoint(this.puntos.get(0).getLatitude(),
                 this.puntos.get(0).getLongitude()));
+        pto.setMarker(this.getResources().getDrawable(R.drawable.inicio));
         overlayItemArray.add(pto);
         pto = new OverlayItem("Track", "Fin", new GeoPoint(this.puntos.get(this.puntos.size()-1).getLatitude(),
                 this.puntos.get(this.puntos.size()-1).getLongitude()));
+        pto.setMarker(this.getResources().getDrawable(R.drawable.fin));
         overlayItemArray.add(pto);
 
         MarkerOverlay overlay = new MarkerOverlay(this, overlayItemArray);

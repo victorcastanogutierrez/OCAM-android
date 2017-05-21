@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/trackMapType"
-        android:icon="@drawable/ic_layers_white_24dp"
+        android:icon="@drawable/osmtypes"
         android:title="Tipo de mapa"
         app:showAsAction="ifRoom"/>
 </menu>

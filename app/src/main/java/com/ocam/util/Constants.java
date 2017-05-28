@@ -39,6 +39,7 @@ public class Constants {
     public static final String REFRESH_TOKEN_KEY = "REFRESH-TOKEN";
     public static final String LOGIN_MONITORIZATION = "LOGIN-MONITORIZATION";
     public static final String TOKEN_MONITORIZATION = "TOKEN-MONITORIZATION";
+    public static final String MINUTES_CONFIGURATION = "MINUTES-CONFIGURATION";
 
     //Errors
     public static final String ERROR_LOADING_ACTIVITIES = "Error cargando las actividades";
@@ -51,4 +52,6 @@ public class Constants {
     public static final Integer BROADCAST_INTENT = 234324243;
 
     public static final long REPORTS_PERIODICITY = 60 * 1000;
+
+    public static final Integer DEFAULT_REPORTS_DELAY = 5;
 }

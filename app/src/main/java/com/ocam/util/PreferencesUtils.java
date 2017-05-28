@@ -1,20 +1,11 @@
 package com.ocam.util;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
-import com.ocam.R;
-import com.ocam.login.LoginActivity;
 import com.ocam.model.UserTokenDTO;
 
-import static android.R.attr.data;
 
-/**
- * Created by Victor on 02/04/2017.
- */
 
 public class PreferencesUtils {
 
@@ -105,5 +96,36 @@ public class PreferencesUtils {
     public static String getMonitorizationTokenHiker(Context context) {
         SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         return sharedPref.getString(Constants.TOKEN_MONITORIZATION, null);
+    }
+
+    /**
+     * Obtiene los minutos entre reporte y reporte. En caso de no tener esta configuración guardada
+     * se establece al valor predeterminado
+     * @param context
+     * @return
+     */
+    public static Integer getMinutesConfiguration(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        if (sharedPref.contains(Constants.MINUTES_CONFIGURATION)) {
+            return Integer.parseInt(sharedPref.getString(Constants.MINUTES_CONFIGURATION, null));
+        }
+        else {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(Constants.MINUTES_CONFIGURATION, Constants.DEFAULT_REPORTS_DELAY.toString());
+            editor.commit();
+            return Constants.DEFAULT_REPORTS_DELAY;
+        }
+    }
+
+    /**
+     * Actualiza los minutos entre reporte y reporte
+     * @param context
+     * @param minutes
+     */
+    public static void updateMinutesConfiguration(Context context, Integer minutes) {
+        SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(Constants.MINUTES_CONFIGURATION, minutes.toString());
+        editor.commit();
     }
 }

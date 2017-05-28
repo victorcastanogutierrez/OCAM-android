@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.ocam.R;
 import com.ocam.activityList.recycler.FragmentList;
+import com.ocam.configuracion.ConfiguracionFragment;
 import com.ocam.login.LoginActivity;
 import com.ocam.manager.UserManager;
 import com.ocam.proffile.FragmentProffile;
@@ -130,6 +131,11 @@ public class ListActivity extends AppCompatActivity {
                             fragmentTransaction = Boolean.TRUE;
                             fragment = new FragmentProffile();
                             setSelectedMenuItem(navView.getMenu().getItem(1));
+                            break;
+                        case R.id.menu_item3:
+                            fragmentTransaction = Boolean.TRUE;
+                            fragment = new ConfiguracionFragment();
+                            setSelectedMenuItem(navView.getMenu().getItem(2));
                             break;
                     }
 

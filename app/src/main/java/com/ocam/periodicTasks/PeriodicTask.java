@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.google.android.gms.location.LocationServices;
 import com.ocam.util.Constants;
+import com.ocam.util.PreferencesUtils;
 
 import static android.content.Context.ALARM_SERVICE;
 
@@ -35,9 +36,10 @@ public class PeriodicTask {
      */
     public static void startBroadcast(Context context) {
         Intent intent = new Intent(context, ReportSender.class);
+        Integer periodicity = PreferencesUtils.getMinutesConfiguration(context) * 60 * 1000;
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Constants.BROADCAST_INTENT, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, Constants.REPORTS_PERIODICITY, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, periodicity, pendingIntent);
         Log.d("REPORTES", "Inicia proceso");
     }
 }

@@ -6,7 +6,7 @@
     <item
         android:id="@+id/action_track"
         android:icon="@drawable/track"
-        android:title="Title"
+        android:title="Track"
         android:tint="@color/colorPrimary"
         app:showAsAction="ifRoom">
     </item>

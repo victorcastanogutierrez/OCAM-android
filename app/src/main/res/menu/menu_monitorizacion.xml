@@ -6,7 +6,7 @@
     <item
         android:id="@+id/tiposMapa"
         android:icon="@drawable/osmtypes"
-        android:title="Title"
+        android:title="Mapa"
         android:tint="@color/colorPrimary"
         app:showAsAction="ifRoom">
     </item>
@@ -14,7 +14,7 @@
     <item
         android:id="@+id/refreshHikers"
         android:icon="@drawable/ic_refresh_white_24dp"
-        android:title="Title"
+        android:title="Recarga"
         android:tint="@color/colorPrimary"
         app:showAsAction="ifRoom">
     </item>

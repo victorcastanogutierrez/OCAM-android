@@ -6,12 +6,12 @@
     <item
         android:id="@+id/filterButton"
         android:icon="@drawable/ic_filter_list_white_24dp"
-        android:title="Title"
+        android:title="Filtro"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/refreshButton"
         android:icon="@drawable/ic_refresh_white_24dp"
-        android:title="Title"
+        android:title="Recarga"
         app:showAsAction="ifRoom"/>
 </menu>

@@ -4,8 +4,10 @@ package com.ocam.periodicTasks.pendingActions.actions;
 import android.content.Context;
 
 import com.ocam.model.PendingAction;
+import com.ocam.settings.Settings;
+import com.ocam.settings.SettingsFactory;
 import com.ocam.util.Constants;
-import com.ocam.util.PreferencesUtils;
+import com.ocam.settings.PreferencesSettingsImpl;
 import com.ocam.volley.NukeSSLCerts;
 
 import java.util.HashMap;
@@ -18,9 +20,11 @@ public abstract class BaseAction implements Action {
     List<String> parametros;
     PendingAction pendingAction;
     private ActionFinishListener listener;
+    private Settings settings;
 
     public BaseAction (Context context, PendingAction pendingAction) {
         this.context = context;
+        this.settings = SettingsFactory.getPreferencesSettingsImpl(context);
         this.pendingAction = pendingAction;
         new NukeSSLCerts().nuke(); // Entorno de desarrollo, ignora certificados
     }
@@ -44,7 +48,7 @@ public abstract class BaseAction implements Action {
      */
     Map<String,String> getHeaders() {
         Map<String, String> headers = new HashMap<>();
-        headers.put(Constants.HEADER_AUTH_NAME, PreferencesUtils.getMonitorizationTokenHiker(this.context));
+        headers.put(Constants.HEADER_AUTH_NAME, settings.getMonitorizationTokenHiker());
         return headers;
     }
 }

@@ -1,20 +1,25 @@
-package com.ocam.util;
+package com.ocam.settings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.ocam.model.UserTokenDTO;
+import com.ocam.util.Constants;
 
 
+/**
+ * Implementación de acceso a settings mediante SharedPrefferences
+ */
+public class PreferencesSettingsImpl implements Settings {
 
-public class PreferencesUtils {
+    private Context context;
 
-    /**
-     * Método que guarda los datos de logiun de un usuario en las SharedPreferences
-     * @param context
-     * @param data
-     */
-    public static void saveUserLogin(Context context, UserTokenDTO data) {
+    public PreferencesSettingsImpl(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    public void saveUserLogin(UserTokenDTO data) {
         SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(Constants.TOKEN_KEY, data.getToken());
@@ -24,12 +29,8 @@ public class PreferencesUtils {
         editor.commit();
     }
 
-    /**
-     * Retorna el token del usuario logueado en el sistema
-     * @param context
-     * @return
-     */
-    public static UserTokenDTO getUserLogged(Context context) {
+    @Override
+    public UserTokenDTO getUserLogged() {
         SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         if (sharedPref.contains(Constants.TOKEN_KEY) && sharedPref.contains(Constants.EMAIL_KEY)) {
             String token = sharedPref.getString(Constants.TOKEN_KEY, null);
@@ -42,25 +43,16 @@ public class PreferencesUtils {
         }
     }
 
-    /**
-     * Método para eliminar las credenciales guardadas
-     * @param context
-     */
-    public static void removeSavedCredentials(Context context) {
+
+    public void removeSavedCredentials() {
         SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.clear();
         editor.commit();
     }
 
-    /**
-     * Guarda el login y el token del usuario que está siendo monitorizado. En el caso en que se cierre la aplicación
-     * y por tanto no sea posible obtenerlo de la memoria del dispositivo, se guarda este valor en
-     * SharedPreferences para que persista tras cerrar la app.
-     * @param context
-     * @param login
-     */
-    public static void setMonitorizationHiker(Context context, String login, String token) {
+    @Override
+    public void setMonitorizationHiker(String login, String token) {
         SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         if (sharedPref.contains(Constants.LOGIN_MONITORIZATION)) {
@@ -74,37 +66,20 @@ public class PreferencesUtils {
         editor.commit();
     }
 
-    /**
-     * Retorna el nombre de usuario del último login en la aplicación.
-     * Para aquellos casos en los que no sea posible obtenerlo del manager correspondiente
-     * por haberse cerrado la app.
-     * @param context
-     * @return
-     */
-    public static String getMonitorizationHiker(Context context) {
+    @Override
+    public String getMonitorizationHiker() {
         SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         return sharedPref.getString(Constants.LOGIN_MONITORIZATION, null);
     }
 
-    /**
-     * Retorna el token de usuario del último login en la aplicación.
-     * Para aquellos casos en los que no sea posible obtenerlo del manager correspondiente
-     * por haberse cerrado la app.
-     * @param context
-     * @return
-     */
-    public static String getMonitorizationTokenHiker(Context context) {
+    @Override
+    public String getMonitorizationTokenHiker() {
         SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         return sharedPref.getString(Constants.TOKEN_MONITORIZATION, null);
     }
 
-    /**
-     * Obtiene los minutos entre reporte y reporte. En caso de no tener esta configuración guardada
-     * se establece al valor predeterminado
-     * @param context
-     * @return
-     */
-    public static Integer getMinutesConfiguration(Context context) {
+    @Override
+    public Integer getMinutesConfiguration() {
         SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         if (sharedPref.contains(Constants.MINUTES_CONFIGURATION)) {
             return Integer.parseInt(sharedPref.getString(Constants.MINUTES_CONFIGURATION, null));
@@ -117,12 +92,8 @@ public class PreferencesUtils {
         }
     }
 
-    /**
-     * Actualiza los minutos entre reporte y reporte
-     * @param context
-     * @param minutes
-     */
-    public static void updateMinutesConfiguration(Context context, Integer minutes) {
+    @Override
+    public void updateMinutesConfiguration(Integer minutes) {
         SharedPreferences sharedPref = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(Constants.MINUTES_CONFIGURATION, minutes.toString());

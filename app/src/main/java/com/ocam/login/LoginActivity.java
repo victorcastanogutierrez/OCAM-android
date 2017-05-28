@@ -19,8 +19,10 @@ import com.ocam.activityList.ListActivity;
 import com.ocam.manager.UserManager;
 import com.ocam.model.UserTokenDTO;
 import com.ocam.register.RegisterActivity;
+import com.ocam.settings.Settings;
+import com.ocam.settings.SettingsFactory;
 import com.ocam.util.ConnectionUtils;
-import com.ocam.util.PreferencesUtils;
+import com.ocam.settings.PreferencesSettingsImpl;
 import com.ocam.util.ViewUtils;
 import com.ocam.volley.NukeSSLCerts;
 import com.squareup.picasso.Picasso;
@@ -34,6 +36,7 @@ public class LoginActivity extends Activity implements LoginView {
     private ProgressBar mProgress;
     private Dialog mOverlayDialog;
     private CheckBox cbRecuerda;
+    private Settings settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +63,14 @@ public class LoginActivity extends Activity implements LoginView {
         this.mProgress = (ProgressBar) findViewById(R.id.progressBar);
         this.cbRecuerda = (CheckBox) findViewById(R.id.cbRecuerda);
         this.mOverlayDialog = new Dialog(LoginActivity.this, android.R.style.Theme_Panel);
+        this.settings = SettingsFactory.getPreferencesSettingsImpl(LoginActivity.this);
 
         Boolean cierraSesion = getIntent().getBooleanExtra("CIERRA_SESION", Boolean.FALSE);
         if (Boolean.FALSE.equals(cierraSesion)) {
             displayProgress();
             this.loginPresenter.checkUserLogged();
         } else {
-            PreferencesUtils.removeSavedCredentials(LoginActivity.this);
+            settings.removeSavedCredentials();
         }
     }
 

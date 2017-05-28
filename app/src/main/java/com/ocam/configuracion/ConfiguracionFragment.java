@@ -12,7 +12,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.ocam.R;
-import com.ocam.util.PreferencesUtils;
+import com.ocam.settings.PreferencesSettingsImpl;
+import com.ocam.settings.Settings;
+import com.ocam.settings.SettingsFactory;
 import com.ocam.util.ViewUtils;
 
 
@@ -21,6 +23,7 @@ public class ConfiguracionFragment extends Fragment implements ConfiguracionView
     private TextInputLayout txInputMinutos;
     private Button btConfirmar;
     private ConfiguracionPresenter configuracionPresenter;
+    private Settings settings;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -30,6 +33,7 @@ public class ConfiguracionFragment extends Fragment implements ConfiguracionView
         this.txInputMinutos = (TextInputLayout) view.findViewById(R.id.idMinutos);
         this.btConfirmar = (Button) view.findViewById(R.id.btConfirmar);
         this.configuracionPresenter = new ConfiguracionPresenterImpl(getContext(), this);
+        this.settings = SettingsFactory.getPreferencesSettingsImpl(getContext());
         setUpConfirmarBt();
         initTextView();
         setHasOptionsMenu(true);
@@ -61,7 +65,7 @@ public class ConfiguracionFragment extends Fragment implements ConfiguracionView
      * Inicializa el campo con la configuración actual de minutos
      */
     private void initTextView() {
-        this.txInputMinutos.getEditText().setText(PreferencesUtils.getMinutesConfiguration(getContext()).toString());
+        this.txInputMinutos.getEditText().setText(settings.getMinutesConfiguration().toString());
     }
 
     /**

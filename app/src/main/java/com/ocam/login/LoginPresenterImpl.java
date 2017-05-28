@@ -11,11 +11,13 @@ import com.ocam.manager.UserManager;
 import com.ocam.model.Activity;
 import com.ocam.model.ActivityDao;
 import com.ocam.model.DaoSession;
+import com.ocam.settings.Settings;
+import com.ocam.settings.SettingsFactory;
 import com.ocam.util.ConnectionUtils;
 import com.ocam.volley.VolleyManager;
 import com.ocam.model.UserTokenDTO;
 import com.ocam.util.Constants;
-import com.ocam.util.PreferencesUtils;
+import com.ocam.settings.PreferencesSettingsImpl;
 import com.ocam.volley.GsonRequest;
 import com.ocam.volley.listeners.GenericErrorListener;
 import com.ocam.volley.listeners.GenericResponseListener;
@@ -35,12 +37,14 @@ public class LoginPresenterImpl implements LoginPresenter {
     private Context context;
     private VolleyManager volleyManager;
     private String username;
+    private Settings settings;
 
     public LoginPresenterImpl(LoginView loginView, Context context) {
         this.loginView = loginView;
         this.context = context;
         this.recuerdaDatos = Boolean.FALSE;
         this.volleyManager = VolleyManager.getInstance(context);
+        this.settings = SettingsFactory.getPreferencesSettingsImpl(context);
     }
 
     /**
@@ -69,7 +73,7 @@ public class LoginPresenterImpl implements LoginPresenter {
      */
     @Override
     public void checkUserLogged() {
-        UserTokenDTO userTokenDTO = PreferencesUtils.getUserLogged(this.context);
+        UserTokenDTO userTokenDTO = settings.getUserLogged();
         if (userTokenDTO == null) {
             loginView.hideProgress();
         } else { // Sesión guardada de otros logins
@@ -128,7 +132,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                 loginView.showErrorMessage("Error inesperado. Prueba más tarde");
             } else {
                 if (Boolean.TRUE.equals(recuerdaDatos)) {
-                    PreferencesUtils.saveUserLogin(context, response);
+                    settings.saveUserLogin(response);
                 }
                 //En caso que venga de introducir los datos
                 //si no la propia response ya contiene el username
@@ -138,7 +142,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                 UserManager userManager = UserManager.getInstance();
                 Log.d("Loguea:", response.toString());
                 userManager.setUserTokenDTO(response);
-                PreferencesUtils.setMonitorizationHiker(context, UserManager.getInstance().getUserTokenDTO().getLogin(),
+                settings.setMonitorizationHiker(UserManager.getInstance().getUserTokenDTO().getLogin(),
                         UserManager.getInstance().getUserTokenDTO().getToken());
                 loginView.loginSuccess();
             }
@@ -153,7 +157,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                 if (error.getMessage().contains(Constants.UNAUTHORIZED_ERROR_CODE)) {
                     errorMsg = "Credenciales inválidas.";
                     //Si las credenciales guardadas son inválidas, las eliminamos
-                    PreferencesUtils.removeSavedCredentials(context);
+                    settings.removeSavedCredentials();
                 }
             }
 

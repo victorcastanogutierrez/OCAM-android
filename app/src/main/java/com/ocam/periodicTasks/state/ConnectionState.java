@@ -1,7 +1,6 @@
 package com.ocam.periodicTasks.state;
 
 
-import android.content.BroadcastReceiver;
 import android.content.BroadcastReceiver.PendingResult;
 import android.content.Context;
 import android.location.Location;
@@ -17,10 +16,12 @@ import com.ocam.model.ReportDTO;
 import com.ocam.model.ReportDao;
 import com.ocam.model.types.GPSPoint;
 import com.ocam.periodicTasks.PeriodicTask;
+import com.ocam.settings.Settings;
+import com.ocam.settings.SettingsFactory;
 import com.ocam.util.Constants;
 import com.ocam.util.DateUtils;
 import com.ocam.util.NotificationUtils;
-import com.ocam.util.PreferencesUtils;
+import com.ocam.settings.PreferencesSettingsImpl;
 import com.ocam.volley.GsonRequest;
 import com.ocam.volley.NukeSSLCerts;
 import com.ocam.volley.VolleyManager;
@@ -43,11 +44,12 @@ public class ConnectionState extends BaseReportState {
    // private PendingResult result;
     private List<Request<Void>> requests = new ArrayList<>();
     private VolleyManager volleyManager;
-
+    private Settings settings;
 
     public ConnectionState(Context context, PendingResult result) {
         super(context, result);
         this.volleyManager = VolleyManager.getInstance(context);
+        this.settings = SettingsFactory.getPreferencesSettingsImpl(context);
     }
 
     /**
@@ -129,7 +131,7 @@ public class ConnectionState extends BaseReportState {
                 report.getPoint().getLatitude(), report.getPoint().getLongitude()));
         reportDTO.setDate(report.getDate());
         HikerDTO hikerDTO = new HikerDTO();
-        hikerDTO.setLogin(PreferencesUtils.getMonitorizationHiker(this.context));
+        hikerDTO.setLogin(settings.getMonitorizationHiker());
         reportDTO.setHikerDTO(hikerDTO);
         return new Gson().toJson(reportDTO);
     }
@@ -140,7 +142,7 @@ public class ConnectionState extends BaseReportState {
      */
     public Map<String,String> getHeaders() {
         Map<String, String> headers = new HashMap<>();
-        headers.put(Constants.HEADER_AUTH_NAME, PreferencesUtils.getMonitorizationTokenHiker(this.context));
+        headers.put(Constants.HEADER_AUTH_NAME, settings.getMonitorizationTokenHiker());
         return headers;
     }
 

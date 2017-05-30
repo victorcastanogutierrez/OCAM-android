@@ -53,5 +53,5 @@ public class Constants {
 
     public static final long REPORTS_PERIODICITY = 60 * 1000;
 
-    public static final Integer DEFAULT_REPORTS_DELAY = 5;
+    public static final Integer DEFAULT_REPORTS_DELAY = 1;
 }

@@ -40,6 +40,6 @@ public class PeriodicTask {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Constants.BROADCAST_INTENT, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, periodicity, pendingIntent);
-        Log.d("REPORTES", "Inicia proceso");
+        Log.d("REPORTES", "Inicia proceso, periodicidad: "+periodicity);
     }
 }

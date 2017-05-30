@@ -96,23 +96,32 @@ public class LocationUtils implements LocationListener,
 
     @Override
     public void onResult(LocationSettingsResult locationSettingsResult) {
+        Log.d("-", "Llega solicitud de permisos");
         final Status status = locationSettingsResult.getStatus();
+        Boolean locValid = Boolean.TRUE;
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                 NotificationUtils.sendNotification(context, GPS_ERROR,
                         "GPS inaccesible", "La configuración del telefono no permite acceder al GPS.",
                         false, new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                locValid = Boolean.FALSE;
                 break;
             case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
                 NotificationUtils.sendNotification(context, GPS_ERROR, "GPS inaccesible",
                         "La configuración del telefono no permite acceder al GPS.",
                         false, new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                locValid = Boolean.FALSE;
                 break;
         }
-        requestLocation();
+        if (Boolean.TRUE.equals(locValid)) {
+            requestLocation();
+        } else {
+            this.listener.onErrorLocationUpdate();
+        }
     }
 
     private void checkLocationSettings() {
+        Log.d("-", "Solicita settings");
         PendingResult<LocationSettingsResult> result =
                 LocationServices.SettingsApi.checkLocationSettings(
                         mGoogleApiClient,

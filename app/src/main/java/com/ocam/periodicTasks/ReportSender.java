@@ -70,4 +70,9 @@ public class ReportSender extends BroadcastReceiver implements UpdateLocationLis
         }
         state.doReport(location);
     }
+
+    @Override
+    public void onErrorLocationUpdate() {
+        this.result.finish();
+    }
 }

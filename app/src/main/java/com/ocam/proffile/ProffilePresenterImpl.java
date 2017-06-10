@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.ocam.manager.UserManager;
 import com.ocam.model.HikerDTO;
 import com.ocam.model.UserTokenDTO;
+import com.ocam.util.ConnectionUtils;
 import com.ocam.util.Constants;
 import com.ocam.volley.GsonRequest;
 import com.ocam.volley.VolleyManager;
@@ -20,8 +21,10 @@ public class ProffilePresenterImpl implements ProffilePresenter {
 
     private ProffileView proffileView;
     private VolleyManager volleyManager;
+    private Context context;
 
     public ProffilePresenterImpl(Context context, ProffileView proffileView) {
+        this.context = context;
         this.proffileView = proffileView;
         this.volleyManager = VolleyManager.getInstance(context);
     }
@@ -31,14 +34,19 @@ public class ProffilePresenterImpl implements ProffilePresenter {
      */
     @Override
     public void changePassword(String actual, String newPassword, String reNewPassword) {
-        if (!assertValuesValid(actual, newPassword, reNewPassword)) {
-            this.proffileView.notifyUser("Debes introducir todos los campos para cambiar la contraseña.");
-            this.proffileView.hideProgress();
-        } else if (!newPassword.equals(reNewPassword)) {
-            this.proffileView.notifyUser("La passwords nuevas deben coincidir.");
+        if (!ConnectionUtils.isConnected(this.context)) {
+            this.proffileView.notifyUser("No puedes actualizar la password sin conexión a internet.");
             this.proffileView.hideProgress();
         } else {
-            sendRequest(actual, newPassword);
+            if (!assertValuesValid(actual, newPassword, reNewPassword)) {
+                this.proffileView.notifyUser("Debes introducir todos los campos para cambiar la contraseña.");
+                this.proffileView.hideProgress();
+            } else if (!newPassword.equals(reNewPassword)) {
+                this.proffileView.notifyUser("La passwords nuevas deben coincidir.");
+                this.proffileView.hideProgress();
+            } else {
+                sendRequest(actual, newPassword);
+            }
         }
     }
 

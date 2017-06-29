@@ -10,6 +10,8 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.MalformedJsonException;
 import com.ocam.model.HikerDTO;
 import com.ocam.model.Report;
 import com.ocam.model.ReportDTO;
@@ -173,9 +175,14 @@ public class ConnectionState extends BaseReportState {
         public void executeError(VolleyError error) {
             if (error != null && error.getMessage() != null) {
                 Log.d("Error", error.getMessage());
-                JsonObject objError = new Gson().fromJson(error.getMessage(), JsonObject.class);
+                JsonObject objError = null;
+                try {
+                    objError = new Gson().fromJson(error.getMessage(), JsonObject.class);
+                } catch (JsonSyntaxException mfex) {
+                    Log.d("Err", "Ha ocurrido un error desconocido");
+                }
                 //Si la actividad cerró, deja de enviar reportes
-                if (objError.get("status").getAsString().equals(Constants.HTTP_422)) {
+                if (objError!= null && objError.get("status").getAsString().equals(Constants.HTTP_422)) {
                     Log.d("Cerrada", "Cierra la actividad");
                     NotificationUtils.sendNotification(context, Constants.ONGOING_NOTIFICATION_ID,
                             "Actividad concluida", "La monitorización de la actividad finalizó",

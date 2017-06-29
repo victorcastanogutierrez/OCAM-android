@@ -67,7 +67,12 @@ public class RegisterPresenterImpl implements RegisterPresenter {
         public void executeError(VolleyError error) {
             registerView.hideProgress();
             JsonObject objError = new Gson().fromJson(error.getMessage(), JsonObject.class);
-            registerView.notify(objError.get("message").getAsString());
+            if (objError != null) {
+                registerView.notify(objError.get("message").getAsString());
+            } else {
+                //Timeout del servidor
+                registerView.notify("En este momento no se puede procesar el registro. Prueba de nuevo más tarde");
+            }
         }
     }
 }

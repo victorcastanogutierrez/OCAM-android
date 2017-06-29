@@ -6,8 +6,9 @@ package com.ocam.util;
 public class Constants {
 
     // API urls
+    public static final String WEB_URL = "https://victorcastanogutierrez.github.io/OCAM-web/";
     //public static final String SERVER_URL = "https://192.168.0.13:8443";
-    public static final String SERVER_URL = "https://ocamserver.herokuapp.com";
+    public static final String SERVER_URL = "http://ocamserver.herokuapp.com";
     public static final String API_TOKEN = "/auth/token";
     public static final String API_AUTH_LOGIN = "/api/auth/login";
     public static final String API_FIND_ALL_ACTIVITIES = "/api/findAllPendingRunningActivities";

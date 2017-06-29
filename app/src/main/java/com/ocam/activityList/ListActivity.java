@@ -1,7 +1,9 @@
 package com.ocam.activityList;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -9,8 +11,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +26,7 @@ import com.ocam.configuracion.ConfiguracionFragment;
 import com.ocam.login.LoginActivity;
 import com.ocam.manager.UserManager;
 import com.ocam.proffile.FragmentProffile;
+import com.ocam.util.Constants;
 
 public class ListActivity extends AppCompatActivity {
 
@@ -50,10 +55,16 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void setUpToolbar() {
+        UserManager userManager = UserManager.getInstance();
+        if (userManager.getUserTokenDTO() == null) {
+            Intent i = new Intent(ListActivity.this, LoginActivity.class);
+            finish();
+            startActivity(i);
+            return;
+        }
         View header = this.navView.getHeaderView(0);
         TextView txDatos = (TextView) header.findViewById(R.id.txDatos);
         txDatos.setTypeface(null, Typeface.BOLD_ITALIC);
-        UserManager userManager = UserManager.getInstance();
         txDatos.setText(userManager.getUserTokenDTO().getLogin()+"\n"+userManager.getUserTokenDTO().getEmail());
 
         final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -136,6 +147,27 @@ public class ListActivity extends AppCompatActivity {
                             fragmentTransaction = Boolean.TRUE;
                             fragment = new ConfiguracionFragment();
                             setSelectedMenuItem(navView.getMenu().getItem(2));
+                            break;
+                        case R.id.menu_item_4:
+                            AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(ListActivity.this, R.style.myDialog));
+                            builder.setTitle(R.string.app_name);
+                            builder.setTitle("Crear actividad");
+                            builder.setMessage("Para crear una actividad deberás hacerlo a través de la página web");
+                            builder.setPositiveButton("Ir", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.WEB_URL));
+                                    startActivity(browserIntent);
+
+                                }
+                            });
+                            builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+                            fragmentTransaction = Boolean.FALSE;
                             break;
                     }
 

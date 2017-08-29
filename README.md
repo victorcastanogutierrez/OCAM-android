@@ -7,3 +7,5 @@ OCAM - Outdoor Colective Activities Monitorization aims to bolster security in o
 OCAM fills this gap, allowing the management and monitoring of the activities, both from the inside being participant or from the outside for the organizers.
 
 This management consists of the registration of activities, participants and continual monitorization of the position of all the people involved in the real-time activities, dealing with the problems related to coverage and supporting the guides of the activity and the external coordinator in the administration of possible vicissitudes that may occur during the activity.
+
+[Read more|https://github.com/victorcastanogutierrez/OCAM/blob/master/ocam.pdf]

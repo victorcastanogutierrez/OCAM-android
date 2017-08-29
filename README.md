@@ -8,4 +8,4 @@ OCAM fills this gap, allowing the management and monitoring of the activities, b
 
 This management consists of the registration of activities, participants and continual monitorization of the position of all the people involved in the real-time activities, dealing with the problems related to coverage and supporting the guides of the activity and the external coordinator in the administration of possible vicissitudes that may occur during the activity.
 
-[Read more](https://github.com/victorcastanogutierrez/OCAM/blob/master/ocam.pdf)
+[Technical documentation](https://github.com/victorcastanogutierrez/OCAM/blob/master/ocam.pdf)
